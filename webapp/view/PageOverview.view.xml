@@ -1,0 +1,203 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:layout="sap.ui.layout"
+	xmlns:svm="sap.ui.comp.smartvariants"
+	controllerName="leverx.app.controller.PageOverview">
+
+		<f:DynamicPage 
+			id="dynamicPageId" 
+			preserveHeaderStateOnScroll="true" 
+			showFooter="true" 
+			fitContent="true">
+			<!-- DynamicPage Title -->
+			<f:title>
+				<f:DynamicPageTitle>
+					<f:heading>
+						<Title text="Standart"/>
+					</f:heading>
+					
+					<f:actions>
+						<ToolbarSpacer/>
+						
+						<Button
+								icon="sap-icon://action"
+								type="Transparent"/>
+					</f:actions>
+				</f:DynamicPageTitle>
+			</f:title>
+
+			<!-- DynamicPage Header -->
+			<f:header>
+				<f:DynamicPageHeader>
+					<f:content>
+						
+						<fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false" >
+							<fb:filterGroupItems >
+
+								<fb:FilterGroupItem 
+									name="search" label="searcher" 
+									groupTitle="false" 
+									groupName="Group1" 
+									visibleInFilterBar="true">
+									<fb:control>
+										<SearchField id="searcher" width="100%" liveChange="onFilter" />
+									</fb:control>
+								</fb:FilterGroupItem>
+
+								<fb:FilterGroupItem 
+									name="Availability" 
+									label="Availability" 
+									groupName="Group1" 
+									visibleInFilterBar="true">
+									<fb:control>
+										<Select
+											id="availabilitySelect"
+											forceSelection="false"
+											selectedKey="all"
+											change="onFilter"
+										>
+										<core:Item key="all" text="all" />
+										<core:Item key="false" text="In Stock" />
+										<core:Item key="true" text="Out of Stock" />
+									</Select>
+									</fb:control>
+								</fb:FilterGroupItem>
+
+								<fb:FilterGroupItem 
+									name="Price range" 
+									label="Price range" 
+									groupName="Group1" 
+									visibleInFilterBar="true">
+									<fb:control>
+										<Input
+											id="productInput"
+											placeholder="Enter product"
+											showSuggestion="true"
+											showValueHelp="true"
+											valueHelpRequest=".onValueHelpRequest"
+											suggestionItems="{/ProductCollection}">
+											<suggestionItems>
+												<core:Item text="{Name}" />
+											</suggestionItems>
+										</Input>
+									</fb:control>
+								</fb:FilterGroupItem>
+
+								<fb:FilterGroupItem 
+									name="Category" 
+									label="Category" 
+									groupName="Group1" 
+									visibleInFilterBar="true">
+									<fb:control>
+										<MultiComboBox
+											id="categorySelect"
+											items="{/Categories}"
+											change="onFilter"
+										>
+											<core:Item key="{Id}" text="{Name}" />
+										</MultiComboBox>
+									</fb:control>
+								</fb:FilterGroupItem>
+
+								<fb:FilterGroupItem 
+									name="Supplier name" 
+									label="Supplier name" 
+									groupName="Group1" 
+									visibleInFilterBar="true">
+									<fb:control>
+										<MultiInput width="40%"
+											id="multiInput"
+											valueHelpRequest="handleValueHelp">
+											<core:Item key="1" text="Name" />
+										</MultiInput>
+									</fb:control>
+								</fb:FilterGroupItem>
+
+							</fb:filterGroupItems>
+						</fb:FilterBar>
+					
+						
+					</f:content>
+				</f:DynamicPageHeader>
+			</f:header>
+				<f:content>
+				<Table
+					id="table"
+					inset="false"
+					mode="MultiSelect"
+					items="{/Products}"
+				>
+					<headerToolbar>
+						<OverflowToolbar id="otbSubheader">
+							<Title text="Products" />
+							<ToolbarSpacer />
+							<Button id="editButton" text="Add" type="Transparent"
+								press="onAdd" />
+							<Button id="saveButton" text="Delete" type="Transparent"
+								press="onDelete" enabled="false" />
+							<Button
+								tooltip="Sort"
+								icon="sap-icon://sort"
+								press="handleSortButton"/>
+							<Button
+								tooltip="Sort"
+								icon="sap-icon://action-settings"
+								press="handleSettingButton"/>
+								
+						</OverflowToolbar>
+					</headerToolbar>
+					<columns>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Name"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Description"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Price"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Quantity"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Supplier Name"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Category"/>
+						</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+							<Text text="Availability"/>
+						</Column>
+						
+					
+					</columns>
+
+					<items>
+						<ColumnListItem type="Active" vAlign="Middle">
+							<cells>
+								<ObjectIdentifier title="{Name}" text="{ProductId}" />
+								<Text text="{Description}" />
+								<Text text="{Price}" />
+								<Text text="{Quantity}" />
+								
+								<Text 
+									text="{
+										path: 'Suppliers',
+										formatter: '.getSuppliersName'
+									}" 
+								/>
+								
+								<Text text="{Category}" />
+								<Text text="{= ${Availability} === true ? 'In Stock' : 'Out of Stock'}" />
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</f:content>
+		</f:DynamicPage>
+
+</mvc:View>

@@ -1,0 +1,122 @@
+{
+    "Products": [
+        {
+            "Id": "1",
+            "Name": "tea",
+            "Description": "very useful thing",
+            "Price": 2.65,
+            "Quantity": "134",
+            "Suppliers": [
+                {
+                    "Id": "1",
+                    "Name": "Gippo",
+                    "Address": "asdsad",
+                    "ProductId": "1"
+                },
+                {
+                    "Id": "2",
+                    "Name": "Rud",
+                    "Address": "qweqwe",
+                    "ProductId": "1"
+                }
+                
+            ],
+            "Category": "relax",
+            "Availability": true
+        },
+        {
+            "Id": "2",
+            "Name": "coffee",
+            "Description": "very cheerful thing",
+            "Price": 21.65,
+            "Quantity": "22",
+            "Suppliers": [
+                {
+                    "Id": "1",
+                    "Name": "Gippo",
+                    "Address": "asdsad",
+                    "ProductId": "2"
+                },
+                {
+                    "Id": "2",
+                    "Name": "Santa",
+                    "Address": "qweqwe",
+                    "ProductId": "2"
+                }
+                
+            ],
+            "Category": "enjoy",
+            "Availability": false
+        },
+        {
+            "Id": "1",
+            "Name": "computer",
+            "Description": "very informative thing",
+            "Price": 2.65,
+            "Quantity": "134",
+            "Suppliers": [
+                {
+                    "Id": "1",
+                    "Name": "GoodSupplier",
+                    "Address": "asdsad",
+                    "ProductId": "1"
+                }   
+            ],
+            "Category": "work",
+            "Availability": true
+        },
+        {
+            "Id": "2",
+            "Name": "car",
+            "Description": "very comfortable thing",
+            "Price": 21.65,
+            "Quantity": "22",
+            "Suppliers": [
+                {
+                    "Id": "1",
+                    "Name": "Gippo",
+                    "Address": "asdsad",
+                    "ProductId": "2"
+                },
+                {
+                    "Id": "2",
+                    "Name": "Santa",
+                    "Address": "qweqwe",
+                    "ProductId": "2"
+                },
+                {
+                    "Id": "3",
+                    "Name": "Swonsy",
+                    "Address": "qweqwe",
+                    "ProductId": "2"
+                }
+                
+            ],
+            "Category": "speed",
+            "Availability": false
+        }
+    ],
+    "Categories": [
+        {
+            "Id": "1",
+            "Name": "relax"
+            
+        },
+        {
+            "Id": "2",
+            "Name": "enjoy"
+        },
+        {
+            "Id": "3",
+            "Name": "work"
+            
+        },
+        {
+            "Id": "4",
+            "Name": "speed"
+        }
+
+    ]
+   
+
+}
