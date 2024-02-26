@@ -6,7 +6,7 @@
 	xmlns:fb="sap.ui.comp.filterbar"
 	xmlns:layout="sap.ui.layout"
 	xmlns:svm="sap.ui.comp.smartvariants"
-	controllerName="leverx.app.controller.PageOverview">
+	controllerName="products.app.controller.PageOverview">
 
 		<f:DynamicPage 
 			id="dynamicPageId" 
@@ -39,12 +39,12 @@
 							<fb:filterGroupItems >
 
 								<fb:FilterGroupItem 
-									name="search" label="searcher" 
+									name="search" label="Product name" 
 									groupTitle="false" 
 									groupName="Group1" 
 									visibleInFilterBar="true">
 									<fb:control>
-										<SearchField id="searcher" width="100%" liveChange="onFilter" />
+										<SearchField id="searcher" width="100%" liveChange="onFilter(null)" />
 									</fb:control>
 								</fb:FilterGroupItem>
 
@@ -58,7 +58,7 @@
 											id="availabilitySelect"
 											forceSelection="false"
 											selectedKey="all"
-											change="onFilter"
+											change="onFilter(null)"
 										>
 										<core:Item key="all" text="all" />
 										<core:Item key="false" text="In Stock" />
@@ -96,7 +96,7 @@
 										<MultiComboBox
 											id="categorySelect"
 											items="{/Categories}"
-											change="onFilter"
+											selectionChange="onFilter(null)"
 										>
 											<core:Item key="{Id}" text="{Name}" />
 										</MultiComboBox>
@@ -111,8 +111,10 @@
 									<fb:control>
 										<MultiInput width="40%"
 											id="multiInput"
+											
+											
 											valueHelpRequest="handleValueHelp">
-											<core:Item key="1" text="Name" />
+											<core:Item key="1" text="{Name}" />
 										</MultiInput>
 									</fb:control>
 								</fb:FilterGroupItem>
@@ -172,12 +174,10 @@
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="Availability"/>
 						</Column>
-						
-					
 					</columns>
 
 					<items>
-						<ColumnListItem type="Active" vAlign="Middle">
+						<ColumnListItem type="Navigation" vAlign="Middle">
 							<cells>
 								<ObjectIdentifier title="{Name}" text="{ProductId}" />
 								<Text text="{Description}" />
@@ -186,7 +186,7 @@
 								
 								<Text 
 									text="{
-										path: 'Suppliers',
+										path: 'Supplier',
 										formatter: '.getSuppliersName'
 									}" 
 								/>

@@ -1,0 +1,44 @@
+{
+    "Suppliers": [
+        {
+            "SupplierId": "1",
+            "SuppliersName": "Gippo",
+            "Address": "asdsad",
+            "ProductId": [
+                "1", "2", "4"
+            ]
+        },
+        {
+            "SupplierId": "2",
+            "SuppliersName": "Rud",
+            "Address": "qweqwe",
+            "ProductId": [
+                "1"
+            ]
+        },
+        {
+            "SupplierId": "3",
+            "SuppliersName": "Santa",
+            "Address": "qweqwe",
+            "ProductId": [
+                "4", "2"
+            ]
+        },
+        {
+            "SupplierId": "4",
+            "SuppliersName": "GoodSupplier",
+            "Address": "asdsad",
+            "ProductId": [
+                "3"
+            ]
+        },
+        {
+            "SupplierId": "5",
+            "SuppliersName": "Swonsy",
+            "Address": "qweqwe",
+            "ProductId": [
+                "4"
+            ]
+        }   
+    ]
+}

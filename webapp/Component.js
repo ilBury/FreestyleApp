@@ -3,7 +3,7 @@ sap.ui.define([
 ], function (UIComponent) {
 	"use strict";
 
-	return UIComponent.extend("leverx.app.Component", {
+	return UIComponent.extend("products.app.Component", {
 		metadata: {
 			manifest: "json"
 		},

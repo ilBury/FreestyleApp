@@ -1,6 +1,6 @@
 {
 	"sap.app": {
-		"id": "leverx.app",
+		"id": "products.app",
 		"type": "application",
 		"i18n": "i18n/i18n.properties",
 		"title": "{{appTitle}}",
@@ -20,12 +20,12 @@
 		]
 	},
 	"sap.ui5": {
-		"rootView": "leverx.app.view.App",
+		"rootView": "products.app.view.App",
 		"routing": {
 			"config": {
 				"routerClass": "sap.m.routing.Router",
 				"viewType": "XML",
-				"viewPath": "leverx.app.view",
+				"viewPath": "products.app.view",
 				"controlId": "RootApp",
 				"controlAggregation": "pages",
 				"bypassed": {
@@ -68,7 +68,7 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "leverx.app.i18n.i18n"
+					"bundleName": "products.app.i18n.i18n"
 				}
 			}
 		}
