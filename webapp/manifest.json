@@ -38,17 +38,17 @@
 			"routes": [
 				{
 					"pattern": "",
-					"name": "PageOverview",
+					"name": "ListReport",
 					"target": [
-						"pageOverview"
+						"listReport"
 					]
 				}
 			],
 
 			"targets": {
-				"pageOverview": {
-					"viewName": "PageOverview",
-					"viewId": "pageOverview",
+				"listReport": {
+					"viewName": "ListReport",
+					"viewId": "listReport",
 					"viewLevel": 1
 				},
 

@@ -7,28 +7,31 @@
             "Price": 2.65,
             "Quantity": "134",
             "Supplier": ["1", "2"],
-            "Category": "relax",
-            "Availability": true
+            "Category": "1",
+            "Availability": true,
+            "Currency": "USD"
         },
         {
             "Id": "2",
             "Name": "coffee",
             "Description": "very cheerful thing",
-            "Price": 21.65,
+            "Price": 501.65,
             "Quantity": "22",
             "Supplier": ["1", "3"],
-            "Category": "enjoy",
-            "Availability": false
+            "Category": "2",
+            "Availability": false,
+            "Currency": "USD"
         },
         {
             "Id": "3",
             "Name": "computer",
             "Description": "very informative thing",
-            "Price": 2.65,
+            "Price": 71.65,
             "Quantity": "134",
             "Supplier": ["4"],
-            "Category": "work",
-            "Availability": true
+            "Category": "3",
+            "Availability": true,
+            "Currency": "USD"
         },
         {
             "Id": "4",
@@ -37,70 +40,9 @@
             "Price": 21.65,
             "Quantity": "22",
             "Supplier": ["1", "3", "5"],
-            "Category": "speed",
-            "Availability": false
+            "Category": "4",
+            "Availability": false,
+            "Currency": "USD"
         }
-    ],
-    "Categories": [
-        {
-            "Id": "1",
-            "Name": "relax"
-            
-        },
-        {
-            "Id": "2",
-            "Name": "enjoy"
-        },
-        {
-            "Id": "3",
-            "Name": "work"
-            
-        },
-        {
-            "Id": "4",
-            "Name": "speed"
-        }
-    ],
-    "Suppliers": [
-        {
-            "SupplierId": "1",
-            "SuppliersName": "Gippo",
-            "Address": "asdsad",
-            "ProductId": [
-                "1", "2", "4"
-            ]
-        },
-        {
-            "SupplierId": "2",
-            "SuppliersName": "Rud",
-            "Address": "qweqwe",
-            "ProductId": [
-                "1"
-            ]
-        },
-        {
-            "SupplierId": "3",
-            "SuppliersName": "Santa",
-            "Address": "qweqwe",
-            "ProductId": [
-                "4", "2"
-            ]
-        },
-        {
-            "SupplierId": "4",
-            "SuppliersName": "GoodSupplier",
-            "Address": "asdsad",
-            "ProductId": [
-                "3"
-            ]
-        },
-        {
-            "SupplierId": "5",
-            "SuppliersName": "Swonsy",
-            "Address": "qweqwe",
-            "ProductId": [
-                "4"
-            ]
-        }   
     ]
 }

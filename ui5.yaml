@@ -1,6 +1,6 @@
 specVersion: "3.2"
 metadata:
-  name: appbase
+  name: products
 type: application
 server:
   customMiddleware:
@@ -12,4 +12,4 @@ server:
           path:
             - /resources
             - /test-resources
-          url: https://openui5.hana.ondemand.com
+          url: https://sapui5.hana.ondemand.com
