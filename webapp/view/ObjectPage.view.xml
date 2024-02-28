@@ -1,0 +1,129 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:layout="sap.ui.layout"
+	controllerName="products.app.controller.ObjectPage">
+
+
+    <f:DynamicPage id="dynamicPageId"
+        stickySubheaderProvider="iconTabBar"
+        class="sapUiNoContentPadding"
+        toggleHeaderOnTitleClick="true">
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{Name}"/>
+                </f:heading>
+                <f:expandedContent>
+                    <Label text="This is a subheading"/>
+                </f:expandedContent>
+                
+            </f:DynamicPageTitle>
+        </f:title>
+        <!-- DynamicPage Header -->
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <HBox wrap="Wrap">
+                    <VBox class="sapUiMediumMarginEnd">
+                        <HBox renderType="Div" wrap="Wrap">
+                            <Label text="Description" design="Bold" showColon="true" class="sapUiTinyMarginEnd"/>
+                            <Text wrapping="false" text="{Description}"/>
+                        </HBox>
+                        <HBox renderType="Div" wrap="Wrap">
+                            <Label text="Price" design="Bold" showColon="true" class="sapUiTinyMarginEnd"/>
+                            <Text wrapping="false" text="{Price} {Currency}"/>
+                        </HBox>
+                        <HBox renderType="Div" wrap="Wrap">
+                            <Label text="Quantity" design="Bold" class="sapUiTinyMarginEnd"/>
+                            <Text wrapping="false" text="{Quantity}"/>
+                        </HBox>
+                    </VBox>
+                    <VBox >
+                        <HBox justifyContent="Start" wrap="Wrap">
+                            
+                            <VBox renderType="Div" wrap="Wrap">
+                                <Label text="Category" design="Bold" class="sapUiMediumMarginEnd"/>
+                                <Text 
+                                    wrapping="false" 
+                                    text="{
+                                        path: 'Category',
+                                        formatter: '.getCategoriesName'
+                                    }" 
+                                />
+                           
+                            </VBox>
+                            <VBox renderType="Div" wrap="Wrap">
+                                <Label text="Availability" design="Bold" class="sapUiMediumMarginEnd"/>
+                                <Text wrapping="false" text="{= ${Availability} === true ? 'In Stock' : 'Out of Stock'}"/>
+                            </VBox>
+                            
+                            <VBox renderType="Div" wrap="Wrap">
+                                <Label text="Created at" design="Bold" class="sapUiMediumMarginEnd"/>
+                                <Text wrapping="false" text="hello"/>
+                            </VBox>
+                            <VBox renderType="Div" wrap="Wrap">
+                                <Label text="Updated at" design="Bold" class="sapUiMediumMarginEnd"/>
+                                <Text wrapping="false" text="hello"/>
+                            </VBox>
+                        </HBox>
+                        
+                    </VBox>
+                    
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <IconTabBar id="iconTabBar" class="sapUiResponsiveContentPadding">
+                <items>
+                    <IconTabFilter text="Products">
+                        <Table id="idProductsTable"
+                            inset="false"
+                            sticky="HeaderToolbar,ColumnHeaders"
+                            items="{Supplier}"
+                            class="sapUiSmallNegativeMarginBeginEnd"
+                            width="auto">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Label text="Suppliers"></Label>
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="12em">
+                                    <Text text="Name" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="Address" />
+                                </Column>
+                                
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>                                        
+                                        <Text text="{
+                                            path: '',
+                                            formatter: '.getSuppliersName'
+                                            }" 
+                                        />
+                                        <Text text="{
+                                            path: '',
+                                            formatter: '.getSuppliersAddress'
+                                            }" 
+                                        />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </f:content>
+        
+    </f:DynamicPage>
+
+
+
+</mvc:View>

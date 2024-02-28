@@ -158,7 +158,10 @@
 					</columns>
 
 					<items>
-						<ColumnListItem type="Navigation" vAlign="Middle">
+						<ColumnListItem 
+							type="Navigation" 
+							vAlign="Middle"
+							press="onNavToObjectPage">
 							<cells>
 								<ObjectIdentifier title="{Name}"/>
 								<Text text="{Description}" />

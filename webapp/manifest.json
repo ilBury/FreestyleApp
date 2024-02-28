@@ -42,6 +42,13 @@
 					"target": [
 						"listReport"
 					]
+				},
+				{
+					"pattern": "objectPage/{productId}",
+					"name": "ObjectPage",
+					"target": [
+						"objectPage"
+					]
 				}
 			],
 
@@ -50,6 +57,11 @@
 					"viewName": "ListReport",
 					"viewId": "listReport",
 					"viewLevel": 1
+				},
+				"objectPage": {
+					"viewName": "ObjectPage",
+					"viewId": "objectPage",
+					"viewLevel": 2
 				},
 
 				"notFound": {

@@ -79,14 +79,14 @@ sap.ui.define([
 			}
 		},
 
-		handlerTokenUpdate: function(event) {
+		handlerTokenUpdate: function(oEvent) {
 			const oMultiInput = this.byId("multiInput");
 			
-			if (event?.getParameter("type") === "removed") {
+			if (oEvent?.getParameter("type") === "removed") {
 				const oModel = this.getView().getModel();
 				const aSuppliers = oModel.getProperty("/Suppliers");
 				
-				const aRemovedTokens = event.getParameter("removedTokens");
+				const aRemovedTokens = oEvent.getParameter("removedTokens");
 			
 				const aRemainingTokens = oMultiInput.getTokens().filter(function (token) {
 					return !aRemovedTokens.includes(token);
@@ -99,17 +99,12 @@ sap.ui.define([
 				
 				this.onFilter(aSelectedId);
 				
-			} else {
-				
 			}
-			
-			
-			
 		},
 
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");			
+			const aSuppliers = oModel.getProperty("/Suppliers");	
 			
 			return aSuppliers
 					.filter((el) => data.includes(el.SupplierId))
@@ -227,7 +222,7 @@ sap.ui.define([
 			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
 		},
 
-		handleValueHelpRequest: function(event) {
+		handleValueHelpRequest: function(oEvent) {
 			const oView = this.getView();
 			
 			if(!this.oDialog) {
@@ -256,8 +251,8 @@ sap.ui.define([
 			}
 		},
 
-		_handleValueHelpSearch: function(event) {
-			const sValue = event.getParameter("value");
+		_handleValueHelpSearch: function(oEvent) {
+			const sValue = oEvent.getParameter("value");
 		
 			const aFilters = [
 				new Filter("SuppliersName", FilterOperator.Contains, sValue),
@@ -267,7 +262,7 @@ sap.ui.define([
 				filters: aFilters,
 				and: false
 			});
-			event.getSource().getBinding("items").filter([oFilter]);
+			oEvent.getSource().getBinding("items").filter([oFilter]);
 		},
 
 		addNewSupplierTokens: function(oMultiInput, aSelectedItems) {
@@ -283,8 +278,8 @@ sap.ui.define([
 			});
 		},
 
-		_handleValueHelpClose: function (event) {
-			const aSelectedItems = event.getParameter("selectedItems"),
+		_handleValueHelpClose: function (oEvent) {
+			const aSelectedItems = oEvent.getParameter("selectedItems"),
 				oMultiInput = this.byId("multiInput");
 			
 			if (aSelectedItems && aSelectedItems.length > 0) {
@@ -296,7 +291,16 @@ sap.ui.define([
 			}
 		
 			this.onFilter()
-		}
+		},
 
+		onNavToObjectPage: function(oEvent) {
+			const oSource = oEvent.getSource();
+			const oCtx = oSource.getBindingContext();
+			const oComponent = this.getOwnerComponent();
+
+			oComponent.getRouter().navTo("ObjectPage", {
+				productId: oCtx.getObject("Id")
+			})
+		}
 	});
 });
