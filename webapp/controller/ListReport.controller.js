@@ -247,9 +247,9 @@ sap.ui.define([
 				const aSelectedTokens = oMultiInput.getTokens().map(el => el.getText());
 				aDialogList.getItems().map(el => el.setSelected(false));
 				aDialogList
-				.getItems()
-				.filter(el => aSelectedTokens.includes(el.getTitle()))
-				.map(el => el.setSelected(true));
+					.getItems()
+					.filter(el => aSelectedTokens.includes(el.getTitle()))
+					.map(el => el.setSelected(true));
 				
 				this.oDialog.open()
 				
@@ -270,28 +270,31 @@ sap.ui.define([
 			event.getSource().getBinding("items").filter([oFilter]);
 		},
 
-		
+		addNewSupplierTokens: function(oMultiInput, aSelectedItems) {
+			const aInputTokensText = oMultiInput.getTokens().map(el => el.getText());
+			aSelectedItems.forEach(function (oItem) {
+				if(!aInputTokensText.includes(oItem.getTitle())) {
+					
+					oMultiInput.addToken(new Token({
+						text: oItem.getTitle()
+					}));
+					
+				}
+			});
+		},
 
 		_handleValueHelpClose: function (event) {
 			const aSelectedItems = event.getParameter("selectedItems"),
 				oMultiInput = this.byId("multiInput");
-				
+			
 			if (aSelectedItems && aSelectedItems.length > 0) {
-				const aInputTokensText = oMultiInput.getTokens().map(el => el.getText());
-				/* const aSelectedItemsTitle = aSelectedItems.map(el => el.getTitle()); */
-				
-				aSelectedItems.forEach(function (oItem) {
-					if(!aInputTokensText.includes(oItem.getTitle())) {
-						
-						oMultiInput.addToken(new Token({
-							text: oItem.getTitle()
-						}));
-					} else {
-						//here should be implementation for removeToken from dialog
-					}
-					
-				});
+				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
 			}	
+			if(aSelectedItems?.length < oMultiInput.getTokens().length) {
+				oMultiInput.removeAllTokens();
+				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
+			}
+		
 			this.onFilter()
 		}
 
