@@ -70,6 +70,10 @@
 				"settings": {
 					"bundleName": "products.app.i18n.i18n"
 				}
+			},
+			"sos": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "/model"
 			}
 		}
 	}
