@@ -15,9 +15,6 @@ sap.ui.define([
 		
 		onInit: function() {
 			const oModel = new JSONModel();
-			const oModelProducts = new JSONModel();
-			const oModelCategories = new JSONModel();
-			const oModelSuppliers = new JSONModel();
 			const oPriceRangeModel = new JSONModel({
 				Range: [
 					{
@@ -70,29 +67,15 @@ sap.ui.define([
 			const oSearcherModel = new JSONModel({
 				field: ""
 			})
+			oModel.loadData("./model/products.json", "", false, "", true);
+			oModel.loadData("./model/categories.json", "", false, "", true);
+			oModel.loadData("./model/suppliers.json", "", false, "", true);
 
-			const sProductsJson = "../model/products.json";
-			const sCategoriesJson = "../model/categories.json";
-			const sSuppliersJson = "../model/suppliers.json";
-
-			oModel.loadData("./model/products.json");
-			oModel.loadData("./model/categories.json");
-			oModel.loadData("./model/suppliers.json");
-			
-			oModelProducts.loadData(sProductsJson, "", false);
-			oModelCategories.loadData(sCategoriesJson, "", false);
-			oModelSuppliers.loadData(sSuppliersJson, "", false);
-			
-			oModelCategories.setData(oModelSuppliers.getData(), true);
-			oModelProducts.setData(oModelCategories.getData(), true);
-			
-			this.getView().setModel(oModel, "model")
-			this.getView().setModel(oModelProducts);
+			this.getView().setModel(oModel);
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
 			this.getView().setModel(oSearcherModel, "SearchModel");
-			
 		},
 
 		getTextFromI18n: function(sKey) {
@@ -113,7 +96,7 @@ sap.ui.define([
 				under: this.getTextFromI18n("UnderText"),
 				over: this.getTextFromI18n("OverText")
 			}
-			console.log(this.getView().getModel("sos"))
+			console.log(this.getView().getModel("model"))
 			const [sFirstRange, sSecondRange] = aCurrentPriceRange;
 			switch(sFirstRange) {
 				case oWords.any: return [new Filter("Price", FilterOperator.NE, null)]; 
