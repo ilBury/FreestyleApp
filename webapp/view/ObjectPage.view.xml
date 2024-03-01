@@ -14,27 +14,27 @@
         toggleHeaderOnTitleClick="true">
         
         <u:headerTitle>
-            <u:ObjectPageHeader objectTitle="{Name}">   
-            </u:ObjectPageHeader>
+            <u:ObjectPageHeader objectTitle="{Name}" /> 
         </u:headerTitle>
       
         <u:headerContent>
+            <VBox>
+				<ObjectStatus title="Description" text="{Description}"/>
+				<ObjectStatus title="Price" text="{Price} {Currency}"/>
+				<ObjectStatus title="Quantity" text="{Quantity}"/>
+			</VBox>
             
-                <HBox wrap="Wrap">
-                    <VBox class="sapUiMediumMarginEnd">
-                        <HBox renderType="Div" wrap="Wrap">
-                            <Label text="Description" design="Bold" showColon="true" class="sapUiTinyMarginEnd"/>
-                            <Text wrapping="false" text="{Description}"/>
-                        </HBox>
-                        <HBox renderType="Div" wrap="Wrap">
-                            <Label text="Price" design="Bold" showColon="true" class="sapUiTinyMarginEnd"/>
-                            <Text wrapping="false" text="{Price} {Currency}"/>
-                        </HBox>
-                        <HBox renderType="Div" wrap="Wrap">
-                            <Label text="Quantity" design="Bold" class="sapUiTinyMarginEnd"/>
-                            <Text wrapping="false" text="{Quantity}"/>
-                        </HBox>
-                    </VBox>
+            <ObjectStatus 
+                title="Category" 
+                text="{
+                    path: 'Category',
+                    formatter: '.getCategoriesName'
+                }"
+            />
+            <ObjectStatus title="Availability" text="{Price} {Currency}"/>
+            <ObjectStatus title="Quantity" text="{Quantity}"/>
+			
+                   <!-- 
                     <VBox >
                         <HBox justifyContent="Start" wrap="Wrap">
                             
@@ -64,9 +64,8 @@
                             </VBox>
                         </HBox>
                         
-                    </VBox>
+                    </VBox> -->
                     
-                </HBox>
           
         </u:headerContent>
         <u:sections>
