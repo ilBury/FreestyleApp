@@ -15,11 +15,8 @@
 			<f:title>
 				<f:DynamicPageTitle>
 					<f:heading>
-						<!-- <Title text="{i18n>ListReportTitle}"/> -->
-						<Title text="{sos>/Products/0/Name}"></Title>
-						<!-- <List items="{sos>/products}">
-							<StandardListItem title="{sos>Name}" />
-						</List> -->
+						<Title text="{i18n>ListReportTitle}"/>
+						
 					</f:heading>
 					
 				</f:DynamicPageTitle>
