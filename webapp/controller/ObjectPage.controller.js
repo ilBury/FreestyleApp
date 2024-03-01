@@ -44,7 +44,7 @@ sap.ui.define([
         getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
 			const aSuppliers = oModel.getProperty("/Suppliers");	
-			console.log(aSuppliers, data)
+			
 			return aSuppliers
 					.filter((el) => data?.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
@@ -53,7 +53,7 @@ sap.ui.define([
         getSuppliersAddress: function(data) {
 			const oModel = this.getView().getModel();
 			const aSuppliers = oModel.getProperty("/Suppliers");	
-			console.log(aSuppliers, data)
+			
 			return aSuppliers
 					.filter((el) => data?.includes(el.SupplierId))
 					.map(el => el.Address)

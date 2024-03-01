@@ -2,31 +2,24 @@
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:f="sap.f"
+    xmlns:u="sap.uxap"
 	xmlns:core="sap.ui.core"
 	xmlns:fb="sap.ui.comp.filterbar"
     xmlns:layout="sap.ui.layout"
 	controllerName="products.app.controller.ObjectPage">
 
 
-    <f:DynamicPage id="dynamicPageId"
-        stickySubheaderProvider="iconTabBar"
+    <u:ObjectPageLayout id="dynamicPageId"
         class="sapUiNoContentPadding"
         toggleHeaderOnTitleClick="true">
-        <!-- DynamicPage Title -->
-        <f:title>
-            <f:DynamicPageTitle>
-                <f:heading>
-                    <Title text="{Name}"/>
-                </f:heading>
-                <f:expandedContent>
-                    <Label text="This is a subheading"/>
-                </f:expandedContent>
-                
-            </f:DynamicPageTitle>
-        </f:title>
-        <!-- DynamicPage Header -->
-        <f:header>
-            <f:DynamicPageHeader pinnable="true">
+        
+        <u:headerTitle>
+            <u:ObjectPageHeader objectTitle="{Name}">   
+            </u:ObjectPageHeader>
+        </u:headerTitle>
+      
+        <u:headerContent>
+            
                 <HBox wrap="Wrap">
                     <VBox class="sapUiMediumMarginEnd">
                         <HBox renderType="Div" wrap="Wrap">
@@ -74,13 +67,13 @@
                     </VBox>
                     
                 </HBox>
-            </f:DynamicPageHeader>
-        </f:header>
-        <f:content>
-            <IconTabBar id="iconTabBar" class="sapUiResponsiveContentPadding">
-                <items>
-                    <IconTabFilter text="Products">
-                        <Table id="idProductsTable"
+          
+        </u:headerContent>
+        <u:sections>
+            <u:ObjectPageSection id="iconTabBar" class="sapUiResponsiveContentPadding">
+                <u:subSections>
+                    <u:ObjectPageSubSection>
+                        <Table id="idSuppliersTable"
                             inset="false"
                             sticky="HeaderToolbar,ColumnHeaders"
                             items="{Supplier}"
@@ -117,12 +110,12 @@
                                 </ColumnListItem>
                             </items>
                         </Table>
-                    </IconTabFilter>
-                </items>
-            </IconTabBar>
-        </f:content>
+                    </u:ObjectPageSubSection>
+                  </u:subSections>
+            </u:ObjectPageSection>
+        </u:sections>
         
-    </f:DynamicPage>
+    </u:ObjectPageLayout>
 
 
 
