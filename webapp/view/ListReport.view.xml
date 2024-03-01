@@ -16,6 +16,7 @@
 				<f:DynamicPageTitle>
 					<f:heading>
 						<Title text="{i18n>ListReportTitle}"/>
+						
 					</f:heading>
 					
 				</f:DynamicPageTitle>
@@ -32,14 +33,23 @@
 
 								<fb:FilterGroupItem 
 									name="search" 
-									label="{i18n>NameText} {i18n>AndText} {i18n>DescriptionText}" 
-									groupTitle="false" 
-									groupName="HeaderFiltersGroup" 
+									label="{
+										parts: [
+											'i18n>SearcherLabelText',
+											'i18n>ProductNameText',
+											'i18n>AndText',
+											'i18n>DescriptionText'
+										],
+										formatter: '.formatMessage'
+										
+									}" 
+									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
 										<SearchField 
 											id="searcher" 
 											width="100%" 
+											value="{SearchModel>/field}"
 											liveChange="onFilter(null)" 	
 										/>
 									</fb:control>
@@ -48,44 +58,50 @@
 								<fb:FilterGroupItem 
 									name="Availability" 
 									label="{i18n>AvailabilityText}" 
-									groupName="HeaderFiltersGroup" 
+									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
 										<Select
 											id="availabilitySelect"
 											forceSelection="false"
-											selectedKey="all"
+											selectedKey="{AvailabilityModel>/SelectedKey}"
 											change="onFilter(null)"
+											items="{AvailabilityModel>/Availability}"
 										>
-										<core:Item key="all" text="all" />
-										<core:Item key="false" text="In Stock" />
-										<core:Item key="true" text="Out of Stock" />
-									</Select>
+											<core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
+										</Select>
 									</fb:control>
 								</fb:FilterGroupItem>
 
 								<fb:FilterGroupItem 
-									name="Price range" 
-									label="{i18n>PriceText} {i18n>RangeText}" 
-									groupName="HeaderFiltersGroup" 
+									name="price range" 
+									label="{
+										parts: [
+											'i18n>PriceRangeText',
+											'i18n>PriceText',
+											'i18n>RangeText'
+										],
+										formatter: '.formatMessage'
+									}" 
+									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
 										<Select
 											id="priceSelect"
 											forceSelection="false"
-											selectedKey="1"
+											selectedKey="{PriceModel>/SelectedKey}"
 											items="{PriceModel>/Range}"
 											change="onFilter(null)"
 										>
-										<core:Item key="{PriceModel>id}" text="{PriceModel>value}" />
-									</Select>
+											<core:Item key="{PriceModel>id}" text="{PriceModel>value}" />
+										</Select>
 									</fb:control>
 								</fb:FilterGroupItem>
 
 								<fb:FilterGroupItem 
 									name="Category" 
 									label="{i18n>CategoryText}" 
-									groupName="HeaderFiltersGroup" 
+									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
 										<MultiComboBox
@@ -100,13 +116,19 @@
 
 								<fb:FilterGroupItem 
 									name="Supplier name" 
-									label="{i18n>SupplierText} {i18n>NameText}" 
-									groupName="HeaderFiltersGroup" 
+									label="{
+										parts: [
+											'i18n>SupplierNameText',
+											'i18n>SupplierText', 
+											'i18n>ProductNameText'
+										],
+										formatter: '.formatMessage'
+									}" 
+									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
 										<MultiInput width="40%"
-											id="multiInput"
-											
+											id="multiInput"	
 											tokenUpdate="handlerTokenUpdate"
 											valueHelpRequest="handleValueHelpRequest">
 											<core:Item key="1" text="{Name}" />
@@ -135,7 +157,7 @@
 					</headerToolbar>
 					<columns>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>NameText}"/>
+							<Text text="{i18n>ProductNameText}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="{i18n>DescriptionText}"/>
@@ -147,7 +169,14 @@
 							<Text text="{i18n>QuantityText}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>SupplierText} {i18n>NameText}"/>
+							<Text text="{
+									parts: [
+										'i18n>SupplierNameText',
+										'i18n>SupplierText', 
+										'i18n>ProductNameText'
+									],
+									formatter: '.formatMessage'
+								}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="{i18n>CategoryText}"/>
@@ -179,7 +208,9 @@
 									path: 'Category',
 									formatter: '.getCategoriesName'
 								}" />
-								<Text text="{= ${Availability} === true ? 'In Stock' : 'Out of Stock'}" />
+								<Text 
+									text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}" 
+								/>
 							</cells>
 						</ColumnListItem>
 					</items>

@@ -12,7 +12,7 @@
 		<StandardListItem
 			iconDensityAware="false"
 			iconInset="false"
-			
+			selected="{= ${SelectedSupModel>/Selected}.includes(${SuppliersName})}"
 			title="{SuppliersName}"
 			description="{Address}" />
 	</SelectDialog>
