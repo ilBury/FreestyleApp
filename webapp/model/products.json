@@ -1,0 +1,48 @@
+{  
+    "Products": [
+        {
+            "Id": "1",
+            "Name": "tea",
+            "Description": "very useful thing",
+            "Price": 2.65,
+            "Quantity": "134",
+            "Supplier": ["1", "2"],
+            "Category": "1",
+            "Availability": true,
+            "Currency": "USD"
+        },
+        {
+            "Id": "2",
+            "Name": "coffee",
+            "Description": "very cheerful thing",
+            "Price": 501.65,
+            "Quantity": "22",
+            "Supplier": ["1", "3"],
+            "Category": "2",
+            "Availability": false,
+            "Currency": "USD"
+        },
+        {
+            "Id": "3",
+            "Name": "computer",
+            "Description": "very informative thing",
+            "Price": 71.65,
+            "Quantity": "134",
+            "Supplier": ["4"],
+            "Category": "3",
+            "Availability": true,
+            "Currency": "USD"
+        },
+        {
+            "Id": "4",
+            "Name": "car",
+            "Description": "very comfortable thing",
+            "Price": 21.65,
+            "Quantity": "22",
+            "Supplier": ["1", "3", "5"],
+            "Category": "4",
+            "Availability": false,
+            "Currency": "USD"
+        }
+    ]
+}
