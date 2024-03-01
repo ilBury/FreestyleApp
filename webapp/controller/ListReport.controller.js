@@ -75,6 +75,10 @@ sap.ui.define([
 			const sCategoriesJson = "../model/categories.json";
 			const sSuppliersJson = "../model/suppliers.json";
 
+			oModel.loadData("./model/products.json");
+			oModel.loadData("./model/categories.json");
+			oModel.loadData("./model/suppliers.json");
+			
 			oModelProducts.loadData(sProductsJson, "", false);
 			oModelCategories.loadData(sCategoriesJson, "", false);
 			oModelSuppliers.loadData(sSuppliersJson, "", false);
@@ -82,7 +86,7 @@ sap.ui.define([
 			oModelCategories.setData(oModelSuppliers.getData(), true);
 			oModelProducts.setData(oModelCategories.getData(), true);
 			
-			
+			this.getView().setModel(oModel, "model")
 			this.getView().setModel(oModelProducts);
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
@@ -330,6 +334,5 @@ sap.ui.define([
 		
 			this.onFilter()
 		}
-
 	});
 });

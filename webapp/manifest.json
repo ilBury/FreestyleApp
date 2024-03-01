@@ -73,7 +73,7 @@
 			},
 			"sos": {
 				"type": "sap.ui.model.json.JSONModel",
-				"uri": "/model"
+				"uri": "/model/products.json"
 			}
 		}
 	}
