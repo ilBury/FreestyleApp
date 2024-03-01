@@ -96,7 +96,7 @@ sap.ui.define([
 				under: this.getTextFromI18n("UnderText"),
 				over: this.getTextFromI18n("OverText")
 			}
-			console.log(this.getView().getModel("model"))
+			
 			const [sFirstRange, sSecondRange] = aCurrentPriceRange;
 			switch(sFirstRange) {
 				case oWords.any: return [new Filter("Price", FilterOperator.NE, null)]; 
