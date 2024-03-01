@@ -1,32 +1,23 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
+	"sap/ui/model/json/JSONModel",
+	"sap/base/strings/formatMessage"
+], function (Controller, JSONModel, formatMessage) {
 	"use strict";
 
 	return Controller.extend("products.app.controller.ObjectPage", {
 		
+        formatMessage: formatMessage,
         onInit: function() {
-            const oModelProducts = new JSONModel();
-            const oModelCategories = new JSONModel();
-            const oModelSuppliers = new JSONModel();
-
-            const sProductsJson = "../model/products.json";
-            const sCategoriesJson = "../model/categories.json";
-            const sSuppliersJson = "../model/suppliers.json";
-
-            oModelProducts.loadData(sProductsJson, "", false);
-            oModelCategories.loadData(sCategoriesJson, "", false);
-            oModelSuppliers.loadData(sSuppliersJson, "", false);
-
-            oModelCategories.setData(oModelSuppliers.getData(), true);
-            oModelProducts.setData(oModelCategories.getData(), true);
-            
-            this.getView().setModel(oModelProducts);
-
+            const oModel = new JSONModel();
             const oComponent = this.getOwnerComponent();
             const oRouter = oComponent.getRouter();
+            
+            oModel.loadData("./model/products.json", "", false, "", true);
+			oModel.loadData("./model/categories.json", "", false, "", true);
+			oModel.loadData("./model/suppliers.json", "", false, "", true);
 
+            this.getView().setModel(oModel);
 
             oRouter.getRoute("ObjectPage").attachPatternMatched(this.onPatternMatched, this);
         },

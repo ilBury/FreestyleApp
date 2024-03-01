@@ -317,7 +317,7 @@ sap.ui.define([
 				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
 			}
 		
-			this.onFilter()
+			this.onFilter(null)
 
 		},
 
