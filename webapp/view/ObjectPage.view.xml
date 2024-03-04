@@ -8,13 +8,15 @@
 
 
     <u:ObjectPageLayout 
+        showFooter="{EditModel>/EditMode}"
         class="sapUiNoContentPadding">
         <u:headerTitle>
-            <u:ObjectPageHeader objectTitle="{Name}" /> 
+            <u:ObjectPageHeader objectTitle="{= ${EditModel>/EditMode} ? ${i18n>CreateNewProductText} : ${Name}}" /> 
         </u:headerTitle>
       
-        <u:headerContent>
-            <VBox>
+        <u:headerContent >
+            
+            <VBox visible="{= !${EditModel>/EditMode}}">
 				<ObjectStatus title="{i18n>DescriptionText}" text="{Description}" />
 				<ObjectStatus 
                     title="{i18n>PriceText}" 
@@ -30,7 +32,9 @@
 				<ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" />
 			</VBox>
             
+            
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>CategoryText}" 
                 text="{
                     path: 'Category',
@@ -38,6 +42,7 @@
                 }"
             />
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>AvailabilityText}" 
                 text="{
                     parts: [
@@ -49,6 +54,7 @@
                 }"
             />
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>CreatedAtText}" 
                 text="{
                     path: 'CreatedAt',
@@ -60,6 +66,7 @@
                     }
                 }"/>
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>UpdatedAtText}" 
                 text="{
                     path: 'UpdatedAt',
@@ -74,17 +81,20 @@
         </u:headerContent>
         <u:sections>
           <u:ObjectPageSection 
-                title="General information" 
+                showTitle="{= !${EditModel>/EditMode}}"
+                title="{i18n>GeneralInformationText}" 
                 titleUppercase="false" 
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
-                       <form:SimpleForm 
+                        <form:SimpleForm 
+                            visible="{= !${EditModel>/EditMode}}"
                             editable="false"
+                            
                             layout="ResponsiveGridLayout"
-                            title="{i18n>GeneralInformationText}"                
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
                             singleContainerFullSize="false">
-                            <form:content>
+                            <form:content >   
                                 <core:Title text="{i18n>ProductInformationText}" />
                                 <VBox >
                                     <ObjectStatus title="{i18n>ProductNameText}" text="{Name}" class="sapUiTinyMarginBottom"/>   
@@ -132,7 +142,70 @@
                                         class="sapUiTinyMarginBottom"
                                     />   
                                     <ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" class="sapUiTinyMarginBottom"/>                       
-                                </VBox>
+                                </VBox>                           
+                            </form:content>
+                        </form:SimpleForm>
+                        <form:SimpleForm 
+                            visible="{= ${EditModel>/EditMode}}"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
+                            singleContainerFullSize="false">
+                            <form:content>
+                                
+                                <Label text="{i18n>ProductNameText}" labelFor="idNameInput" />
+                                <Input 
+                                  
+                                    id="idNameInput"    
+                                    value="{
+                                        path: 'FormModel>/Name',
+                                        type: 'sap.ui.model.type.String',
+                                        constraints: {
+                                            minLength: 1,
+                                            maxLength: 25
+                                        }
+                                    }" 
+                                    liveChange=""
+                                    formatError="checkFieldsForValidity"
+                                />   
+
+                                <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
+                                <Input value="{FormModel>/Description}" id="idDescriptionInput" />
+
+                                <Label text="{i18n>PriceText}" labelFor="idPriceInput" />
+                                <Input value="{FormModel>/Price}" id="idPriceInput" />
+
+                                <Label text="{i18n>QuantityText}" labelFor="idQuantityInput" />
+                                <Input value="{FormModel>/Quantity}" id="idQuantityInput" />
+            
+                                <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
+                                <Select 
+                                    items="{/Categories}" 
+                                    id="idCategoriesSelect"
+                                >
+                                    <core:Item key="{Id}" text="{Name}" />
+                                </Select>
+
+                                <Label text="{i18n>AvailabilityText}" labelFor="idAvailabilitySelect" />
+                                <Select 
+                                    items="{AvailabilityModel>/Availability}" 
+                                    selectedKey="{AvailabilityModel>/SelectedKey}"
+                                    id="idAvailabilitySelect"
+                                >
+                                    <core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
+                                </Select>
+
+                                <Label text="{i18n>SupplierText}" labelFor="idSuppliersMultiComboBox" />
+                                <MultiComboBox
+                                    items="{/Suppliers}"
+                                    id="idSuppliersMultiComboBox"
+                                    selectedKeys="{FormModel>/Suppliers}"
+                                >
+                                    <core:Item key="{SupplierId}" text="{SuppliersName}" />
+                                </MultiComboBox>
+
+                                <Label text="{i18n>CurrencyText}" labelFor="idCurrencyInput" />
+                                <Input value="{FormModel>/Currency}" id="idCurrencyInput" />
                                 
                             </form:content>
                         </form:SimpleForm>
@@ -141,6 +214,7 @@
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -194,6 +268,15 @@
             </u:ObjectPageSection>
             
         </u:sections>
+
+        <u:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="Create" press="onCreateProductPress" type="Emphasized"/>
+                <Button text="Cancel" press="onCancelButtonPress"/>
+                
+            </OverflowToolbar>
+        </u:footer>
         
     </u:ObjectPageLayout>
 

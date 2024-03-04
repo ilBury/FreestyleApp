@@ -14,7 +14,6 @@ sap.ui.define([
 		formatMessage: formatMessage,
 		
 		onInit: function() {
-			const oModel = new JSONModel();
 			const oPriceRangeModel = new JSONModel({
 				Range: [
 					{
@@ -67,11 +66,7 @@ sap.ui.define([
 			const oSearcherModel = new JSONModel({
 				field: ""
 			})
-			oModel.loadData("./model/products.json", "", false, "", true);
-			oModel.loadData("./model/categories.json", "", false, "", true);
-			oModel.loadData("./model/suppliers.json", "", false, "", true);
 
-			this.getView().setModel(oModel);
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
@@ -325,10 +320,21 @@ sap.ui.define([
 			const oSource = oEvent.getSource();
 			const oCtx = oSource.getBindingContext();
 			const oComponent = this.getOwnerComponent();
-
+		
 			oComponent.getRouter().navTo("ObjectPage", {
 				productId: oCtx.getObject("Id")
 			})
+		},
+
+		onCreateButtonPress: function(oEvent) {
+			const oModel = this.getView().getModel();
+			const sProductId = oModel.getProperty("/Products").length + 1;
+			const oComponent = this.getOwnerComponent();
+			oComponent.getRouter().navTo("ObjectPage", {
+				productId: sProductId
+			})
+			
+			
 		}
 	});
 });

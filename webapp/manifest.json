@@ -44,7 +44,7 @@
 					]
 				},
 				{
-					"pattern": "objectPage/{productId}",
+					"pattern": "product/{productId}",
 					"name": "ObjectPage",
 					"target": [
 						"objectPage"

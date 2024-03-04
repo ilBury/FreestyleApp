@@ -146,13 +146,21 @@
 				<f:content>
 				<Table
 					id="table"
-					inset="false"
 					mode="MultiSelect"
 					items="{/Products}"
 				>
 					<headerToolbar>
-						<OverflowToolbar id="otbSubheader">
+						<OverflowToolbar>
 							<Title text="{i18n>ListReportTitle}" />	
+							<ToolbarSpacer/>
+							<Button
+								text="Create"
+								type="Emphasized"
+								press="onCreateButtonPress"
+							/>
+							<Button
+								text="Delete"
+							/>
 						</OverflowToolbar>
 					</headerToolbar>
 					<columns>
