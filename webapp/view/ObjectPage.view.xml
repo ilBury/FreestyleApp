@@ -149,24 +149,24 @@
                             visible="{= ${EditModel>/EditMode}}"
                             editable="true"
                             layout="ResponsiveGridLayout"
+                            validateFieldGroup="onValidateFieldGroup"
                             title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
                             singleContainerFullSize="false">
                             <form:content>
                                 
                                 <Label text="{i18n>ProductNameText}" labelFor="idNameInput" />
                                 <Input 
-                                  
+                                    required="true"
+                                    fieldGroupIds="valid"
                                     id="idNameInput"    
                                     value="{
                                         path: 'FormModel>/Name',
                                         type: 'sap.ui.model.type.String',
                                         constraints: {
-                                            minLength: 1,
-                                            maxLength: 25
+                                            minLength: 1
                                         }
                                     }" 
-                                    liveChange=""
-                                    formatError="checkFieldsForValidity"
+                                    
                                 />   
 
                                 <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
@@ -229,7 +229,7 @@
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
                             sticky="HeaderToolbar,ColumnHeaders"
-                            items="{Supplier}"
+                            items="{Suppliers}"
                             class="sapUiSmallNegativeMarginBeginEnd"
                             width="auto">
                             <headerToolbar>

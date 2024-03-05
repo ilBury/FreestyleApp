@@ -21,6 +21,7 @@
 	},
 	"sap.ui5": {
 		"rootView": "products.app.view.App",
+		"handleValidation": true,
 		"routing": {
 			"config": {
 				"routerClass": "sap.m.routing.Router",

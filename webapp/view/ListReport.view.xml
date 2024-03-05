@@ -207,7 +207,7 @@
 								
 								<Text 
 									text="{
-										path: 'Supplier',
+										path: 'Suppliers',
 										formatter: '.getSuppliersName'
 									}" 
 								/>

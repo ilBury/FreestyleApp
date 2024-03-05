@@ -11,6 +11,7 @@ sap.ui.define([
         formatMessage: formatMessage,
         onInit: function() {
 			const oMessageManager = Core.getMessageManager();
+			const oMessageProcessor = new sap.ui.core.message.ControlMessageProcessor();
             const oComponent = this.getOwnerComponent();
             const oRouter = oComponent.getRouter();
 			const oAvailabilityModel = new JSONModel({
@@ -28,7 +29,7 @@ sap.ui.define([
 			})
 			const oFormModel = new JSONModel({
 				Id: "",
-				Name: null,
+				Name: "",
 				Description: "",
 				Price: null,
 				Quantity: "",
@@ -40,14 +41,17 @@ sap.ui.define([
 				UpdatedAt: new Date()
 			})
 			
-
 			oMessageManager.registerObject(this.getView(), true)
-
 			this.getView().setModel(oFormModel, "FormModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 
             oRouter.getRoute("ObjectPage").attachPatternMatched(this.onPatternMatched, this);
         },
+
+		onNameInputLiveChange: function() {
+			console.log("hello")
+			
+		},
 
 		getTextFromI18n: function(sKey) {
 			const i18nModel = this.getOwnerComponent().getModel("i18n");
@@ -100,48 +104,10 @@ sap.ui.define([
 					.join("")
 		},
 
-			/**
-		 * Validates the value of an input control.
-		 *
-		 * @param {sap.m.Input} oInput - The input control to validate.
-		 * @returns {boolean} - Indicates whether a validation error occurred.
-		 * @public
-		 */
-			validateInput: function (oInput) {
-				let sValueState = "None";
-				let bValidationError = false;
-				const oBinding = oInput.getBinding("value");
-				
-				try {
-					oBinding.getType().validateValue(oInput.getValue());
-					if(!oInput.getValue()) {
-						throw new Error("Required");
-					}
-				} catch (oException) {
-					sValueState = "Error";
-					bValidationError = true;
-				}
-	
-				oInput.setValueState(sValueState);
-	
-				return bValidationError;
-			},
-
-		/**
-		 * Event handler for the change event of a valid input.
-		 *
-		 * @param {sap.ui.base.Event} oEvent - The event object passed when the function is called.
-		 * @returns {void}
-		 * @public
-		 */
-		onChangeInputValid: function(oEvent) {
-			const oInput = oEvent.getSource();
-			this.validateInput(oInput);
-		},
-
-		checkFieldsForValidity: function(oField) {
-			console.log(oField)
-			/* return oField !== "" ? "None" : "Error";	 */
+		onValidateFieldGroup: function(oEvent) {
+			
+			
+			console.log("hello")
 		},
 
 		onCreateProductPress: function(oEvent) {
@@ -151,15 +117,11 @@ sap.ui.define([
 			const aProducts = oModel.getProperty("/Products");
 			const sProductId = aProducts.length + 1;
 
-			oFormModel.setProperty("/Id", String(sProductId));
-			console.log(oFormModel.getProperty("/"))
-			/* this.checkFieldsForValidity(oFormModel.getProperty("/Name")) */
+			/* oFormModel.setProperty("/Id", String(sProductId));
 			
-
-			/* 
+			
 			aProducts.push(oFormModel.getProperty("/"))
 			oModel.setProperty("/Products", aProducts);
-
 			oFormModel.setProperty("/", {
 				Id: "",
 				Name: "",
@@ -172,7 +134,7 @@ sap.ui.define([
 				Currency: "",
 				CreatedAt: new Date(),
 				UpdatedAt: new Date()
-			})*/
+			}) */
 		},
 
 		onCancelButtonPress: function() {

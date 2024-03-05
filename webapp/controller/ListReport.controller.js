@@ -130,7 +130,7 @@ sap.ui.define([
 			const aSuppliers = oModel.getProperty("/Suppliers");	
 			
 			return aSuppliers
-					.filter((el) => data.includes(el.SupplierId))
+					.filter((el) => data?.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
 					.join(", ");
 		},
@@ -140,7 +140,7 @@ sap.ui.define([
 			const aCategories = oModel.getProperty("/Categories");	
 
 			return aCategories
-					.filter((el) => data.includes(el.Id))
+					.filter((el) => data?.includes(el.Id))
 					.map(el => el.Name)
 					.join("")
 		},
@@ -213,7 +213,7 @@ sap.ui.define([
 			aSuppliersId.forEach((el) => {
 				aFilters.push(
 					new Filter({
-						path: "Supplier",
+						path: "Suppliers",
 						operator: FilterOperator.EQ,
 						value1: el,
 						test: (supplier) => {
@@ -228,7 +228,7 @@ sap.ui.define([
 				)
 			})
 
-			return aFilters.length ? aFilters : [new Filter("Supplier/0", FilterOperator.Contains, "")];
+			return aFilters.length ? aFilters : [new Filter("Suppliers/0", FilterOperator.Contains, "")];
 		},
 
 		getCategoriesFilters: function() {
