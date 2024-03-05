@@ -4,14 +4,11 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/m/Token",
-	"sap/ui/core/Fragment",
-	"sap/base/strings/formatMessage"
-], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment, formatMessage) {
+	"sap/ui/core/Fragment"
+], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment) {
 	"use strict";
 
 	return Controller.extend("products.app.controller.ListReport", {
-
-		formatMessage: formatMessage,
 		
 		onInit: function() {
 			const oModel = new JSONModel();
@@ -326,7 +323,7 @@ sap.ui.define([
 			const oCtx = oSource.getBindingContext();
 			const oComponent = this.getOwnerComponent();
 
-			oComponent.getRouter().navTo("ObjectPage", {
+			oComponent.getRouter().navTo("ProductDetails", {
 				productId: oCtx.getObject("Id")
 			})
 		}

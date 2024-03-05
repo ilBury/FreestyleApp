@@ -1,13 +1,11 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/json/JSONModel",
-	"sap/base/strings/formatMessage"
-], function (Controller, JSONModel, formatMessage) {
+	"sap/ui/model/json/JSONModel"
+], function (Controller, JSONModel) {
 	"use strict";
 
-	return Controller.extend("products.app.controller.ObjectPage", {
+	return Controller.extend("products.app.controller.ProductDetails", {
 		
-        formatMessage: formatMessage,
         onInit: function() {
             const oModel = new JSONModel();
             const oComponent = this.getOwnerComponent();
@@ -19,7 +17,7 @@ sap.ui.define([
 
             this.getView().setModel(oModel);
 
-            oRouter.getRoute("ObjectPage").attachPatternMatched(this.onPatternMatched, this);
+            oRouter.getRoute("ProductDetails").attachPatternMatched(this.onPatternMatched, this);
         },
 
         onPatternMatched: function(oEvent) {
@@ -35,7 +33,7 @@ sap.ui.define([
         getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
 			const aSuppliers = oModel.getProperty("/Suppliers");	
-			
+			console.log(data)
 			return aSuppliers
 					.filter((el) => data?.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
