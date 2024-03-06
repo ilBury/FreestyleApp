@@ -30,24 +30,17 @@ sap.ui.define([
             })
         },
 
-        getSuppliersName: function(data) {
+        getCurrentSupplier: function(data) {
 			const oModel = this.getView().getModel();
 			const aSuppliers = oModel.getProperty("/Suppliers");	
-			console.log(data)
-			return aSuppliers
-					.filter((el) => data?.includes(el.SupplierId))
-					.map(el => el.SuppliersName)
+
+			return aSuppliers.find((el) => data?.includes(el.SupplierId))
 		},
 
-        getSuppliersAddress: function(data) {
-			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");	
-			
-			return aSuppliers
-					.filter((el) => data?.includes(el.SupplierId))
-					.map(el => el.Address)
+		formatDate: function(sDate) {
+			console.log(sDate)
+			return new Date(sDate);
 		},
-
 		getCategoriesName: function(data) {
 			const oModel = this.getView().getModel();
 			const aCategories = oModel.getProperty("/Categories");	

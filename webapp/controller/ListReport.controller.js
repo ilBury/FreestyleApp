@@ -122,17 +122,17 @@ sap.ui.define([
 										.filter((el) => aSelectedTokens.includes(el.SuppliersName))
 										.map((el) => el.SupplierId);
 				
-				this.onFilter(aSelectedId);
-				
+				this.onFilter(aSelectedId);	
 			}
 		},
 
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");	
+			const aSuppliers = oModel.getProperty("/Suppliers");
+			const aCurrentSuppliers = data.map(el => el.SupplierId);
 			
 			return aSuppliers
-					.filter((el) => data.includes(el.SupplierId))
+					.filter((el) => aCurrentSuppliers.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
 					.join(", ");
 		},
@@ -220,8 +220,8 @@ sap.ui.define([
 						value1: el,
 						test: (supplier) => {
 							const aResult = supplier.filter((item) => {
-							
-								return	item === el
+								
+								return	item.SupplierId === el
 							});
 
 							return !!aResult.length;
@@ -229,8 +229,8 @@ sap.ui.define([
 					})
 				)
 			})
-
-			return aFilters.length ? aFilters : [new Filter("Supplier/0", FilterOperator.Contains, "")];
+			
+			return aFilters.length ? aFilters : [new Filter("Supplier/0/SupplierId", FilterOperator.Contains, "")];
 		},
 
 		getCategoriesFilters: function() {
@@ -277,7 +277,7 @@ sap.ui.define([
 
 		_handleValueHelpSearch: function(oEvent) {
 			const sValue = oEvent.getParameter("value");
-		
+			
 			const aFilters = [
 				new Filter("SuppliersName", FilterOperator.Contains, sValue),
 				new Filter("Address", FilterOperator.Contains, sValue)

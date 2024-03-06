@@ -54,6 +54,7 @@
                             pattern: 'yyyy-MM-ddTHH:mm:ss'
                         }
                     }
+                    
                 }"/>
             <ObjectStatus 
                 title="{i18n>UpdatedAtText}" 
@@ -171,14 +172,16 @@
                             <items>
                                 <ColumnListItem>
                                     <cells>                                        
-                                        <Text text="{
-                                            path: '',
-                                            formatter: '.getSuppliersName'
+                                        <Text text="{= ${
+                                                    path: 'SupplierId',
+                                                    formatter: '.getCurrentSupplier'
+                                                }.SuppliersName
                                             }" 
                                         />
-                                        <Text text="{
-                                            path: '',
-                                            formatter: '.getSuppliersAddress'
+                                        <Text text="{= ${
+                                                    path: 'SupplierId',
+                                                    formatter: '.getCurrentSupplier'
+                                                }.Address
                                             }" 
                                         />
                                     </cells>
