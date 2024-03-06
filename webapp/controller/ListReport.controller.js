@@ -67,7 +67,7 @@ sap.ui.define([
 			oModel.loadData("./model/products.json", "", false, "", true);
 			oModel.loadData("./model/categories.json", "", false, "", true);
 			oModel.loadData("./model/suppliers.json", "", false, "", true);
-
+			
 			this.getView().setModel(oModel);
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");

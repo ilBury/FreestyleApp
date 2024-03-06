@@ -7,7 +7,7 @@
 		text="The requested resource was not found"
 		icon="{sap-icon://document}"
 		id="page"
-		description="Here description goes">
+		description="Please check whether the url is correct">
 	</MessagePage>
 
 </mvc:View>

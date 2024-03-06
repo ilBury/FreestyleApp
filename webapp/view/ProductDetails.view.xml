@@ -7,7 +7,6 @@
     core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
 	controllerName="products.app.controller.ProductDetails">
 
-
     <u:ObjectPageLayout 
         class="sapUiNoContentPadding">
         <u:headerTitle>

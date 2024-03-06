@@ -22,13 +22,20 @@ sap.ui.define([
 
         onPatternMatched: function(oEvent) {
             const mRouteArguments = oEvent.getParameter("arguments");
-            const sProductId = mRouteArguments.productId;
-            const sKey = "/Products/" + (sProductId - 1);
+            const nProductId = Number(mRouteArguments.productId);
+			const oModel = this.getView().getModel();
+            const sKey = "/Products/" + (nProductId - 1);
 
+			if(nProductId <= 0  || nProductId > oModel.getProperty("/Products").length || !nProductId) {
+				const oComponent = this.getOwnerComponent();
+				oComponent.getRouter().getTargets().display("notFound");
+			}
+		
             this.getView().bindObject({
                 path: sKey
             })
         },
+
 
         getCurrentSupplier: function(data) {
 			const oModel = this.getView().getModel();
@@ -45,6 +52,12 @@ sap.ui.define([
 					.map(el => el.Name)
 					.join("")
 		},
+
+		onNavToNotFoundPage: function() {
+			const oComponent = this.getOwnerComponent();
+			
+			oComponent.getRouter().navTo("NotFound");
+		}
 
 	});
 });
