@@ -36,11 +36,6 @@ sap.ui.define([
 
 			return aSuppliers.find((el) => data?.includes(el.SupplierId))
 		},
-
-		formatDate: function(sDate) {
-			console.log(sDate)
-			return new Date(sDate);
-		},
 		getCategoriesName: function(data) {
 			const oModel = this.getView().getModel();
 			const aCategories = oModel.getProperty("/Categories");	
