@@ -6,10 +6,19 @@
             "Description": "very useful thing",
             "Price": 2.65,
             "Quantity": "134",
-            "Supplier": ["1", "2"],
+            "Supplier": [
+                {
+                    "SupplierId": "1"
+                },
+                {
+                    "SupplierId": "2"
+                }
+            ],
             "Category": "1",
             "Availability": true,
-            "Currency": "USD"
+            "Currency": "USD",
+            "CreatedAt": "2024-02-01T12:30:00",
+            "UpdatedAt": "2024-03-01T10:00:00"
         },
         {
             "Id": "2",
@@ -17,10 +26,19 @@
             "Description": "very cheerful thing",
             "Price": 501.65,
             "Quantity": "22",
-            "Supplier": ["1", "3"],
+            "Supplier": [
+                {
+                    "SupplierId": "1"
+                },
+                {
+                    "SupplierId": "3"
+                }
+            ],
             "Category": "2",
             "Availability": false,
-            "Currency": "USD"
+            "Currency": "USD",
+            "CreatedAt": "2024-02-01T12:30:00",
+            "UpdatedAt": "2024-03-01T10:00:00"
         },
         {
             "Id": "3",
@@ -28,10 +46,16 @@
             "Description": "very informative thing",
             "Price": 71.65,
             "Quantity": "134",
-            "Supplier": ["4"],
+            "Supplier": [
+                {
+                    "SupplierId": "4"
+                }
+            ],
             "Category": "3",
             "Availability": true,
-            "Currency": "USD"
+            "Currency": "USD",
+            "CreatedAt": "2024-02-24T10:30:00",
+            "UpdatedAt": "2024-03-01T10:00:00"
         },
         {
             "Id": "4",
@@ -39,10 +63,22 @@
             "Description": "very comfortable thing",
             "Price": 21.65,
             "Quantity": "22",
-            "Supplier": ["1", "3", "5"],
+            "Supplier": [
+                {
+                    "SupplierId": "1"
+                },
+                {
+                    "SupplierId": "3"
+                },
+                {
+                    "SupplierId": "5"
+                }
+            ],
             "Category": "4",
             "Availability": false,
-            "Currency": "USD"
+            "Currency": "USD",
+            "CreatedAt": "2024-02-06T18:30:00",
+            "UpdatedAt": "2024-03-01T10:00:00"
         }
     ]
 }

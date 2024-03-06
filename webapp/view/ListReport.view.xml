@@ -4,6 +4,7 @@
 	xmlns:f="sap.f"
 	xmlns:core="sap.ui.core"
 	xmlns:fb="sap.ui.comp.filterbar"
+    core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
 	controllerName="products.app.controller.ListReport">
 
 		<f:DynamicPage 
@@ -40,7 +41,7 @@
 											'i18n>AndText',
 											'i18n>DescriptionText'
 										],
-										formatter: '.formatMessage'
+										formatter: 'formatMessage'
 										
 									}" 
 									groupName="ProductFiltersGroup" 
@@ -81,7 +82,7 @@
 											'i18n>PriceText',
 											'i18n>RangeText'
 										],
-										formatter: '.formatMessage'
+										formatter: 'formatMessage'
 									}" 
 									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
@@ -122,7 +123,7 @@
 											'i18n>SupplierText', 
 											'i18n>ProductNameText'
 										],
-										formatter: '.formatMessage'
+										formatter: 'formatMessage'
 									}" 
 									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
@@ -175,7 +176,7 @@
 										'i18n>SupplierText', 
 										'i18n>ProductNameText'
 									],
-									formatter: '.formatMessage'
+									formatter: 'formatMessage'
 								}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
@@ -187,7 +188,10 @@
 					</columns>
 
 					<items>
-						<ColumnListItem type="Navigation" vAlign="Middle">
+						<ColumnListItem 
+							type="Navigation" 
+							vAlign="Middle"
+							press="onNavToObjectPage">
 							<cells>
 								<ObjectIdentifier title="{Name}"/>
 								<Text text="{Description}" />
@@ -205,8 +209,10 @@
 									path: 'Category',
 									formatter: '.getCategoriesName'
 								}" />
-								<Text 
-									text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}" 
+								<ObjectStatus 
+									inverted="true"
+									state="{= ${Availability} === true ? ${i18n>SuccessText} : ${i18n>WarningText}}"
+									text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}"
 								/>
 							</cells>
 						</ColumnListItem>

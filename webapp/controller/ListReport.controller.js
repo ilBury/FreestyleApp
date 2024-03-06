@@ -4,14 +4,11 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/m/Token",
-	"sap/ui/core/Fragment",
-	"sap/base/strings/formatMessage"
-], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment, formatMessage) {
+	"sap/ui/core/Fragment"
+], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment) {
 	"use strict";
 
 	return Controller.extend("products.app.controller.ListReport", {
-
-		formatMessage: formatMessage,
 		
 		onInit: function() {
 			const oModel = new JSONModel();
@@ -70,7 +67,7 @@ sap.ui.define([
 			oModel.loadData("./model/products.json", "", false, "", true);
 			oModel.loadData("./model/categories.json", "", false, "", true);
 			oModel.loadData("./model/suppliers.json", "", false, "", true);
-
+			
 			this.getView().setModel(oModel);
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
@@ -107,14 +104,14 @@ sap.ui.define([
 
 		},
 
-		handlerTokenUpdate: function(event) {
+		handlerTokenUpdate: function(oEvent) {
 			const oMultiInput = this.byId("multiInput");
 			
-			if (event?.getParameter("type") === "removed") {
+			if (oEvent?.getParameter("type") === "removed") {
 				const oModel = this.getView().getModel();
 				const aSuppliers = oModel.getProperty("/Suppliers");
 				
-				const aRemovedTokens = event.getParameter("removedTokens");
+				const aRemovedTokens = oEvent.getParameter("removedTokens");
 			
 				const aRemainingTokens = oMultiInput.getTokens().filter(function (token) {
 					return !aRemovedTokens.includes(token);
@@ -125,17 +122,17 @@ sap.ui.define([
 										.filter((el) => aSelectedTokens.includes(el.SuppliersName))
 										.map((el) => el.SupplierId);
 				
-				this.onFilter(aSelectedId);
-				
+				this.onFilter(aSelectedId);	
 			}
 		},
 
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");			
+			const aSuppliers = oModel.getProperty("/Suppliers");
+			const aCurrentSuppliers = data.map(el => el.SupplierId);
 			
 			return aSuppliers
-					.filter((el) => data.includes(el.SupplierId))
+					.filter((el) => aCurrentSuppliers.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
 					.join(", ");
 		},
@@ -223,8 +220,8 @@ sap.ui.define([
 						value1: el,
 						test: (supplier) => {
 							const aResult = supplier.filter((item) => {
-							
-								return	item === el
+								
+								return	item.SupplierId === el
 							});
 
 							return !!aResult.length;
@@ -232,8 +229,8 @@ sap.ui.define([
 					})
 				)
 			})
-
-			return aFilters.length ? aFilters : [new Filter("Supplier/0", FilterOperator.Contains, "")];
+			
+			return aFilters.length ? aFilters : [new Filter("Supplier/0/SupplierId", FilterOperator.Contains, "")];
 		},
 
 		getCategoriesFilters: function() {
@@ -252,7 +249,9 @@ sap.ui.define([
 			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
 		},
 
+
 		handleValueHelpRequest: function() {
+
 			const oView = this.getView();
 			
 			if(!this.oDialog) {
@@ -276,9 +275,9 @@ sap.ui.define([
 			}
 		},
 
-		_handleValueHelpSearch: function(event) {
-			const sValue = event.getParameter("value");
-		
+		_handleValueHelpSearch: function(oEvent) {
+			const sValue = oEvent.getParameter("value");
+			
 			const aFilters = [
 				new Filter("SuppliersName", FilterOperator.Contains, sValue),
 				new Filter("Address", FilterOperator.Contains, sValue)
@@ -287,7 +286,7 @@ sap.ui.define([
 				filters: aFilters,
 				and: false
 			});
-			event.getSource().getBinding("items").filter([oFilter]);
+			oEvent.getSource().getBinding("items").filter([oFilter]);
 		},
 
 		addNewSupplierTokens: function(oMultiInput, aSelectedItems) {
@@ -303,8 +302,8 @@ sap.ui.define([
 			});
 		},
 
-		_handleValueHelpClose: function (event) {
-			const aSelectedItems = event.getParameter("selectedItems"),
+		_handleValueHelpClose: function (oEvent) {
+			const aSelectedItems = oEvent.getParameter("selectedItems"),
 				oMultiInput = this.byId("multiInput");
 			
 			if (aSelectedItems && aSelectedItems.length > 0) {
@@ -315,7 +314,18 @@ sap.ui.define([
 				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
 			}
 		
-			this.onFilter()
+			this.onFilter(null)
+
+		},
+
+		onNavToObjectPage: function(oEvent) {
+			const oSource = oEvent.getSource();
+			const oCtx = oSource.getBindingContext();
+			const oComponent = this.getOwnerComponent();
+
+			oComponent.getRouter().navTo("ProductDetails", {
+				productId: oCtx.getObject("Id")
+			})
 		}
 	});
 });

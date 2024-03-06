@@ -1,0 +1,200 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+    xmlns:u="sap.uxap"
+    xmlns:form="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+    core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
+	controllerName="products.app.controller.ProductDetails">
+
+    <u:ObjectPageLayout 
+        class="sapUiNoContentPadding">
+        <u:headerTitle>
+            <u:ObjectPageHeader objectTitle="{Name}" /> 
+        </u:headerTitle>
+      
+        <u:headerContent>
+            <VBox>
+				<ObjectStatus title="{i18n>DescriptionText}" text="{Description}" />
+				<ObjectStatus 
+                    title="{i18n>PriceText}" 
+                    text="{
+                        parts: [
+                            'i18n>PriceAndCurrencyText',
+                            'Price',
+                            'Currency'
+                        ],
+                        formatter: 'formatMessage'
+                    }" 
+                />
+				<ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" />
+			</VBox>
+            
+            <ObjectStatus 
+                title="{i18n>CategoryText}" 
+                text="{
+                    path: 'Category',
+                    formatter: '.getCategoriesName'
+                }"
+            />
+            <ObjectStatus 
+                inverted="true"
+                state="{= ${Availability} === true ? ${i18n>SuccessText} : ${i18n>WarningText}}"
+                title="{i18n>AvailabilityText}" 
+                text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}"
+            />
+            <ObjectStatus 
+                title="{i18n>CreatedAtText}" 
+                text="{
+                    path: 'CreatedAt',
+                    type: 'sap.ui.model.type.Date',
+                    formatOptions: {
+                        source: {
+                            pattern: 'yyyy-MM-ddTHH:mm:ss'
+                        }
+                    }
+                    
+                }"/>
+            <ObjectStatus 
+                title="{i18n>UpdatedAtText}" 
+                text="{
+                    path: 'UpdatedAt',
+                    type: 'sap.ui.model.type.Date',
+                    formatOptions: {
+                        source: {
+                            pattern: 'yyyy-MM-ddTHH:mm:ss'
+                        }
+                    }
+                }"
+            />         
+        </u:headerContent>
+        <u:sections>
+          <u:ObjectPageSection 
+                title="{i18n>GeneralInformationText}" 
+                titleUppercase="false" 
+                class="sapUiResponsiveContentPadding">
+                <u:subSections>
+                    <u:ObjectPageSubSection>
+                       <form:SimpleForm 
+                            editable="false"
+                            layout="ResponsiveGridLayout"
+                            title="{i18n>GeneralInformationText}"                
+                            singleContainerFullSize="false">
+                            <form:content>
+                                <core:Title text="{i18n>ProductInformationText}" />
+                                <VBox >
+                                    <ObjectStatus title="{i18n>ProductNameText}" text="{Name}" class="sapUiTinyMarginBottom"/>   
+                                    <ObjectStatus title="{i18n>DescriptionText}" text="{Description}" class="sapUiTinyMarginBottom"/>  
+                                    <ObjectStatus 
+                                        title="{i18n>CreatedAtText}" 
+                                        text="{
+                                            path: 'CreatedAt',
+                                            type: 'sap.ui.model.type.Date',
+                                            formatOptions: {
+                                                source: {
+                                                    pattern: 'yyyy-MM-ddTHH:mm:ss'
+                                                }
+                                            }
+                                        }"
+                                        class="sapUiTinyMarginBottom"
+                                    />  
+                                    <ObjectStatus 
+                                        title="{i18n>UpdatedAtText}" 
+                                        text="{
+                                            path: 'UpdatedAt',
+                                            type: 'sap.ui.model.type.Date',
+                                            formatOptions: {
+                                                source: {
+                                                    pattern: 'yyyy-MM-ddTHH:mm:ss'
+                                                }
+                                            }
+                                        }" 
+                                        class="sapUiTinyMarginBottom"
+                                    />  
+                                </VBox>
+                                
+                                <core:Title text="{i18n>ProductDetailsText}" />
+                                <VBox >
+                                    <ObjectStatus 
+                                        title="{i18n>PriceText}" 
+                                        text="{
+                                            parts: [
+                                                'i18n>PriceAndCurrencyText',
+                                                'Price',
+                                                'Currency'
+                                            ],
+                                            formatter: 'formatMessage'
+                                        }" 
+                                        class="sapUiTinyMarginBottom"
+                                    />   
+                                    <ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" class="sapUiTinyMarginBottom"/>                       
+                                </VBox>
+                                
+                            </form:content>
+                        </form:SimpleForm>
+                    </u:ObjectPageSubSection>
+                  </u:subSections>
+            </u:ObjectPageSection>
+
+            <u:ObjectPageSection 
+                title="{
+                    parts: [
+                        'i18n>SuppliersInfotext',
+                        'i18n>SupplierText',
+                        'i18n>InfoText'
+                    ],
+                    formatter: 'formatMessage'
+                }" 
+                titleUppercase="false" 
+                class="sapUiResponsiveContentPadding">
+                <u:subSections>
+                    <u:ObjectPageSubSection>
+                        <Table id="idSuppliersTable"
+                            sticky="HeaderToolbar,ColumnHeaders"
+                            items="{Supplier}"
+                            class="sapUiSmallNegativeMarginBeginEnd"
+                            width="auto">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Label text="{i18n>SupplierText}"></Label>
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="12em">
+                                    <Text text="{i18n>ProductNameText}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>AddressText}" />
+                                </Column>
+                                
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>                                        
+                                        <Text text="{= ${
+                                                    path: 'SupplierId',
+                                                    formatter: '.getCurrentSupplier'
+                                                }.SuppliersName
+                                            }" 
+                                        />
+                                        <Text text="{= ${
+                                                    path: 'SupplierId',
+                                                    formatter: '.getCurrentSupplier'
+                                                }.Address
+                                            }" 
+                                        />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </u:ObjectPageSubSection>
+                  </u:subSections>
+            </u:ObjectPageSection>
+            
+        </u:sections>
+        
+    </u:ObjectPageLayout>
+
+
+
+</mvc:View>
