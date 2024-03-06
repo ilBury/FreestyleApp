@@ -46,9 +46,10 @@
 				},
 				{
 					"pattern": "product/{productId}",
-					"name": "ObjectPage",
+
+					"name": "ProductDetails",
 					"target": [
-						"objectPage"
+						"productDetails"
 					]
 				}
 			],
@@ -59,9 +60,10 @@
 					"viewId": "listReport",
 					"viewLevel": 1
 				},
-				"objectPage": {
-					"viewName": "ObjectPage",
-					"viewId": "objectPage",
+
+				"productDetails": {
+					"viewName": "ProductDetails",
+					"viewId": "productDetails",
 					"viewLevel": 2
 				},
 

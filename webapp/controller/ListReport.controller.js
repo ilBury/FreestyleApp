@@ -4,14 +4,11 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/m/Token",
-	"sap/ui/core/Fragment",
-	"sap/base/strings/formatMessage"
-], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment, formatMessage) {
+	"sap/ui/core/Fragment"
+], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment) {
 	"use strict";
 
 	return Controller.extend("products.app.controller.ListReport", {
-
-		formatMessage: formatMessage,
 		
 		onInit: function() {
 			const oPriceRangeModel = new JSONModel({
@@ -66,7 +63,7 @@ sap.ui.define([
 			const oSearcherModel = new JSONModel({
 				field: ""
 			})
-
+			
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
@@ -120,17 +117,18 @@ sap.ui.define([
 										.filter((el) => aSelectedTokens.includes(el.SuppliersName))
 										.map((el) => el.SupplierId);
 				
-				this.onFilter(aSelectedId);
-				
+				this.onFilter(aSelectedId);	
 			}
 		},
 
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");	
+
+			const aSuppliers = oModel.getProperty("/Suppliers");
+			const aCurrentSuppliers = data.map(el => el.SupplierId);
 			
 			return aSuppliers
-					.filter((el) => data?.includes(el.SupplierId))
+					.filter((el) => aCurrentSuppliers.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
 					.join(", ");
 		},
@@ -218,8 +216,8 @@ sap.ui.define([
 						value1: el,
 						test: (supplier) => {
 							const aResult = supplier.filter((item) => {
-							
-								return	item === el
+								
+								return	item.SupplierId === el
 							});
 
 							return !!aResult.length;
@@ -228,7 +226,9 @@ sap.ui.define([
 				)
 			})
 
-			return aFilters.length ? aFilters : [new Filter("Suppliers/0", FilterOperator.Contains, "")];
+			
+			return aFilters.length ? aFilters : [new Filter("Supplier/0/SupplierId", FilterOperator.Contains, "")];
+
 		},
 
 		getCategoriesFilters: function() {
@@ -275,7 +275,6 @@ sap.ui.define([
 
 		_handleValueHelpSearch: function(oEvent) {
 			const sValue = oEvent.getParameter("value");
-		
 			const aFilters = [
 				new Filter("SuppliersName", FilterOperator.Contains, sValue),
 				new Filter("Address", FilterOperator.Contains, sValue)
@@ -320,6 +319,7 @@ sap.ui.define([
 			const oSource = oEvent.getSource();
 			const oCtx = oSource.getBindingContext();
 			const oComponent = this.getOwnerComponent();
+
 		
 			oComponent.getRouter().navTo("ObjectPage", {
 				productId: oCtx.getObject("Id")
@@ -335,6 +335,7 @@ sap.ui.define([
 			})
 			
 			
+
 		}
 	});
 });
