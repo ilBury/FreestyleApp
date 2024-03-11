@@ -146,21 +146,25 @@
 			</f:header>
 				<f:content>
 				<Table
-					id="table"
+					id="idProductsTable"
 					mode="MultiSelect"
 					items="{/Products}"
+					
+					selectionChange="onTableSelectionChange"
 				>
 					<headerToolbar>
 						<OverflowToolbar>
 							<Title text="{i18n>ListReportTitle}" />	
 							<ToolbarSpacer/>
 							<Button
-								text="Create"
+								text="{i18n>CreateText}"
 								type="Emphasized"
 								press="onCreateButtonPress"
 							/>
 							<Button
-								text="Delete"
+								enabled="{DeleteModel>/Enable}"
+								text="{i18n>DeleteText}"
+								press="onDeleteButtonPress"
 							/>
 						</OverflowToolbar>
 					</headerToolbar>
@@ -199,6 +203,10 @@
 						<ColumnListItem 
 							type="Navigation" 
 							vAlign="Middle"
+							selected="{
+								path: 'Id',
+								formatter: '.getSelectedItem'
+							}"
 							press="onNavToObjectPage">
 							<cells>
 								<ObjectIdentifier title="{Name}"/>

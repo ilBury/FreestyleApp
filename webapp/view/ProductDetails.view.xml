@@ -8,13 +8,31 @@
 	controllerName="products.app.controller.ProductDetails">
 
     <u:ObjectPageLayout 
+        showFooter="{EditModel>/EditMode}"
         class="sapUiNoContentPadding">
         <u:headerTitle>
-            <u:ObjectPageHeader objectTitle="{Name}" /> 
+            <u:ObjectPageHeader 
+                objectTitle="{= !${Name} ? ${i18n>CreateNewProductText} : ${Name}}" 
+            >
+                <u:actions>
+                    <Button
+                        visible="{= !${EditModel>/EditMode}}"
+                        text="{i18n>UpdateText}"
+                        type="Emphasized"
+                        press="onUpdateProductPress"
+                    />
+                    <Button
+                        visible="{= !${EditModel>/EditMode}}"
+                        text="{i18n>DeleteText}"
+                        press="onDeleteProductPress"
+                    />
+                </u:actions>
+            </u:ObjectPageHeader>
+
         </u:headerTitle>
       
         <u:headerContent>
-            <VBox>
+            <VBox visible="{= !${EditModel>/EditMode}}">
 				<ObjectStatus title="{i18n>DescriptionText}" text="{Description}" />
 				<ObjectStatus 
                     title="{i18n>PriceText}" 
@@ -31,6 +49,7 @@
 			</VBox>
             
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>CategoryText}" 
                 text="{
                     path: 'Category',
@@ -38,12 +57,14 @@
                 }"
             />
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 inverted="true"
                 state="{= ${Availability} === true ? ${i18n>SuccessText} : ${i18n>WarningText}}"
                 title="{i18n>AvailabilityText}" 
                 text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}"
             />
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>CreatedAtText}" 
                 text="{
                     path: 'CreatedAt',
@@ -56,6 +77,7 @@
                     
                 }"/>
             <ObjectStatus 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{i18n>UpdatedAtText}" 
                 text="{
                     path: 'UpdatedAt',
@@ -69,16 +91,18 @@
             />         
         </u:headerContent>
         <u:sections>
-          <u:ObjectPageSection 
+            <u:ObjectPageSection 
+                showTitle="{= !${EditModel>/EditMode}}"
                 title="{i18n>GeneralInformationText}" 
                 titleUppercase="false" 
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
-                       <form:SimpleForm 
+                        <form:SimpleForm 
+                            visible="{= !${EditModel>/EditMode}}"
                             editable="false"
                             layout="ResponsiveGridLayout"
-                            title="{i18n>GeneralInformationText}"                
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
                             singleContainerFullSize="false">
                             <form:content>
                                 <core:Title text="{i18n>ProductInformationText}" />
@@ -132,11 +156,118 @@
                                 
                             </form:content>
                         </form:SimpleForm>
+                        <form:SimpleForm 
+                            visible="{= ${EditModel>/EditMode}}"
+                            editable="true"
+                            id="idSimpleForm"
+                            layout="ResponsiveGridLayout"
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
+                            singleContainerFullSize="false"
+                            labelSpanXL="2"
+                            emptySpanXL="3">
+                            <form:content>
+                                <core:Title text="{i18n>ProductInformationText}" />
+                                
+                                <Label text="{i18n>ProductNameText}" labelFor="idNameInput" />
+                                <Input
+                                    required="true"
+                                    fieldGroupIds="valid"
+                                    id="idNameInput"    
+                                    value="{
+                                        path: 'FormModel>/Name',
+                                        type: 'sap.ui.model.type.String',
+                                        constraints: {
+                                            minLength: 1
+                                        }
+                                    }" 
+                                    
+                                />   
+
+                                <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
+                                <Input 
+                                    required="true" 
+                                    value="{
+                                        path: 'FormModel>/Description',
+                                        type: 'sap.ui.model.type.String',
+                                        constraints: {
+                                            minLength: 5
+                                        }
+                                    }" 
+                                    id="idDescriptionInput" 
+                                />
+
+                                <Label text="{i18n>PriceText}" labelFor="idPriceInput" />
+                                <Input 
+                                    value="{
+                                        path: 'FormModel>/Price',
+                                        type: 'sap.ui.model.type.Float',
+                                        constraints: {
+                                            minimum: 0
+                                        }
+                                    }" 
+                                    id="idPriceInput" 
+                                />
+
+                                <Label text="{i18n>QuantityText}" labelFor="idQuantityInput" />
+                                <Input 
+                                    value="{
+                                        path: 'FormModel>/Quantity',
+                                        type: 'sap.ui.model.type.Float',
+                                        constraints: {
+                                            minimum: 0
+                                        }
+                                    }" 
+                                    id="idQuantityInput" 
+                                />
+                                <core:Title text="{i18n>ProductDetailsText}" />
+                                <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
+                                <Select 
+                                    forceSelection="false"
+                                    items="{/Categories}" 
+                                    id="idCategoriesSelect"
+                                    selectedKey="{FormModel>/Category}"
+                                >
+                                    <core:Item key="{Id}" text="{Name}" />
+                                </Select>
+
+                                <Label text="{i18n>AvailabilityText}" labelFor="idAvailabilitySelect" />
+                                <Select 
+                                    fieldGroupIds="valid"
+                                    items="{AvailabilityModel>/Availability}" 
+                                    selectedKey="{FormModel>/Availability}"
+                                    id="idAvailabilitySelect"
+                                    forceSelection="false"
+                                >
+                                    <core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
+                                </Select>
+    
+                                <Label text="{i18n>SupplierText}" labelFor="idSuppliersMultiComboBox" />
+                                <MultiComboBox
+                                    items="{/Suppliers}"
+                                    id="idSuppliersMultiComboBox"
+                                    selectedKeys="{
+                                        path: 'FormModel>/Suppliers',
+                                        formatter: '.getSuppliers'
+                                    }"  
+                                     
+                                >
+                                    <core:Item key="{SupplierId}" text="{SuppliersName}" />
+                                </MultiComboBox>
+
+                                <Label text="{i18n>CurrencyText}" labelFor="idCurrencyInput" />
+                                <Input 
+                                    value="{FormModel>/Currency}" 
+                                    id="idCurrencyInput" 
+                                />
+                                
+                            </form:content>
+                        </form:SimpleForm>
                     </u:ObjectPageSubSection>
                   </u:subSections>
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
+                visible="{= !${EditModel>/EditMode}}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -151,7 +282,7 @@
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
                             sticky="HeaderToolbar,ColumnHeaders"
-                            items="{Supplier}"
+                            items="{Suppliers}"
                             class="sapUiSmallNegativeMarginBeginEnd"
                             width="auto">
                             <headerToolbar>
@@ -193,6 +324,26 @@
             
         </u:sections>
         
+        <u:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button 
+                    text="Save" 
+                    visible="{= ${Name} ? true : false}" 
+                    press="onSaveProductPress" 
+                    type="Emphasized"
+                />
+                <Button 
+                    text="Create" 
+                    visible="{= ${Name} ? false : true}" 
+                    press="onCreateProductPress" 
+                    type="Emphasized"
+                />
+                <Button text="Cancel" press="onCancelButtonPress"/>
+                
+            </OverflowToolbar>
+        </u:footer>
+
     </u:ObjectPageLayout>
 
 

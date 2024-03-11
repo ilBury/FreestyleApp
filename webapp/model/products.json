@@ -6,7 +6,7 @@
             "Description": "very useful thing",
             "Price": 2.65,
             "Quantity": "134",
-            "Supplier": [
+            "Suppliers": [
                 {
                     "SupplierId": "1"
                 },
@@ -26,7 +26,7 @@
             "Description": "very cheerful thing",
             "Price": 501.65,
             "Quantity": "22",
-            "Supplier": [
+            "Suppliers": [
                 {
                     "SupplierId": "1"
                 },
@@ -46,7 +46,7 @@
             "Description": "very informative thing",
             "Price": 71.65,
             "Quantity": "134",
-            "Supplier": [
+            "Suppliers": [
                 {
                     "SupplierId": "4"
                 }
@@ -63,7 +63,7 @@
             "Description": "very comfortable thing",
             "Price": 21.65,
             "Quantity": "22",
-            "Supplier": [
+            "Suppliers": [
                 {
                     "SupplierId": "1"
                 },

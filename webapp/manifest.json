@@ -46,7 +46,6 @@
 				},
 				{
 					"pattern": "product/{productId}",
-
 					"name": "ProductDetails",
 					"target": [
 						"productDetails"

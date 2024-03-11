@@ -4,8 +4,11 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/m/Token",
-	"sap/ui/core/Fragment"
-], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment) {
+	"sap/ui/core/Fragment",
+	"sap/ui/model/Sorter",
+	'sap/m/MessageBox',
+	"sap/m/MessageToast"
+], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment, Sorter, MessageBox, MessageToast) {
 	"use strict";
 
 	return Controller.extend("products.app.controller.ListReport", {
@@ -47,11 +50,11 @@ sap.ui.define([
 						value: ""
 					}, 
 					{
-						key: "false",
+						key: false,
 						value: this.getTextFromI18n("InStockText")
 					},
 					{
-						key: "true",
+						key: true,
 						value: this.getTextFromI18n("OutOfStockText")
 					}
 				],
@@ -63,11 +66,40 @@ sap.ui.define([
 			const oSearcherModel = new JSONModel({
 				field: ""
 			})
-			
+			const oDeleteButtonModel = new JSONModel({
+				Enable: false
+			})
+
+			this.getView().setModel(oDeleteButtonModel, "DeleteModel");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
 			this.getView().setModel(oSearcherModel, "SearchModel");
+		},
+
+		onAfterRendering: function() {
+			const aProducts = this.getView().getModel().getProperty("/Products");
+			const oSelectedItems = {
+				Items: aProducts.map(el =>({"Id": el.Id, "Selected": false}))
+			}
+			const oSelectedItemsModel = new JSONModel(oSelectedItems);
+			
+			this.getView().setModel(oSelectedItemsModel, "SelectedItemsModel")
+			
+			const oTable = this.byId("idProductsTable");
+			const oItemsBinding = oTable.getBinding("items");
+			const oSorter = new Sorter("CreatedAt", "ASC");
+			
+			oItemsBinding.sort(oSorter);
+		},
+
+		getSelectedItem: function(sProductId) {
+			const oTempModel = this.getView().getModel("SelectedItemsModel");
+			if(!oTempModel) return;
+			const oTempItems = oTempModel.getProperty("/Items");
+			const oCurrentItem = oTempItems.find(el => el.Id === sProductId);
+			
+			return oCurrentItem?.Selected;
 		},
 
 		getTextFromI18n: function(sKey) {
@@ -90,6 +122,8 @@ sap.ui.define([
 			}
 			
 			const [sFirstRange, sSecondRange] = aCurrentPriceRange;
+			
+			
 			switch(sFirstRange) {
 				case oWords.any: return [new Filter("Price", FilterOperator.NE, null)]; 
 				case oWords.under: return [new Filter("Price", FilterOperator.BT, 0, Number(sSecondRange))];
@@ -123,10 +157,9 @@ sap.ui.define([
 
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
-
 			const aSuppliers = oModel.getProperty("/Suppliers");
 			const aCurrentSuppliers = data.map(el => el.SupplierId);
-			
+	
 			return aSuppliers
 					.filter((el) => aCurrentSuppliers.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
@@ -177,6 +210,7 @@ sap.ui.define([
 				filters: this.getPriceFilter(),
 				and: false
 			})
+			
 			return new Filter({
 				filters: [oSearchFilter, oAvailabilityFilter, oCategoryFilters, oSuppliersFilters, oPriceFilter],
 				and: true
@@ -184,7 +218,7 @@ sap.ui.define([
 		},
 
 		onFilter: function(aSelectedId = null) {
-			const oTable = this.byId("table");
+			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
 			
 			const oFilter = this.getCombinedFilter(aSelectedId);
@@ -225,10 +259,8 @@ sap.ui.define([
 					})
 				)
 			})
-
-			
-			return aFilters.length ? aFilters : [new Filter("Supplier/0/SupplierId", FilterOperator.Contains, "")];
-
+	
+			return aFilters.length ? aFilters : [new Filter("Suppliers/0/SupplierId", FilterOperator.Contains, "")];
 		},
 
 		getCategoriesFilters: function() {
@@ -319,23 +351,69 @@ sap.ui.define([
 			const oSource = oEvent.getSource();
 			const oCtx = oSource.getBindingContext();
 			const oComponent = this.getOwnerComponent();
-
-		
-			oComponent.getRouter().navTo("ObjectPage", {
+			
+			oComponent.getRouter().navTo("ProductDetails", {
 				productId: oCtx.getObject("Id")
 			})
 		},
 
-		onCreateButtonPress: function(oEvent) {
+		onCreateButtonPress: function() {
 			const oModel = this.getView().getModel();
-			const sProductId = oModel.getProperty("/Products").length + 1;
+			const sProductId = "newProduct";
 			const oComponent = this.getOwnerComponent();
-			oComponent.getRouter().navTo("ObjectPage", {
+			oComponent.getRouter().navTo("ProductDetails", {
 				productId: sProductId
+			})	
+		},
+		
+		rewriteProductsIds: function() {
+			const aProducts = this.getView().getModel().getProperty("/Products");
+			aProducts.map((el, id) => {
+				el.Id = String(id + 1);
+				return el;
 			})
-			
-			
+		},
 
+		deleteProducts: function() {
+			try {
+				const oTable = this.byId("idProductsTable");
+				const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("Id"));
+				const aProducts = this.getView().getModel().getProperty("/Products")
+				const oDeleteModel = this.getView().getModel("DeleteModel");
+				const aNonSelectedProducts = aProducts.filter(el => !aSelectedItemsIds.includes(el.Id));
+				oDeleteModel.setProperty("/Enable", false);
+				this.getView().getModel().setProperty("/Products", aNonSelectedProducts);
+				
+				this.rewriteProductsIds()
+				MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
+			} catch {
+				MessageToast.show(this.getTextFromI18n("ProductWasNotRemovedMessage"))
+			}
+			
+		},
+
+		onDeleteButtonPress: function(oEvent) {
+			MessageBox.warning(this.getTextFromI18n("DeleteProductsWarningMessage"), {
+				actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+				emphasizedAction: MessageBox.Action.OK,
+				onClose: (sAction) => {
+					
+					if(sAction === MessageBox.Action.OK) {
+						this.deleteProducts();
+					} 
+				}
+			});
+		},
+
+		onTableSelectionChange: function(oEvent) {
+			const oDeleteButtonModel = this.getView().getModel("DeleteModel");
+			const aSelectedItems = oEvent.getSource().getSelectedItems();
+
+			if(aSelectedItems.length) {
+				oDeleteButtonModel.setProperty("/Enable", true)
+			} else {
+				oDeleteButtonModel.setProperty("/Enable", false)
+			}		
 		}
 	});
 });
