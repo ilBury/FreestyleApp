@@ -138,10 +138,8 @@ sap.ui.define([
 			
 			if (oEvent?.getParameter("type") === "removed") {
 				const oModel = this.getView().getModel();
-				const aSuppliers = oModel.getProperty("/Suppliers");
-				
+				const aSuppliers = oModel.getProperty("/Suppliers");		
 				const aRemovedTokens = oEvent.getParameter("removedTokens");
-			
 				const aRemainingTokens = oMultiInput.getTokens().filter(function (token) {
 					return !aRemovedTokens.includes(token);
 				});
@@ -220,7 +218,6 @@ sap.ui.define([
 		onFilter: function(aSelectedId = null) {
 			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
-			
 			const oFilter = this.getCombinedFilter(aSelectedId);
 			
 			oItemsBinding.filter(oFilter);
@@ -358,7 +355,6 @@ sap.ui.define([
 		},
 
 		onCreateButtonPress: function() {
-			const oModel = this.getView().getModel();
 			const sProductId = "newProduct";
 			const oComponent = this.getOwnerComponent();
 			oComponent.getRouter().navTo("ProductDetails", {

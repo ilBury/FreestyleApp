@@ -163,6 +163,7 @@
                             layout="ResponsiveGridLayout"
                             title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
                             singleContainerFullSize="false"
+                            validateFieldGroup="onFormValidateFieldGroup"
                             labelSpanXL="2"
                             emptySpanXL="3">
                             <form:content>
@@ -186,6 +187,7 @@
                                 <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
                                 <Input 
                                     required="true" 
+                                    fieldGroupIds="valid"
                                     value="{
                                         path: 'FormModel>/Description',
                                         type: 'sap.ui.model.type.String',
@@ -247,7 +249,7 @@
                                     id="idSuppliersMultiComboBox"
                                     selectedKeys="{
                                         path: 'FormModel>/Suppliers',
-                                        formatter: '.getSuppliers'
+                                        formatter: '.getSuppliersId'
                                     }"  
                                      
                                 >
