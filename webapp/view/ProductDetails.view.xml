@@ -172,7 +172,7 @@
                                 <Label text="{i18n>ProductNameText}" labelFor="idNameInput" />
                                 <Input
                                     required="true"
-                                    fieldGroupIds="valid"
+                                    liveChange="onLiveChange"
                                     id="idNameInput"    
                                     value="{
                                         path: 'FormModel>/Name',
@@ -186,20 +186,16 @@
 
                                 <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
                                 <Input 
-                                    required="true" 
-                                    fieldGroupIds="valid"
                                     value="{
                                         path: 'FormModel>/Description',
-                                        type: 'sap.ui.model.type.String',
-                                        constraints: {
-                                            minLength: 5
-                                        }
+                                        type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idDescriptionInput" 
                                 />
 
                                 <Label text="{i18n>PriceText}" labelFor="idPriceInput" />
                                 <Input 
+                                    liveChange="onLiveChange"
                                     value="{
                                         path: 'FormModel>/Price',
                                         type: 'sap.ui.model.type.Float',
@@ -212,6 +208,7 @@
 
                                 <Label text="{i18n>QuantityText}" labelFor="idQuantityInput" />
                                 <Input 
+                                    liveChange="onLiveChange"
                                     value="{
                                         path: 'FormModel>/Quantity',
                                         type: 'sap.ui.model.type.Float',
@@ -224,6 +221,7 @@
                                 <core:Title text="{i18n>ProductDetailsText}" />
                                 <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
                                 <Select 
+                                    change="onLiveChange"
                                     forceSelection="false"
                                     items="{/Categories}" 
                                     id="idCategoriesSelect"
@@ -234,7 +232,7 @@
 
                                 <Label text="{i18n>AvailabilityText}" labelFor="idAvailabilitySelect" />
                                 <Select 
-                                    fieldGroupIds="valid"
+                                    change="onLiveChange"
                                     items="{AvailabilityModel>/Availability}" 
                                     selectedKey="{FormModel>/Availability}"
                                     id="idAvailabilitySelect"
@@ -247,18 +245,18 @@
                                 <MultiComboBox
                                     items="{/Suppliers}"
                                     id="idSuppliersMultiComboBox"
-                                    selectedKeys="{
-                                        path: 'FormModel>/Suppliers',
-                                        formatter: '.getSuppliersId'
-                                    }"  
-                                     
+                                    selectedKeys="{FormModel>/Suppliers}"  
                                 >
                                     <core:Item key="{SupplierId}" text="{SuppliersName}" />
                                 </MultiComboBox>
 
                                 <Label text="{i18n>CurrencyText}" labelFor="idCurrencyInput" />
                                 <Input 
-                                    value="{FormModel>/Currency}" 
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'FormModel>/Currency',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
                                     id="idCurrencyInput" 
                                 />
                                 
@@ -269,7 +267,7 @@
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
-                visible="{= !${EditModel>/EditMode}}"
+                visible="{= ${Name} ? true : false}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -283,6 +281,7 @@
                 <u:subSections>
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
+                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
                             sticky="HeaderToolbar,ColumnHeaders"
                             items="{Suppliers}"
                             class="sapUiSmallNegativeMarginBeginEnd"
@@ -290,6 +289,19 @@
                             <headerToolbar>
                                 <Toolbar>
                                     <Label text="{i18n>SupplierText}"></Label>
+                                    <ToolbarSpacer/>
+                                    <Button
+                                        text="{i18n>Addtext}"
+                                        type="Emphasized"
+                                        press="onCreateButtonPress"
+                                        visible="{= ${EditModel>/EditMode} ? true : false}"
+                                    />
+                                    <Button
+                                        enabled="{DeleteModel>/Enable}"
+                                        text="{i18n>RemoveText}"
+                                        press="onDeleteButtonPress"
+                                        visible="{= ${EditModel>/EditMode} ? true : false}"
+                                    />
                                 </Toolbar>
                             </headerToolbar>
                             <columns>
@@ -303,13 +315,29 @@
                             </columns>
                             <items>
                                 <ColumnListItem>
-                                    <cells>                                        
-                                        <Text text="{= ${
+                                    <cells> 
+                                        <VBox
+                                        >
+                                            <Text 
+                                                text="{= ${
                                                     path: 'SupplierId',
                                                     formatter: '.getCurrentSupplier'
-                                                }.SuppliersName
-                                            }" 
-                                        />
+                                                    }.SuppliersName
+                                                }" 
+                                                visible="{= ${EditModel>/EditMode} ? false : true}"
+                                            />
+                                            <Select
+                                                items="{/Suppliers}"
+                                                visible="{= ${EditModel>/EditMode} ? true : false}"
+                                                selectedKeys="{FormModel>/Suppliers}"  
+                                            >
+                                                <core:Item key="{SupplierId}" text="{SuppliersName}" />
+                                            </Select>
+                                            
+                                        </VBox> 
+                                        
+                                                                               
+                                        
                                         <Text text="{= ${
                                                     path: 'SupplierId',
                                                     formatter: '.getCurrentSupplier'

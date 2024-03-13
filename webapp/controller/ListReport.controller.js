@@ -70,6 +70,7 @@ sap.ui.define([
 				Enable: false
 			})
 
+
 			this.getView().setModel(oDeleteButtonModel, "DeleteModel");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
@@ -156,10 +157,10 @@ sap.ui.define([
 		getSuppliersName: function(data) {
 			const oModel = this.getView().getModel();
 			const aSuppliers = oModel.getProperty("/Suppliers");
-			const aCurrentSuppliers = data.map(el => el.SupplierId);
+			const aCurrentSuppliers = data?.map(el => el.SupplierId);
 	
 			return aSuppliers
-					.filter((el) => aCurrentSuppliers.includes(el.SupplierId))
+					.filter((el) => aCurrentSuppliers?.includes(el.SupplierId))
 					.map(el => el.SuppliersName)
 					.join(", ");
 		},
@@ -371,20 +372,17 @@ sap.ui.define([
 		},
 
 		deleteProducts: function() {
-			try {
-				const oTable = this.byId("idProductsTable");
-				const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("Id"));
-				const aProducts = this.getView().getModel().getProperty("/Products")
-				const oDeleteModel = this.getView().getModel("DeleteModel");
-				const aNonSelectedProducts = aProducts.filter(el => !aSelectedItemsIds.includes(el.Id));
-				oDeleteModel.setProperty("/Enable", false);
-				this.getView().getModel().setProperty("/Products", aNonSelectedProducts);
-				
-				this.rewriteProductsIds()
-				MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
-			} catch {
-				MessageToast.show(this.getTextFromI18n("ProductWasNotRemovedMessage"))
-			}
+			
+			const oTable = this.byId("idProductsTable");
+			const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("Id"));
+			const aProducts = this.getView().getModel().getProperty("/Products")
+			const oDeleteModel = this.getView().getModel("DeleteModel");
+			const aNonSelectedProducts = aProducts.filter(el => !aSelectedItemsIds.includes(el.Id));
+			oDeleteModel.setProperty("/Enable", false);
+			this.getView().getModel().setProperty("/Products", aNonSelectedProducts);
+			
+			this.rewriteProductsIds()
+			MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
 			
 		},
 
