@@ -50,7 +50,7 @@
 										<SearchField 
 											id="searcher" 
 											width="100%" 
-											value="{SearchModel>/field}"
+											value="{view>/searchField}"
 											liveChange="onFilter(null)" 	
 										/>
 									</fb:control>
@@ -162,7 +162,7 @@
 								press="onCreateButtonPress"
 							/>
 							<Button
-								enabled="{DeleteModel>/Enable}"
+								enabled="{view>/isButtonEnable}"
 								text="{i18n>DeleteText}"
 								press="onDeleteButtonPress"
 							/>
@@ -203,10 +203,6 @@
 						<ColumnListItem 
 							type="Navigation" 
 							vAlign="Middle"
-							selected="{
-								path: 'Id',
-								formatter: '.getSelectedItem'
-							}"
 							press="onNavToObjectPage">
 							<cells>
 								<ObjectIdentifier title="{Name}"/>

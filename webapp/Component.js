@@ -7,8 +7,7 @@ sap.ui.define([
 
 	return UIComponent.extend("products.app.Component", {
 		metadata: {
-			manifest: "json",
-			handleValidation: true
+			manifest: "json"
 		},
 
 		init : function () {

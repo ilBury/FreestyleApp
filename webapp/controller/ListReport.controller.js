@@ -14,6 +14,7 @@ sap.ui.define([
 	return Controller.extend("products.app.controller.ListReport", {
 		
 		onInit: function() {
+			const oRouter = this.getOwnerComponent().getRouter();
 			const oPriceRangeModel = new JSONModel({
 				Range: [
 					{
@@ -60,47 +61,25 @@ sap.ui.define([
 				],
 				SelectedKey: "all"
 			})
-			const oSelectedSupModel = new JSONModel({
-				Selected: []
-			})
-			const oSearcherModel = new JSONModel({
-				field: ""
-			})
-			const oDeleteButtonModel = new JSONModel({
-				Enable: false
+			const oViewModel = new JSONModel({
+				isButtonEnable: false,
+				searchField: "",
+				selectedInDialogSuppliers: []
 			})
 
 
-			this.getView().setModel(oDeleteButtonModel, "DeleteModel");
+			this.getView().setModel(oViewModel, "view");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
-			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
-			this.getView().setModel(oSearcherModel, "SearchModel");
+			oRouter.attachRouteMatched(this.onRouteMatched, this);
 		},
 
-		onAfterRendering: function() {
-			const aProducts = this.getView().getModel().getProperty("/Products");
-			const oSelectedItems = {
-				Items: aProducts.map(el =>({"Id": el.Id, "Selected": false}))
-			}
-			const oSelectedItemsModel = new JSONModel(oSelectedItems);
-			
-			this.getView().setModel(oSelectedItemsModel, "SelectedItemsModel")
-			
+		onRouteMatched: function() {
 			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
 			const oSorter = new Sorter("CreatedAt", "ASC");
 			
 			oItemsBinding.sort(oSorter);
-		},
-
-		getSelectedItem: function(sProductId) {
-			const oTempModel = this.getView().getModel("SelectedItemsModel");
-			if(!oTempModel) return;
-			const oTempItems = oTempModel.getProperty("/Items");
-			const oCurrentItem = oTempItems.find(el => el.Id === sProductId);
-			
-			return oCurrentItem?.Selected;
 		},
 
 		getTextFromI18n: function(sKey) {
@@ -123,8 +102,6 @@ sap.ui.define([
 			}
 			
 			const [sFirstRange, sSecondRange] = aCurrentPriceRange;
-			
-			
 			switch(sFirstRange) {
 				case oWords.any: return [new Filter("Price", FilterOperator.NE, null)]; 
 				case oWords.under: return [new Filter("Price", FilterOperator.BT, 0, Number(sSecondRange))];
@@ -178,7 +155,7 @@ sap.ui.define([
 		getCombinedFilter: function(aSelectedId) {
 			const oView = this.getView();
 			const oAvailabilityModel = oView.getModel("AvailabilityModel");
-			const sQuerySearch = oView.getModel("SearchModel").getProperty("/field").trim();
+			const sQuerySearch = oView.getModel("view").getProperty("/searchField").trim();
 			const sSelectedKey = oAvailabilityModel.getProperty("/SelectedKey");
 			
 			const sAvailability = "all";
@@ -297,7 +274,7 @@ sap.ui.define([
 				const oMultiInput = this.byId("multiInput");
 				const aSelectedTokens = oMultiInput.getTokens().map(el => el.getText());
 				
-				this.getView().getModel("SelectedSupModel").setProperty("/Selected", aSelectedTokens);
+				this.getView().getModel("view").setProperty("/selectedInDialogSuppliers", aSelectedTokens);
 		
 				this.oDialog.open()	
 			}
@@ -365,9 +342,16 @@ sap.ui.define([
 		
 		rewriteProductsIds: function() {
 			const aProducts = this.getView().getModel().getProperty("/Products");
-			aProducts.map((el, id) => {
+			aProducts.forEach((el, id) => {
 				el.Id = String(id + 1);
 				return el;
+			})
+		},
+
+		cleanSelectedTableItems: function() {
+			const oTable = this.byId("idProductsTable");
+			oTable.getSelectedItems()?.forEach(el => {
+				oTable.setSelectedItem(el, false)
 			})
 		},
 
@@ -376,14 +360,13 @@ sap.ui.define([
 			const oTable = this.byId("idProductsTable");
 			const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("Id"));
 			const aProducts = this.getView().getModel().getProperty("/Products")
-			const oDeleteModel = this.getView().getModel("DeleteModel");
+			const oViewModel = this.getView().getModel("view");
 			const aNonSelectedProducts = aProducts.filter(el => !aSelectedItemsIds.includes(el.Id));
-			oDeleteModel.setProperty("/Enable", false);
+			oViewModel.setProperty("/isButtonEnable", false);
 			this.getView().getModel().setProperty("/Products", aNonSelectedProducts);
-			
-			this.rewriteProductsIds()
+			this.cleanSelectedTableItems();
+			this.rewriteProductsIds();
 			MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
-			
 		},
 
 		onDeleteButtonPress: function(oEvent) {
@@ -400,14 +383,10 @@ sap.ui.define([
 		},
 
 		onTableSelectionChange: function(oEvent) {
-			const oDeleteButtonModel = this.getView().getModel("DeleteModel");
+			const oViewModel = this.getView().getModel("view");
 			const aSelectedItems = oEvent.getSource().getSelectedItems();
 
-			if(aSelectedItems.length) {
-				oDeleteButtonModel.setProperty("/Enable", true)
-			} else {
-				oDeleteButtonModel.setProperty("/Enable", false)
-			}		
+			oViewModel.setProperty("/isButtonEnable", !!aSelectedItems.length)
 		}
 	});
 });

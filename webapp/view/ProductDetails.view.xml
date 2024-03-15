@@ -240,12 +240,13 @@
                                 >
                                     <core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
                                 </Select>
-    
-                                <Label text="{i18n>SupplierText}" labelFor="idSuppliersMultiComboBox" />
+
+                                <Label visible="{= !${Name}}" text="{i18n>SupplierText}" labelFor="idSuppliersMultiComboBox" />
                                 <MultiComboBox
                                     items="{/Suppliers}"
                                     id="idSuppliersMultiComboBox"
-                                    selectedKeys="{FormModel>/Suppliers}"  
+                                    selectedKeys="{FormModel>/Suppliers}" 
+                                    visible="{= !${Name}}" 
                                 >
                                     <core:Item key="{SupplierId}" text="{SuppliersName}" />
                                 </MultiComboBox>
@@ -267,7 +268,7 @@
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
-                visible="{= ${Name} ? true : false}"
+                visible="{= !!${Name}}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -281,9 +282,9 @@
                 <u:subSections>
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
-                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
                             sticky="HeaderToolbar,ColumnHeaders"
                             items="{Suppliers}"
+                            selectionChange="onChangeRemoveButtonEnable"
                             class="sapUiSmallNegativeMarginBeginEnd"
                             width="auto">
                             <headerToolbar>
@@ -291,17 +292,12 @@
                                     <Label text="{i18n>SupplierText}"></Label>
                                     <ToolbarSpacer/>
                                     <Button
-                                        text="{i18n>Addtext}"
+                                        text="{i18n>AddAndRemovetext}"
                                         type="Emphasized"
-                                        press="onCreateButtonPress"
+                                        press="handleValueHelpRequest"
                                         visible="{= ${EditModel>/EditMode} ? true : false}"
                                     />
-                                    <Button
-                                        enabled="{DeleteModel>/Enable}"
-                                        text="{i18n>RemoveText}"
-                                        press="onDeleteButtonPress"
-                                        visible="{= ${EditModel>/EditMode} ? true : false}"
-                                    />
+                                    
                                 </Toolbar>
                             </headerToolbar>
                             <columns>
@@ -316,27 +312,16 @@
                             <items>
                                 <ColumnListItem>
                                     <cells> 
-                                        <VBox
-                                        >
-                                            <Text 
-                                                text="{= ${
-                                                    path: 'SupplierId',
-                                                    formatter: '.getCurrentSupplier'
-                                                    }.SuppliersName
-                                                }" 
-                                                visible="{= ${EditModel>/EditMode} ? false : true}"
-                                            />
-                                            <Select
-                                                items="{/Suppliers}"
-                                                visible="{= ${EditModel>/EditMode} ? true : false}"
-                                                selectedKeys="{FormModel>/Suppliers}"  
-                                            >
-                                                <core:Item key="{SupplierId}" text="{SuppliersName}" />
-                                            </Select>
+                                      
+                                        <Text 
+                                            text="{= ${
+                                                path: 'SupplierId',
+                                                formatter: '.getCurrentSupplier'
+                                                }.SuppliersName
+                                            }" 
                                             
-                                        </VBox> 
-                                        
-                                                                               
+                                        />
+                                           
                                         
                                         <Text text="{= ${
                                                     path: 'SupplierId',
@@ -359,17 +344,17 @@
                 <ToolbarSpacer />
                 <Button 
                     text="Save" 
-                    visible="{= ${Name} ? true : false}" 
+                    visible="{= !!${Name}}" 
                     press="onSaveProductPress" 
                     type="Emphasized"
                 />
                 <Button 
                     text="Create" 
-                    visible="{= ${Name} ? false : true}" 
+                    visible="{= !${Name}}" 
                     press="onCreateProductPress" 
                     type="Emphasized"
                 />
-                <Button text="Cancel" press="onCancelButtonPress"/>
+                <Button text="{i18n>CancelText}" press="onCancelButtonPress"/>
                 
             </OverflowToolbar>
         </u:footer>
