@@ -50,7 +50,7 @@
 										<SearchField 
 											id="searcher" 
 											width="100%" 
-											value="{SearchModel>/field}"
+											value="{view>/searchField}"
 											liveChange="onFilter(null)" 	
 										/>
 									</fb:control>
@@ -146,14 +146,26 @@
 			</f:header>
 				<f:content>
 				<Table
-					id="table"
-					inset="false"
+					id="idProductsTable"
 					mode="MultiSelect"
 					items="{/Products}"
+					
+					selectionChange="onTableSelectionChange"
 				>
 					<headerToolbar>
-						<OverflowToolbar id="otbSubheader">
+						<OverflowToolbar>
 							<Title text="{i18n>ListReportTitle}" />	
+							<ToolbarSpacer/>
+							<Button
+								text="{i18n>CreateText}"
+								type="Emphasized"
+								press="onCreateButtonPress"
+							/>
+							<Button
+								enabled="{view>/isButtonEnable}"
+								text="{i18n>DeleteText}"
+								press="onDeleteButtonPress"
+							/>
 						</OverflowToolbar>
 					</headerToolbar>
 					<columns>
@@ -200,7 +212,7 @@
 								
 								<Text 
 									text="{
-										path: 'Supplier',
+										path: 'Suppliers',
 										formatter: '.getSuppliersName'
 									}" 
 								/>

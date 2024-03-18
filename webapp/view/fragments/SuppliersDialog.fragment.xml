@@ -7,12 +7,12 @@
 		items="{/Suppliers}"
 		liveChange="_handleValueHelpSearch"
 		confirm="_handleValueHelpClose"
-		cancel="_handleValueHelpClose"
+		
 		multiSelect="true">
 		<StandardListItem
 			iconDensityAware="false"
 			iconInset="false"
-			selected="{= ${SelectedSupModel>/Selected}.includes(${SuppliersName})}"
+			selected="{= ${view>/selectedInDialogSuppliers}.includes(${SuppliersName})}"
 			title="{SuppliersName}"
 			description="{Address}" />
 	</SelectDialog>
