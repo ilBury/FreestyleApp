@@ -62,15 +62,14 @@
 									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
-										<Select
+										<MultiComboBox
 											id="availabilitySelect"
-											forceSelection="false"
-											selectedKey="{AvailabilityModel>/SelectedKey}"
-											change="onFilter(null)"
+											
 											items="{AvailabilityModel>/Availability}"
+											selectionChange="onFilter(null)"
 										>
 											<core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
-										</Select>
+										</MultiComboBox>
 									</fb:control>
 								</fb:FilterGroupItem>
 
@@ -107,6 +106,7 @@
 									<fb:control>
 										<MultiComboBox
 											id="categorySelect"
+											
 											items="{/Categories}"
 											selectionChange="onFilter(null)"
 										>
@@ -213,13 +213,13 @@
 								<Text 
 									text="{
 										path: 'Suppliers',
-										formatter: '.getSuppliersName'
+										formatter: '.formatter.getSuppliersName'
 									}" 
 								/>
 								
 								<Text text="{
 									path: 'Category',
-									formatter: '.getCategoriesName'
+									formatter: '.formatter.getCategoriesName'
 								}" />
 								<ObjectStatus 
 									inverted="true"

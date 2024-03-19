@@ -53,7 +53,7 @@
                 title="{i18n>CategoryText}" 
                 text="{
                     path: 'Category',
-                    formatter: '.getCategoriesName'
+                    formatter: '.formatter.getCategoriesName'
                 }"
             />
             <ObjectStatus 
@@ -195,6 +195,7 @@
 
                                 <Label text="{i18n>PriceText}" labelFor="idPriceInput" />
                                 <Input 
+                                    required="true"
                                     liveChange="onLiveChange"
                                     value="{
                                         path: 'FormModel>/Price',
@@ -208,6 +209,7 @@
 
                                 <Label text="{i18n>QuantityText}" labelFor="idQuantityInput" />
                                 <Input 
+                                    required="true"
                                     liveChange="onLiveChange"
                                     value="{
                                         path: 'FormModel>/Quantity',
@@ -221,6 +223,7 @@
                                 <core:Title text="{i18n>ProductDetailsText}" />
                                 <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
                                 <Select 
+                                    required="true"
                                     change="onLiveChange"
                                     forceSelection="false"
                                     items="{/Categories}" 
@@ -232,6 +235,7 @@
 
                                 <Label text="{i18n>AvailabilityText}" labelFor="idAvailabilitySelect" />
                                 <Select 
+                                    required="true"
                                     change="onLiveChange"
                                     items="{AvailabilityModel>/Availability}" 
                                     selectedKey="{FormModel>/Availability}"
@@ -241,18 +245,9 @@
                                     <core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
                                 </Select>
 
-                                <Label visible="{= !${Name}}" text="{i18n>SupplierText}" labelFor="idSuppliersMultiComboBox" />
-                                <MultiComboBox
-                                    items="{/Suppliers}"
-                                    id="idSuppliersMultiComboBox"
-                                    selectedKeys="{FormModel>/Suppliers}" 
-                                    visible="{= !${Name}}" 
-                                >
-                                    <core:Item key="{SupplierId}" text="{SuppliersName}" />
-                                </MultiComboBox>
-
                                 <Label text="{i18n>CurrencyText}" labelFor="idCurrencyInput" />
                                 <Input 
+                                    required="true"
                                     liveChange="onLiveChange"
                                     value="{
                                         path: 'FormModel>/Currency',
@@ -268,7 +263,6 @@
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
-                visible="{= !!${Name}}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -282,22 +276,29 @@
                 <u:subSections>
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
+                            visible="{= !!${Name}}"
                             sticky="HeaderToolbar,ColumnHeaders"
                             items="{Suppliers}"
-                            selectionChange="onChangeRemoveButtonEnable"
+                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
+                            selectionChange="onSelectSuppliers"
                             class="sapUiSmallNegativeMarginBeginEnd"
                             width="auto">
                             <headerToolbar>
                                 <Toolbar>
-                                    <Label text="{i18n>SupplierText}"></Label>
+                                    <Label text="{i18n>SupplierText}"></Label>  
                                     <ToolbarSpacer/>
                                     <Button
-                                        text="{i18n>AddAndRemovetext}"
+                                        text="{i18n>Addtext}"
                                         type="Emphasized"
                                         press="handleValueHelpRequest"
-                                        visible="{= ${EditModel>/EditMode} ? true : false}"
+                                        visible="{= !!${EditModel>/EditMode}}"
                                     />
-                                    
+                                    <Button
+                                        text="{i18n>Removetext}"
+                                        enabled="{view>/isButtonEnable}"
+                                        press="onRemoveSuppliers"
+                                        visible="{= !!${EditModel>/EditMode}}"
+                                    />
                                 </Toolbar>
                             </headerToolbar>
                             <columns>
@@ -306,26 +307,78 @@
                                 </Column>
                                 <Column minScreenWidth="Tablet" demandPopin="true">
                                     <Text text="{i18n>AddressText}" />
-                                </Column>
-                                
+                                </Column>                           
                             </columns>
                             <items>
                                 <ColumnListItem>
                                     <cells> 
-                                      
                                         <Text 
                                             text="{= ${
                                                 path: 'SupplierId',
-                                                formatter: '.getCurrentSupplier'
+                                                formatter: '.formatter.getCurrentSupplier'
                                                 }.SuppliersName
                                             }" 
                                             
-                                        />
-                                           
-                                        
+                                        />     
                                         <Text text="{= ${
                                                     path: 'SupplierId',
-                                                    formatter: '.getCurrentSupplier'
+                                                    formatter: '.formatter.getCurrentSupplier'
+                                                }.Address
+                                            }" 
+                                        />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                        <Table 
+                            id="idCreateSuppliersTable"
+                            sticky="HeaderToolbar,ColumnHeaders"
+                            items="{FormModel>/Suppliers}"
+                            visible="{= !${Name}}"
+                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
+                            selectionChange="onSelectSuppliers"
+                            class="sapUiSmallNegativeMarginBeginEnd"
+                            width="auto">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Label text="{i18n>SupplierText}"></Label>  
+                                    <ToolbarSpacer/>
+                                    <Button
+                                        text="{i18n>Addtext}"
+                                        type="Emphasized"
+                                        press="handleValueHelpRequest"
+                                        visible="{= !!${EditModel>/EditMode}}"
+                                    />
+                                    <Button
+                                        text="{i18n>Removetext}"
+                                        enabled="{view>/isButtonEnable}"
+                                        press="onRemoveSuppliersInCreateMode"
+                                        visible="{= !!${EditModel>/EditMode}}"
+                                    />
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="12em">
+                                    <Text text="{i18n>ProductNameText}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>AddressText}" />
+                                </Column>                           
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells> 
+                                        <Text 
+                                            text="{= ${
+                                                path: 'FormModel>',
+                                                formatter: '.formatter.getCurrentSupplier'
+                                                }.SuppliersName
+                                            }" 
+                                            
+                                        />     
+                                        <Text text="{= ${
+                                                path: 'FormModel>',
+                                                formatter: '.formatter.getCurrentSupplier'
                                                 }.Address
                                             }" 
                                         />

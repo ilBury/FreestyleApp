@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"products/app/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
@@ -7,12 +7,14 @@ sap.ui.define([
 	"sap/ui/core/Fragment",
 	"sap/ui/model/Sorter",
 	'sap/m/MessageBox',
-	"sap/m/MessageToast"
-], function (Controller, JSONModel, Filter, FilterOperator, Token, Fragment, Sorter, MessageBox, MessageToast) {
+	"sap/m/MessageToast",
+	"../model/formatter"
+], function (BaseController, JSONModel, Filter, FilterOperator, Token, Fragment, Sorter, MessageBox, MessageToast, formatter) {
 	"use strict";
 
-	return Controller.extend("products.app.controller.ListReport", {
-		
+	return BaseController.extend("products.app.controller.ListReport", {
+		formatter: formatter,
+
 		onInit: function() {
 			const oRouter = this.getOwnerComponent().getRouter();
 			const oPriceRangeModel = new JSONModel({
@@ -47,10 +49,6 @@ sap.ui.define([
 			const oAvailabilityModel = new JSONModel({
 				Availability: [
 					{
-						key: "all",
-						value: ""
-					}, 
-					{
 						key: false,
 						value: this.getTextFromI18n("InStockText")
 					},
@@ -58,15 +56,14 @@ sap.ui.define([
 						key: true,
 						value: this.getTextFromI18n("OutOfStockText")
 					}
-				],
-				SelectedKey: "all"
+				]
 			})
 			const oViewModel = new JSONModel({
 				isButtonEnable: false,
 				searchField: "",
 				selectedInDialogSuppliers: []
 			})
-
+			
 
 			this.getView().setModel(oViewModel, "view");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
@@ -82,14 +79,8 @@ sap.ui.define([
 			oItemsBinding.sort(oSorter);
 		},
 
-		getTextFromI18n: function(sKey) {
-			const i18nModel = this.getOwnerComponent().getModel("i18n");
-			const oBundle = i18nModel.getResourceBundle();
-      		return oBundle.getText(sKey)
-		},
-
 		getPriceFilter: function() {
-			const oPriceModel = this.getView().getModel("PriceModel");
+			const oPriceModel = this.getModel("PriceModel");
 			const sSelectedKey = oPriceModel.getProperty("/SelectedKey");
 			const aPricesRange = oPriceModel.getProperty("/Range");
 			const [oCurrentPriceRange] = aPricesRange.filter(el => el.id === sSelectedKey);
@@ -108,14 +99,13 @@ sap.ui.define([
 				case oWords.over: return [new Filter("Price", FilterOperator.GT, Number(sSecondRange))];
 				default: return [new Filter("Price", FilterOperator.BT, Number(sFirstRange), Number(sSecondRange))];
 			}
-
 		},
 
 		handlerTokenUpdate: function(oEvent) {
 			const oMultiInput = this.byId("multiInput");
 			
 			if (oEvent?.getParameter("type") === "removed") {
-				const oModel = this.getView().getModel();
+				const oModel = this.getModel();
 				const aSuppliers = oModel.getProperty("/Suppliers");		
 				const aRemovedTokens = oEvent.getParameter("removedTokens");
 				const aRemainingTokens = oMultiInput.getTokens().filter(function (token) {
@@ -131,39 +121,13 @@ sap.ui.define([
 			}
 		},
 
-		getSuppliersName: function(data) {
-			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");
-			const aCurrentSuppliers = data?.map(el => el.SupplierId);
-	
-			return aSuppliers
-					.filter((el) => aCurrentSuppliers?.includes(el.SupplierId))
-					.map(el => el.SuppliersName)
-					.join(", ");
-		},
-
-		getCategoriesName: function(data) {
-			const oModel = this.getView().getModel();
-			const aCategories = oModel.getProperty("/Categories");	
-
-			return aCategories
-					.filter((el) => data?.includes(el.Id))
-					.map(el => el.Name)
-					.join("")
-		},
-
 		getCombinedFilter: function(aSelectedId) {
-			const oView = this.getView();
-			const oAvailabilityModel = oView.getModel("AvailabilityModel");
-			const sQuerySearch = oView.getModel("view").getProperty("/searchField").trim();
-			const sSelectedKey = oAvailabilityModel.getProperty("/SelectedKey");
-			
-			const sAvailability = "all";
-			const oAvailabilityFilter = new Filter(
-				"Availability", 
-				FilterOperator.NE,
-				sSelectedKey === sAvailability ? sSelectedKey : JSON.parse(sSelectedKey.toLowerCase())
-			)
+			const sQuerySearch = this.getView().getModel("view").getProperty("/searchField").trim();
+		
+			const oAvailabilityFilter = new Filter({
+				filters: this.getAvailabilitiesFilters(),
+				and: false
+			})
 
 			const aSearchFilters = [
 				new Filter("Name", FilterOperator.Contains, sQuerySearch),
@@ -201,9 +165,39 @@ sap.ui.define([
 			oItemsBinding.filter(oFilter);
 		},
 
+		getCategoriesFilters: function() {
+			const oModel = this.getModel();
+			const aCategories = oModel.getProperty("/Categories");
+			const oCategorySelect = this.byId("categorySelect");			
+			const aCategoryNames = oCategorySelect.getSelectedItems().map(el => el.getText());
+			const aCategoriesIds = aCategories
+									.filter(el => aCategoryNames.includes(el.Name))
+									.map(el => el.Id);
+			
+			const aFilters = aCategoriesIds.map((el) => {
+				return new Filter("Category", FilterOperator.Contains, el)
+			})
+			
+			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
+		},
+
+		getAvailabilitiesFilters: function() {
+			const aAvailabilities = this.getView().getModel("AvailabilityModel").getProperty("/Availability");
+			const oAvailabilitySelect = this.byId("availabilitySelect");
+			const aAvailabilityNames = oAvailabilitySelect.getSelectedItems().map(el => el.getText());
+			const aAvailabilitiesKeys = aAvailabilities
+											.filter(el => aAvailabilityNames.includes(el.value))
+											.map(el => el.key)
+			const aFilters = aAvailabilitiesKeys.map(el => {
+				return new Filter("Availability", FilterOperator.EQ, !el)
+			})
+
+			return aFilters.length ? aFilters : [new Filter("Availability", FilterOperator.NE, null)]
+		},
+
 		getSuppliersFilters: function(aSelectedId) {
 			const oMultiInput = this.byId("multiInput");
-			const oModel = this.getView().getModel();
+			const oModel = this.getModel();
 			const aAllSuppliers = oModel.getProperty("/Suppliers");
 			const aSuppliersItems = oMultiInput.getTokens().map(el => el.getText());
 			const aFilters = [];
@@ -238,21 +232,7 @@ sap.ui.define([
 			return aFilters.length ? aFilters : [new Filter("Suppliers/0/SupplierId", FilterOperator.Contains, "")];
 		},
 
-		getCategoriesFilters: function() {
-			const oModel = this.getView().getModel();
-			const aCategories = oModel.getProperty("/Categories");
-			const oCategorySelect = this.byId("categorySelect");			
-			const aCategoryNames = oCategorySelect.getSelectedItems().map(el => el.getText());
-			const aCategoriesIds = aCategories
-									.filter(el => aCategoryNames.includes(el.Name))
-									.map(el => el.Id);
-			
-			const aFilters = aCategoriesIds.map((el) => {
-				return new Filter("Category", FilterOperator.Contains, el)
-			})
-			
-			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
-		},
+		
 
 
 		handleValueHelpRequest: function() {
@@ -274,25 +254,12 @@ sap.ui.define([
 				const oMultiInput = this.byId("multiInput");
 				const aSelectedTokens = oMultiInput.getTokens().map(el => el.getText());
 				
-				this.getView().getModel("view").setProperty("/selectedInDialogSuppliers", aSelectedTokens);
+				this.getModel("view").setProperty("/selectedInDialogSuppliers", aSelectedTokens);
 		
 				this.oDialog.open()	
 			}
 		},
-
-		_handleValueHelpSearch: function(oEvent) {
-			const sValue = oEvent.getParameter("value");
-			const aFilters = [
-				new Filter("SuppliersName", FilterOperator.Contains, sValue),
-				new Filter("Address", FilterOperator.Contains, sValue)
-			]
-			const oFilter = new Filter({
-				filters: aFilters,
-				and: false
-			});
-			oEvent.getSource().getBinding("items").filter([oFilter]);
-		},
-
+		
 		addNewSupplierTokens: function(oMultiInput, aSelectedItems) {
 			const aInputTokensText = oMultiInput.getTokens().map(el => el.getText());
 			aSelectedItems.forEach(function (oItem) {
@@ -341,7 +308,7 @@ sap.ui.define([
 		},
 		
 		rewriteProductsIds: function() {
-			const aProducts = this.getView().getModel().getProperty("/Products");
+			const aProducts = this.getModel().getProperty("/Products");
 			aProducts.forEach((el, id) => {
 				el.Id = String(id + 1);
 				return el;
@@ -359,11 +326,11 @@ sap.ui.define([
 			
 			const oTable = this.byId("idProductsTable");
 			const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("Id"));
-			const aProducts = this.getView().getModel().getProperty("/Products")
-			const oViewModel = this.getView().getModel("view");
+			const aProducts = this.getModel().getProperty("/Products")
+			const oViewModel = this.getModel("view");
 			const aNonSelectedProducts = aProducts.filter(el => !aSelectedItemsIds.includes(el.Id));
 			oViewModel.setProperty("/isButtonEnable", false);
-			this.getView().getModel().setProperty("/Products", aNonSelectedProducts);
+			this.getModel().setProperty("/Products", aNonSelectedProducts);
 			this.cleanSelectedTableItems();
 			this.rewriteProductsIds();
 			MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
@@ -383,7 +350,7 @@ sap.ui.define([
 		},
 
 		onTableSelectionChange: function(oEvent) {
-			const oViewModel = this.getView().getModel("view");
+			const oViewModel = this.getModel("view");
 			const aSelectedItems = oEvent.getSource().getSelectedItems();
 
 			oViewModel.setProperty("/isButtonEnable", !!aSelectedItems.length)
