@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"products/app/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/m/MessageBox",
@@ -10,23 +10,22 @@ sap.ui.define([
 	'sap/ui/core/library',
 	"sap/ui/core/Fragment",
 	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator"
-], function (Controller,
-	JSONModel,
-	MessageToast,
-	MessageBox,
-	DateFormat,
-	deepEqual,
-	Messaging,
-	Message,
-	library,
-	Fragment,
-	Filter,
-	FilterOperator) {
+	"sap/ui/model/FilterOperator",
+	'sap/m/Label',
+	'sap/ui/table/Column',
+	'sap/m/Column',
+	'sap/m/Text',
+	'sap/ui/model/type/String',
+	'sap/m/SearchField',
+	'sap/m/ColumnListItem',
+	"sap/m/Token",
+	"../model/formatter"
+], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, MColumn, Text,	TypeString,	SearchField,ColumnListItem, Token, formatter) {
 	"use strict";
 
-	return Controller.extend("products.app.controller.ProductDetails", {
-		
+	return BaseController.extend("products.app.controller.ProductDetails", {
+		formatter: formatter,
+
         onInit: function() {
 			
             const oComponent = this.getOwnerComponent();
@@ -47,7 +46,7 @@ sap.ui.define([
 				Selected: []
 			})
 			const oViewModel = new JSONModel({
-				selectedInDialogSuppliers: []
+				isButtonEnable: false
 			})
 			
 			this.getView().setModel(oViewModel, "view")
@@ -64,12 +63,9 @@ sap.ui.define([
 			const oEditModel = new JSONModel({
 				EditMode: sProductId === sNewProduct
 			});
-			const oDateFormat = DateFormat.getDateTimeInstance({
-				pattern: "yyyy-MM-dd'T'HH:mm:ss"
-			});
 			
 			this.getView().setModel(oEditModel, "EditModel");
-			const bEditMode = this.getView().getModel("EditModel").getProperty("/EditMode");
+			const bEditMode = this.getModel("EditModel").getProperty("/EditMode");
 			const sKey = bEditMode ? "/Products/newProduct" : "/Products/" + (sProductId - 1);	
 			const oFormModel = new JSONModel({
 				Id: "",
@@ -86,47 +82,23 @@ sap.ui.define([
 			})
 
 			this.checkForCorrectPath(sProductId, bEditMode);
-			this.getView().getModel("CopyModel")?.setProperty("/", null)
+			this.getModel("CopyModel")?.setProperty("/", null)
 			this.getView().setModel(oFormModel, "FormModel");
-			
+			this.getView().getModel("view").setProperty("/isButtonEnable", false)
             this.getView().bindObject({
                 path: sKey
             })
+	
         },
 
 		checkForCorrectPath: function(sProductId, bEditMode) {
-			const oModel = this.getView().getModel();
+			const oModel = this.getModel();
 			const bCorrectId = oModel.getProperty("/Products").map((el) => el.Id).includes(sProductId);
 
 			if(!bCorrectId && !bEditMode) {
 				const oComponent = this.getOwnerComponent();
 				oComponent.getRouter().getTargets().display("notFound");
 			}
-		},
-
-		getTextFromI18n: function(sKey) {
-			const i18nModel = this.getOwnerComponent().getModel("i18n");
-			const oBundle = i18nModel.getResourceBundle();
-      		return oBundle.getText(sKey)
-		},
-
-        getCurrentSupplier: function(data) {
-			const oModel = this.getView().getModel();
-			const aSuppliers = oModel.getProperty("/Suppliers");
-			if(data instanceof Object)	{
-				return aSuppliers.find((el) => !data.SupplierId === el.SupplierId)
-			}
-			
-			return aSuppliers.find((el) => data?.includes(el.SupplierId))
-		},
-		getCategoriesName: function(data) {
-			const oModel = this.getView().getModel();
-			const aCategories = oModel.getProperty("/Categories");	
-
-			return aCategories
-					.filter((el) => data?.includes(el.Id))
-					.map(el => el.Name)
-					.join("")
 		},
 
 		getFormFields: function() {
@@ -139,7 +111,6 @@ sap.ui.define([
 				this.byId("idCurrencyInput")
 			]
 		},
-
 
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
@@ -159,7 +130,7 @@ sap.ui.define([
 						message: "Should be required",
 						type: library.MessageType.Error,
 						target: sCurrentBindingPath,
-						processor: this.getView().getModel("FormModel")
+						processor: this.getModel("FormModel")
 					})
 				)
 			}
@@ -227,11 +198,11 @@ sap.ui.define([
 		},
 
 		onConfirmationMessageBoxPress: function(oComponent) {
-			const oCopyModel = this.getView().getModel("CopyModel");
+			const oCopyModel = this.getModel("CopyModel");
 			const oCopyModelSuppliers = oCopyModel?.getProperty("/Suppliers")?.map(el => ({SupplierId: el}));
-			const oFormModel = this.getView().getModel("FormModel");
+			const oFormModel = this.getModel("FormModel");
 			const sCurrentId = this.getView().getBindingContext().getObject("Id")
-			const oModel = this.getView().getModel();
+			const oModel = this.getModel();
 			
 			
 			MessageBox
@@ -244,7 +215,8 @@ sap.ui.define([
 							oFormModel.setProperty("/", Object.assign({}, oCopyModel.getData()))
 							oCopyModel.setProperty("/Suppliers", oCopyModelSuppliers)
 							oModel.setProperty("/Products/" + (sCurrentId - 1), Object.assign({}, oCopyModel.getData()));
-							this.getView().getModel("EditModel").setProperty("/EditMode", false);
+							this.getModel("EditModel").setProperty("/EditMode", false);
+							
 							oFormModel.updateBindings(true);
 							Messaging.getMessageModel().getData().forEach(el => Messaging.removeMessages(el))
 						} else {
@@ -268,9 +240,9 @@ sap.ui.define([
 		},
 
 		onCancelButtonPress: function() {
-			const oCopyModel = this.getView().getModel("CopyModel");
+			const oCopyModel = this.getModel("CopyModel");
 			const oComponent = this.getOwnerComponent();
-			const oFormModelData = this.getView().getModel("FormModel").getData();
+			const oFormModelData = this.getModel("FormModel").getData();
 			const bAllEmptyFields = Object.keys(oFormModelData)
 										.slice(0, -2)
 										.every(el => !oFormModelData[el] || !oFormModelData[el]?.length);
@@ -280,14 +252,16 @@ sap.ui.define([
 			if(bAllEmptyFields) {
 				oComponent.getRouter().navTo("ListReport");
 			} else if(!bIsChangedFields && oCopyModel?.getData() && !bIsInvalidChanges) {
-				this.getView().getModel("EditModel").setProperty("/EditMode", false);
+				this.getModel("EditModel").setProperty("/EditMode", false);
+				
 			} else {
 				this.onConfirmationMessageBoxPress(oComponent);		
 			}	
+			this.getView().getModel("view").setProperty("/isButtonEnable", false)
 		},
 
 		rewriteProductsIds: function() {
-			const aProducts = this.getView().getModel().getProperty("/Products");
+			const aProducts = this.getModel().getProperty("/Products");
 			aProducts.map((el, id) => {
 				el.Id = String(id + 1);
 				return el;
@@ -297,7 +271,7 @@ sap.ui.define([
 		removeProduct: function() {
 			const oComponent = this.getOwnerComponent()
 			const sCurrentId = this.getView().getBindingContext().getObject("Id");
-			const oModel = this.getView().getModel();
+			const oModel = this.getModel();
 			const aCurrentProducts = oModel.getProperty("/Products").filter(el => el.Id !== sCurrentId);
 
 			oModel.setProperty("/Products", aCurrentProducts);
@@ -324,26 +298,24 @@ sap.ui.define([
 			const oCtx = this.getView().getBindingContext();
 			const sCurrentId = oCtx.getObject("Id")
 			const oCurrentProduct = oCtx.getProperty("/Products").find(el => el.Id == sCurrentId);
-			const oFormModel = this.getView().getModel("FormModel");
+			const oFormModel = this.getModel("FormModel");
 			const oCopyProductModel = new JSONModel(Object.assign({}, oCurrentProduct));
 
 			oFormModel.setData({
 				...oCurrentProduct,
 				Suppliers: oCurrentProduct.Suppliers.map(({SupplierId}) => SupplierId)
 			})
+			
 			oCopyProductModel.setProperty("/Suppliers", oCurrentProduct.Suppliers.map(el => el.SupplierId))
 			
-			this.getView().getModel("EditModel").setProperty("/EditMode", true)
+			this.getModel("EditModel").setProperty("/EditMode", true)
 			this.getView().setModel(oCopyProductModel, "CopyModel")
 		},
 
 		onSaveProductPress: function() {
-			const oFormModel = this.getView().getModel("FormModel");
-			const oModel = this.getView().getModel();
-			/* const oCopyModel = this.getView().getModel("CopyModel"); */
-			
+			const oFormModel = this.getModel("FormModel");
+			const oModel = this.getModel();
 			const aSelectedSuppliers = oFormModel.getData().Suppliers.map(el => ({SupplierId: el}));
-		
 			const oDateFormat = DateFormat.getDateTimeInstance({
 				pattern: "yyyy-MM-dd'T'HH:mm:ss"
 			});
@@ -358,7 +330,7 @@ sap.ui.define([
 				oFormModel.setProperty("/Suppliers", aSelectedSuppliers)
 				oModel.setProperty("/Products/" + nProductPositionInArray, oFormModel.getData());
 				
-				this.getOwnerComponent().getRouter().navTo("ListReport");	
+				this.getModel("EditModel").setProperty("/EditMode", false)
 		
 				MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
 					closeOnBrowserNavigation: false
@@ -377,64 +349,119 @@ sap.ui.define([
 
 		handleValueHelpRequest: function() {
 			const oView = this.getView();
-			const oTemp = this.getView().getModel("FormModel").getProperty("/Suppliers")
-			
-			const aSuppliers = this.getView().getModel().getProperty("/Suppliers");
-			const aCurrentSuppliers = aSuppliers
-										.filter(el => oTemp.includes(el.SupplierId))
-										.map(el => el.SuppliersName);
-			this.getView().getModel("view").setProperty("/selectedInDialogSuppliers", aCurrentSuppliers);
-		
+			const aCurrentSuppliers = this.getModel("FormModel").getProperty("/Suppliers");
+			const aSuppliers = this.getModel().getProperty("/Suppliers");
+			const aCurrentSuppliersName = aSuppliers
+											.filter((el) => aCurrentSuppliers?.includes(el.SupplierId))
+											.map(el => el.SuppliersName)
+			const aCurrentTokens = [];
+
 			if(!this.oDialog) {
 				Fragment.load({
 					id: oView.getId(),
-					name: "products.app.view.fragments.SuppliersDialog",
+					name: "products.app.view.fragments.ValueHelpDialogSuppliers",
 					controller: this
 				}).then((oDialog) => {
-					this.oDialog = oDialog
+					this.oDialog = oDialog;
 					oView.addDependent(this.oDialog);
+					this.oDialog.getTableAsync().then((oTable) => {
+						if (oTable.bindRows) {
+
+							oTable.bindAggregation("rows", {
+								path: "/Suppliers",
+								events: {
+									dataReceived: function() {
+										this.oDialog.update();
+									}
+								}
+							});
+							const oColumnSupplierName = new UIColumn({
+								label: new Label({text: "Name"}),
+								template: new Text({wrapping: false, text: "{SuppliersName}"})
+							});
+							const oColumnSupplierAddress = new UIColumn({
+								label: new Label({text: "Address"}), 
+								template: new Text({wrapping: false, text: "{Address}"})
+							});
+	
+							oTable.addColumn(oColumnSupplierName);
+							oTable.addColumn(oColumnSupplierAddress);
+						}
+						this.oDialog.update();
+					});
+					
+					this.setValueHelpTokens(aCurrentSuppliersName, aCurrentTokens)
 					
 					this.oDialog.open();
 				})
 			} else {
-			
+				this.setValueHelpTokens(aCurrentSuppliersName, aCurrentTokens)
+				this.oDialog.update();
 				this.oDialog.open()	
 			}
 		},
-		_handleValueHelpSearch: function(oEvent) {
-			const sValue = oEvent.getParameter("value");
-			const aFilters = [
-				new Filter("SuppliersName", FilterOperator.Contains, sValue),
-				new Filter("Address", FilterOperator.Contains, sValue)
-			]
-			const oFilter = new Filter({
-				filters: aFilters,
-				and: false
-			});
-			oEvent.getSource().getBinding("items").filter([oFilter]);
-		},
 
-		_handleValueHelpClose: function (oEvent) {
-			const oFormModel = this.getView().getModel("FormModel");
-			const nProductPositionInArray = oFormModel.getData().Id - 1;
-			const aSelectedItems = oEvent.getParameter("selectedItems")?.map(el => el.getTitle());
-			const aSuppliers = this.getView().getModel().getProperty("/Suppliers");
-			const aSelectedItemsIds = aSuppliers.filter(el => aSelectedItems?.includes(el.SuppliersName))
-										
+		onValueHelpOkPress: function(oEvent) {
+			const aTokens = oEvent.getParameter("tokens");
+			const aSelectedSuppliersName = aTokens.map(el => el.getText());
+			const aSuppliers = this.getModel().getProperty("/Suppliers");
+			const oFormModel = this.getModel("FormModel");
+			const aSelectedSuppliers = aSuppliers.filter(el => aSelectedSuppliersName.includes(el.SuppliersName));
+			const aSelectedSuppliersId = aSelectedSuppliers.map(el => el.SupplierId);
+			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
 			
-			this.getView().getModel("FormModel").setProperty("/Suppliers", aSelectedItemsIds);
-			this.getView().getModel().setProperty("/Products/" + nProductPositionInArray, oFormModel.getData())
-			this.getView().getModel("FormModel").setProperty("/Suppliers", aSelectedItemsIds.map(el => el.SupplierId));
-			this.cleanSelectedSuppliersTable()
+			oFormModel.setProperty("/Suppliers", aSelectedSuppliersId);
+			this.getModel().setProperty(sCurrentBindingPath + "/Suppliers", aSelectedSuppliers);	
+
+			this.onValueHelpCancelPress();
 		},
 
-		cleanSelectedSuppliersTable: function() {
-			const oTable = this.byId("idSuppliersTable");
-			const aSelectedItemsIds = oTable.getSelectedItems();
+		setValueHelpTokens: function(aCurrentSuppliersName, aCurrentTokens) {
+			aCurrentSuppliersName.forEach(sName => {
+				aCurrentTokens.push(
+					new Token({
+						key: sName,
+						text: sName
+					})
+				)
+			})
+	
+			this.oDialog.setTokens(aCurrentTokens);
+		},
 
-			aSelectedItemsIds.forEach(el => {
+		onValueHelpCancelPress: function () {
+			this.oDialog.close();
+		},
+
+		onValueHelpAfterClose: function () {
+			this.oDialog.setTokens([])
+		},
+
+		onSelectSuppliers: function(oEvent) {
+			const aSelectedItems = oEvent.getSource().getSelectedItems();
+			this.getView().getModel("view").setProperty("/isButtonEnable", !!aSelectedItems.length);	
+		},
+
+		cleanSelectedTableItems: function() {
+			const oTable = this.byId("idSuppliersTable");
+			oTable.getSelectedItems()?.forEach(el => {
 				oTable.setSelectedItem(el, false)
 			})
+			this.getView().getModel("view").setProperty("/isButtonEnable", false)
+		},
+
+		removeSuppliers: function() {
+			const oTable = this.byId("idSuppliersTable");
+			const aSelectedSuppliersId = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("SupplierId"));
+			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers")
+			const aNonSelectedSuppliersId = aCurrentSuppliersId.filter(el => !aSelectedSuppliersId.includes(el));
+			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
+			this.getModel("FormModel").setProperty("/Suppliers", aNonSelectedSuppliersId);
+			this.getModel()
+				.setProperty(sCurrentBindingPath + "/Suppliers", aNonSelectedSuppliersId.map(el => ({SupplierId: el})));	
+			this.cleanSelectedTableItems();
 		}
+
+
 	});
 });

@@ -107,6 +107,7 @@
 									<fb:control>
 										<MultiComboBox
 											id="categorySelect"
+											
 											items="{/Categories}"
 											selectionChange="onFilter(null)"
 										>
@@ -213,13 +214,13 @@
 								<Text 
 									text="{
 										path: 'Suppliers',
-										formatter: '.getSuppliersName'
+										formatter: '.formatter.getSuppliersName'
 									}" 
 								/>
 								
 								<Text text="{
 									path: 'Category',
-									formatter: '.getCategoriesName'
+									formatter: '.formatter.getCategoriesName'
 								}" />
 								<ObjectStatus 
 									inverted="true"
