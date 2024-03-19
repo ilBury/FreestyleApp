@@ -15,9 +15,8 @@ sap.ui.define([
 	'sap/ui/table/Column',
 	'sap/m/Text',
 	"sap/m/Token",
-	"../model/formatter",
-	"../controller/mixin/CRUD"
-], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, Text, Token, formatter, crud) {
+	"../model/formatter"
+], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, Text, Token, formatter) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ProductDetails", {
@@ -455,7 +454,7 @@ sap.ui.define([
 		},
 
 		onRemoveSuppliers: function() {
-			crud.removeSupplier()
+			
 			const oTable = this.byId("idSuppliersTable");
 			const aSelectedSuppliersId = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("SupplierId"));
 			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers")
