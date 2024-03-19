@@ -62,15 +62,14 @@
 									groupName="ProductFiltersGroup" 
 									visibleInFilterBar="true">
 									<fb:control>
-										<Select
+										<MultiComboBox
 											id="availabilitySelect"
-											forceSelection="false"
-											selectedKey="{AvailabilityModel>/SelectedKey}"
-											change="onFilter(null)"
+											
 											items="{AvailabilityModel>/Availability}"
+											selectionChange="onFilter(null)"
 										>
 											<core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
-										</Select>
+										</MultiComboBox>
 									</fb:control>
 								</fb:FilterGroupItem>
 

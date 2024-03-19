@@ -13,14 +13,11 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	'sap/m/Label',
 	'sap/ui/table/Column',
-	'sap/m/Column',
 	'sap/m/Text',
-	'sap/ui/model/type/String',
-	'sap/m/SearchField',
-	'sap/m/ColumnListItem',
 	"sap/m/Token",
-	"../model/formatter"
-], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, MColumn, Text,	TypeString,	SearchField,ColumnListItem, Token, formatter) {
+	"../model/formatter",
+	"../controller/mixin/CRUD"
+], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, Text, Token, formatter, crud) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ProductDetails", {
@@ -90,7 +87,6 @@ sap.ui.define([
             })
 	
         },
-
 		checkForCorrectPath: function(sProductId, bEditMode) {
 			const oModel = this.getModel();
 			const bCorrectId = oModel.getProperty("/Products").map((el) => el.Id).includes(sProductId);
@@ -347,6 +343,14 @@ sap.ui.define([
 			}
 		},
 
+		getSuppliersSelectedFilters: function(aCurrentSuppliersName) {
+			const aFilters = aCurrentSuppliersName.map(el => {
+
+				return new Filter("SuppliersName", FilterOperator.NE, el)
+			})
+			return aFilters.length ? aFilters : [new Filter("SuppliersName", FilterOperator.Contains, "")];
+		},
+
 		handleValueHelpRequest: function() {
 			const oView = this.getView();
 			const aCurrentSuppliers = this.getModel("FormModel").getProperty("/Suppliers");
@@ -355,50 +359,50 @@ sap.ui.define([
 											.filter((el) => aCurrentSuppliers?.includes(el.SupplierId))
 											.map(el => el.SuppliersName)
 			const aCurrentTokens = [];
-
-			if(!this.oDialog) {
-				Fragment.load({
-					id: oView.getId(),
-					name: "products.app.view.fragments.ValueHelpDialogSuppliers",
-					controller: this
-				}).then((oDialog) => {
-					this.oDialog = oDialog;
-					oView.addDependent(this.oDialog);
-					this.oDialog.getTableAsync().then((oTable) => {
-						if (oTable.bindRows) {
-
-							oTable.bindAggregation("rows", {
-								path: "/Suppliers",
-								events: {
-									dataReceived: function() {
-										this.oDialog.update();
-									}
+			Fragment.load({
+				id: oView.getId(),
+				name: "products.app.view.fragments.ValueHelpDialogSuppliers",
+				controller: this
+			}).then((oDialog) => {
+				this.oDialog = oDialog;
+				oView.addDependent(this.oDialog);
+				this.oDialog.getTableAsync().then((oTable) => {
+					
+					if (oTable.bindRows) {
+						console.log(aCurrentSuppliersName)
+						const oFilter = new Filter({
+							filters: this.getSuppliersSelectedFilters(aCurrentSuppliersName),
+							and: true
+						})
+						oTable.bindAggregation("rows", {
+							path: "/Suppliers",
+							filters: oFilter,
+							events: {
+								dataReceived: function() {
+									this.oDialog.update();
 								}
-							});
-							const oColumnSupplierName = new UIColumn({
-								label: new Label({text: "Name"}),
-								template: new Text({wrapping: false, text: "{SuppliersName}"})
-							});
-							const oColumnSupplierAddress = new UIColumn({
-								label: new Label({text: "Address"}), 
-								template: new Text({wrapping: false, text: "{Address}"})
-							});
-	
-							oTable.addColumn(oColumnSupplierName);
-							oTable.addColumn(oColumnSupplierAddress);
-						}
-						this.oDialog.update();
-					});
-					
-					this.setValueHelpTokens(aCurrentSuppliersName, aCurrentTokens)
-					
-					this.oDialog.open();
-				})
-			} else {
+							}
+						});
+						console.log(oTable.getBinding())
+						const oColumnSupplierName = new UIColumn({
+							label: new Label({text: "Name"}),
+							template: new Text({wrapping: false, text: "{SuppliersName}"})
+						});
+						const oColumnSupplierAddress = new UIColumn({
+							label: new Label({text: "Address"}), 
+							template: new Text({wrapping: false, text: "{Address}"})
+						});
+
+						oTable.addColumn(oColumnSupplierName);
+						oTable.addColumn(oColumnSupplierAddress);
+					}
+					this.oDialog.update();
+				});
+				
 				this.setValueHelpTokens(aCurrentSuppliersName, aCurrentTokens)
-				this.oDialog.update();
-				this.oDialog.open()	
-			}
+				
+				this.oDialog.open();
+			})		
 		},
 
 		onValueHelpOkPress: function(oEvent) {
@@ -409,10 +413,10 @@ sap.ui.define([
 			const aSelectedSuppliers = aSuppliers.filter(el => aSelectedSuppliersName.includes(el.SuppliersName));
 			const aSelectedSuppliersId = aSelectedSuppliers.map(el => el.SupplierId);
 			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
-			
+
 			oFormModel.setProperty("/Suppliers", aSelectedSuppliersId);
 			this.getModel().setProperty(sCurrentBindingPath + "/Suppliers", aSelectedSuppliers);	
-
+			
 			this.onValueHelpCancelPress();
 		},
 
@@ -450,18 +454,31 @@ sap.ui.define([
 			this.getView().getModel("view").setProperty("/isButtonEnable", false)
 		},
 
-		removeSuppliers: function() {
+		onRemoveSuppliers: function() {
+			crud.removeSupplier()
 			const oTable = this.byId("idSuppliersTable");
 			const aSelectedSuppliersId = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("SupplierId"));
 			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers")
 			const aNonSelectedSuppliersId = aCurrentSuppliersId.filter(el => !aSelectedSuppliersId.includes(el));
 			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
+			
 			this.getModel("FormModel").setProperty("/Suppliers", aNonSelectedSuppliersId);
 			this.getModel()
 				.setProperty(sCurrentBindingPath + "/Suppliers", aNonSelectedSuppliersId.map(el => ({SupplierId: el})));	
 			this.cleanSelectedTableItems();
+		},
+
+		onRemoveSuppliersInCreateMode: function() {
+			const oTable = this.byId("idCreateSuppliersTable");
+			const aSuppliers = this.getModel().getProperty("/Suppliers");
+			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers");
+			const aSelectedSuppliersName = oTable.getSelectedItems().map(el => el.getCells()[0].getText());
+			const aNonSelectedSuppliersId = aSuppliers
+											.filter(el => !aSelectedSuppliersName.includes(el.SuppliersName))
+											.filter(el => aCurrentSuppliersId.includes(el.SupplierId))
+											.map(el => el.SupplierId);
+			
+			this.getModel("FormModel").setProperty("/Suppliers", aNonSelectedSuppliersId)	
 		}
-
-
 	});
 });

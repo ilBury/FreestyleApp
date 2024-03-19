@@ -276,6 +276,7 @@
                 <u:subSections>
                     <u:ObjectPageSubSection>
                         <Table id="idSuppliersTable"
+                            visible="{= !!${Name}}"
                             sticky="HeaderToolbar,ColumnHeaders"
                             items="{Suppliers}"
                             mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
@@ -295,7 +296,7 @@
                                     <Button
                                         text="{i18n>Removetext}"
                                         enabled="{view>/isButtonEnable}"
-                                        press="removeSuppliers"
+                                        press="onRemoveSuppliers"
                                         visible="{= !!${EditModel>/EditMode}}"
                                     />
                                 </Toolbar>
@@ -322,6 +323,62 @@
                                         <Text text="{= ${
                                                     path: 'SupplierId',
                                                     formatter: '.formatter.getCurrentSupplier'
+                                                }.Address
+                                            }" 
+                                        />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                        <Table 
+                            id="idCreateSuppliersTable"
+                            sticky="HeaderToolbar,ColumnHeaders"
+                            items="{FormModel>/Suppliers}"
+                            visible="{= !${Name}}"
+                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
+                            selectionChange="onSelectSuppliers"
+                            class="sapUiSmallNegativeMarginBeginEnd"
+                            width="auto">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Label text="{i18n>SupplierText}"></Label>  
+                                    <ToolbarSpacer/>
+                                    <Button
+                                        text="{i18n>Addtext}"
+                                        type="Emphasized"
+                                        press="handleValueHelpRequest"
+                                        visible="{= !!${EditModel>/EditMode}}"
+                                    />
+                                    <Button
+                                        text="{i18n>Removetext}"
+                                        enabled="{view>/isButtonEnable}"
+                                        press="onRemoveSuppliersInCreateMode"
+                                        visible="{= !!${EditModel>/EditMode}}"
+                                    />
+                                </Toolbar>
+                            </headerToolbar>
+                            <columns>
+                                <Column width="12em">
+                                    <Text text="{i18n>ProductNameText}" />
+                                </Column>
+                                <Column minScreenWidth="Tablet" demandPopin="true">
+                                    <Text text="{i18n>AddressText}" />
+                                </Column>                           
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells> 
+                                        <Text 
+                                            text="{= ${
+                                                path: 'FormModel>',
+                                                formatter: '.formatter.getCurrentSupplier'
+                                                }.SuppliersName
+                                            }" 
+                                            
+                                        />     
+                                        <Text text="{= ${
+                                                path: 'FormModel>',
+                                                formatter: '.formatter.getCurrentSupplier'
                                                 }.Address
                                             }" 
                                         />

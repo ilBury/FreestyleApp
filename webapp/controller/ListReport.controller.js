@@ -49,10 +49,6 @@ sap.ui.define([
 			const oAvailabilityModel = new JSONModel({
 				Availability: [
 					{
-						key: "all",
-						value: ""
-					}, 
-					{
 						key: false,
 						value: this.getTextFromI18n("InStockText")
 					},
@@ -60,8 +56,7 @@ sap.ui.define([
 						key: true,
 						value: this.getTextFromI18n("OutOfStockText")
 					}
-				],
-				SelectedKey: "all"
+				]
 			})
 			const oViewModel = new JSONModel({
 				isButtonEnable: false,
@@ -127,17 +122,12 @@ sap.ui.define([
 		},
 
 		getCombinedFilter: function(aSelectedId) {
-			const oView = this.getView();
-			const oAvailabilityModel = oView.getModel("AvailabilityModel");
-			const sQuerySearch = oView.getModel("view").getProperty("/searchField").trim();
-			const sSelectedKey = oAvailabilityModel.getProperty("/SelectedKey");
-			
-			const sAvailability = "all";
-			const oAvailabilityFilter = new Filter(
-				"Availability", 
-				FilterOperator.NE,
-				sSelectedKey === sAvailability ? sSelectedKey : JSON.parse(sSelectedKey.toLowerCase())
-			)
+			const sQuerySearch = this.getView().getModel("view").getProperty("/searchField").trim();
+		
+			const oAvailabilityFilter = new Filter({
+				filters: this.getAvailabilitiesFilters(),
+				and: false
+			})
 
 			const aSearchFilters = [
 				new Filter("Name", FilterOperator.Contains, sQuerySearch),
@@ -173,6 +163,36 @@ sap.ui.define([
 			const oFilter = this.getCombinedFilter(aSelectedId);
 			
 			oItemsBinding.filter(oFilter);
+		},
+
+		getCategoriesFilters: function() {
+			const oModel = this.getModel();
+			const aCategories = oModel.getProperty("/Categories");
+			const oCategorySelect = this.byId("categorySelect");			
+			const aCategoryNames = oCategorySelect.getSelectedItems().map(el => el.getText());
+			const aCategoriesIds = aCategories
+									.filter(el => aCategoryNames.includes(el.Name))
+									.map(el => el.Id);
+			
+			const aFilters = aCategoriesIds.map((el) => {
+				return new Filter("Category", FilterOperator.Contains, el)
+			})
+			
+			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
+		},
+
+		getAvailabilitiesFilters: function() {
+			const aAvailabilities = this.getView().getModel("AvailabilityModel").getProperty("/Availability");
+			const oAvailabilitySelect = this.byId("availabilitySelect");
+			const aAvailabilityNames = oAvailabilitySelect.getSelectedItems().map(el => el.getText());
+			const aAvailabilitiesKeys = aAvailabilities
+											.filter(el => aAvailabilityNames.includes(el.value))
+											.map(el => el.key)
+			const aFilters = aAvailabilitiesKeys.map(el => {
+				return new Filter("Availability", FilterOperator.EQ, !el)
+			})
+
+			return aFilters.length ? aFilters : [new Filter("Availability", FilterOperator.NE, null)]
 		},
 
 		getSuppliersFilters: function(aSelectedId) {
@@ -212,21 +232,7 @@ sap.ui.define([
 			return aFilters.length ? aFilters : [new Filter("Suppliers/0/SupplierId", FilterOperator.Contains, "")];
 		},
 
-		getCategoriesFilters: function() {
-			const oModel = this.getModel();
-			const aCategories = oModel.getProperty("/Categories");
-			const oCategorySelect = this.byId("categorySelect");			
-			const aCategoryNames = oCategorySelect.getSelectedItems().map(el => el.getText());
-			const aCategoriesIds = aCategories
-									.filter(el => aCategoryNames.includes(el.Name))
-									.map(el => el.Id);
-			
-			const aFilters = aCategoriesIds.map((el) => {
-				return new Filter("Category", FilterOperator.Contains, el)
-			})
-			
-			return aFilters.length ? aFilters : [new Filter("Category", FilterOperator.Contains, "")];
-		},
+		
 
 
 		handleValueHelpRequest: function() {
