@@ -7,6 +7,15 @@
 		"description": "{{appDescription}}",
 		"applicationVersion": {
 			"version": "1.0.0"
+		},
+		"dataSources": {
+			"default": {
+				"uri": "proxy/V2/(S(3g0wqswc4ao3yrwcjcbcoqzw))/OData/OData.svc/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0"
+				}
+			}
 		}
 	},
 	"sap.ui": {
@@ -45,7 +54,7 @@
 					]
 				},
 				{
-					"pattern": "product/{productId}",
+					"pattern": "product/{productId}/:mode:",
 					"name": "ProductDetails",
 					"target": [
 						"productDetails"
@@ -83,6 +92,15 @@
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
 					"bundleName": "products.app.i18n.i18n"
+				}
+			},
+			"": {
+				"dataSource": "default",
+				"settings": {
+					"useBatch": false,
+					"defaultBindingMode": "TwoWay",
+					"defaultCountMode": "Inline",
+					"disableHeadRequestForToken": true
 				}
 			}
 		}

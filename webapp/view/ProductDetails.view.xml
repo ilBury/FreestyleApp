@@ -5,24 +5,27 @@
     xmlns:form="sap.ui.layout.form"
 	xmlns:core="sap.ui.core"
     core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
-	controllerName="products.app.controller.ProductDetails">
+	controllerName="products.app.controller.ProductDetails"
+    busy="{view>/isBusyIndicator}"
+    busyIndicatorDelay="0">
 
     <u:ObjectPageLayout 
-        showFooter="{EditModel>/EditMode}"
-        class="sapUiNoContentPadding">
+        showFooter="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
+        class="sapUiNoContentPadding"
+        >
         <u:headerTitle>
             <u:ObjectPageHeader 
                 objectTitle="{= !${Name} ? ${i18n>CreateNewProductText} : ${Name}}" 
             >
                 <u:actions>
                     <Button
-                        visible="{= !${EditModel>/EditMode}}"
+                        visible="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                         text="{i18n>UpdateText}"
                         type="Emphasized"
                         press="onUpdateProductPress"
                     />
                     <Button
-                        visible="{= !${EditModel>/EditMode}}"
+                        visible="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                         text="{i18n>DeleteText}"
                         press="onDeleteProductPress"
                     />
@@ -32,7 +35,7 @@
         </u:headerTitle>
       
         <u:headerContent>
-            <VBox visible="{= !${EditModel>/EditMode}}">
+            <VBox visible="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}">
 				<ObjectStatus title="{i18n>DescriptionText}" text="{Description}" />
 				<ObjectStatus 
                     title="{i18n>PriceText}" 
@@ -45,61 +48,43 @@
                         formatter: 'formatMessage'
                     }" 
                 />
-				<ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" />
+				<ObjectStatus title="{i18n>RatingText}" text="{Rating}" />
 			</VBox>
             
             <ObjectStatus 
-                visible="{= !${EditModel>/EditMode}}"
+                visible="{EditModel>/DisplayMode}"
                 title="{i18n>CategoryText}" 
-                text="{
-                    path: 'Category',
-                    formatter: '.formatter.getCategoriesName'
-                }"
+                text="{Category/Name}"
             />
             <ObjectStatus 
-                visible="{= !${EditModel>/EditMode}}"
-                inverted="true"
-                state="{= ${Availability} === true ? ${i18n>SuccessText} : ${i18n>WarningText}}"
-                title="{i18n>AvailabilityText}" 
-                text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}"
-            />
-            <ObjectStatus 
-                visible="{= !${EditModel>/EditMode}}"
+                visible="{EditModel>/DisplayMode}"
                 title="{i18n>CreatedAtText}" 
                 text="{
-                    path: 'CreatedAt',
-                    type: 'sap.ui.model.type.Date',
-                    formatOptions: {
-                        source: {
-                            pattern: 'yyyy-MM-ddTHH:mm:ss'
-                        }
-                    }
-                    
-                }"/>
-            <ObjectStatus 
-                visible="{= !${EditModel>/EditMode}}"
-                title="{i18n>UpdatedAtText}" 
-                text="{
-                    path: 'UpdatedAt',
-                    type: 'sap.ui.model.type.Date',
-                    formatOptions: {
-                        source: {
-                            pattern: 'yyyy-MM-ddTHH:mm:ss'
-                        }
-                    }
+                    path: 'ReleaseDate',
+                    type: 'sap.ui.model.type.Date'  
                 }"
-            />         
+            />
+            <ObjectStatus 
+                visible="{EditModel>/DisplayMode}"
+                title="{i18n>DiscontinuedAtText}" 
+                text="{
+                    path: 'DiscontinuedDate',
+                    type: 'sap.ui.model.type.Date',
+                    formatter: '.formatter.getCorrectDiscontinuedDate'  
+                }"
+            />
+             
         </u:headerContent>
         <u:sections>
             <u:ObjectPageSection 
-                showTitle="{= !${EditModel>/EditMode}}"
+                showTitle="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                 title="{i18n>GeneralInformationText}" 
                 titleUppercase="false" 
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
                         <form:SimpleForm 
-                            visible="{= !${EditModel>/EditMode}}"
+                            visible="{EditModel>/DisplayMode}"
                             editable="false"
                             layout="ResponsiveGridLayout"
                             title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
@@ -107,31 +92,22 @@
                             <form:content>
                                 <core:Title text="{i18n>ProductInformationText}" />
                                 <VBox >
-                                    <ObjectStatus title="{i18n>ProductNameText}" text="{Name}" class="sapUiTinyMarginBottom"/>   
+                                    <ObjectStatus title="{i18n>NameText}" text="{Name}" class="sapUiTinyMarginBottom"/>   
                                     <ObjectStatus title="{i18n>DescriptionText}" text="{Description}" class="sapUiTinyMarginBottom"/>  
                                     <ObjectStatus 
                                         title="{i18n>CreatedAtText}" 
                                         text="{
-                                            path: 'CreatedAt',
-                                            type: 'sap.ui.model.type.Date',
-                                            formatOptions: {
-                                                source: {
-                                                    pattern: 'yyyy-MM-ddTHH:mm:ss'
-                                                }
-                                            }
+                                            path: 'ReleaseDate',
+                                            type: 'sap.ui.model.type.Date'
                                         }"
                                         class="sapUiTinyMarginBottom"
                                     />  
                                     <ObjectStatus 
-                                        title="{i18n>UpdatedAtText}" 
+                                        title="{i18n>DiscontinuedAtText}" 
                                         text="{
-                                            path: 'UpdatedAt',
+                                            path: 'DiscontinuedDate',
                                             type: 'sap.ui.model.type.Date',
-                                            formatOptions: {
-                                                source: {
-                                                    pattern: 'yyyy-MM-ddTHH:mm:ss'
-                                                }
-                                            }
+                                            formatter: '.formatter.getCorrectDiscontinuedDate'  
                                         }" 
                                         class="sapUiTinyMarginBottom"
                                     />  
@@ -151,13 +127,13 @@
                                         }" 
                                         class="sapUiTinyMarginBottom"
                                     />   
-                                    <ObjectStatus title="{i18n>QuantityText}" text="{Quantity}" class="sapUiTinyMarginBottom"/>                       
+                                    <ObjectStatus title="{i18n>RatingText}" text="{Rating}" class="sapUiTinyMarginBottom"/>                       
                                 </VBox>
                                 
                             </form:content>
                         </form:SimpleForm>
                         <form:SimpleForm 
-                            visible="{= ${EditModel>/EditMode}}"
+                            visible="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
                             editable="true"
                             id="idSimpleForm"
                             layout="ResponsiveGridLayout"
@@ -169,13 +145,13 @@
                             <form:content>
                                 <core:Title text="{i18n>ProductInformationText}" />
                                 
-                                <Label text="{i18n>ProductNameText}" labelFor="idNameInput" />
+                                <Label text="{i18n>NameText}" labelFor="idNameInput" />
                                 <Input
                                     required="true"
                                     liveChange="onLiveChange"
                                     id="idNameInput"    
                                     value="{
-                                        path: 'FormModel>/Name',
+                                        path: 'Name',
                                         type: 'sap.ui.model.type.String',
                                         constraints: {
                                             minLength: 1
@@ -187,7 +163,7 @@
                                 <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
                                 <Input 
                                     value="{
-                                        path: 'FormModel>/Description',
+                                        path: 'Description',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idDescriptionInput" 
@@ -198,27 +174,25 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'FormModel>/Price',
-                                        type: 'sap.ui.model.type.Float',
-                                        constraints: {
-                                            minimum: 0
-                                        }
+                                        path: 'Price',
+                                        type: 'sap.ui.model.odata.type.Decimal'
                                     }" 
                                     id="idPriceInput" 
                                 />
 
-                                <Label text="{i18n>QuantityText}" labelFor="idQuantityInput" />
+                                <Label text="{i18n>RatingText}" labelFor="idRatingInput" />
                                 <Input 
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'FormModel>/Quantity',
-                                        type: 'sap.ui.model.type.Float',
+                                        path: 'Rating',
+                                        type: 'sap.ui.model.type.Integer',
                                         constraints: {
                                             minimum: 0
                                         }
                                     }" 
-                                    id="idQuantityInput" 
+                    
+                                    id="idRatingInput" 
                                 />
                                 <core:Title text="{i18n>ProductDetailsText}" />
                                 <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
@@ -228,33 +202,10 @@
                                     forceSelection="false"
                                     items="{/Categories}" 
                                     id="idCategoriesSelect"
-                                    selectedKey="{FormModel>/Category}"
+                                    selectedKey="{Category/ID}"
                                 >
-                                    <core:Item key="{Id}" text="{Name}" />
+                                    <core:Item key="{ID}" text="{Name}" />
                                 </Select>
-
-                                <Label text="{i18n>AvailabilityText}" labelFor="idAvailabilitySelect" />
-                                <Select 
-                                    required="true"
-                                    change="onLiveChange"
-                                    items="{AvailabilityModel>/Availability}" 
-                                    selectedKey="{FormModel>/Availability}"
-                                    id="idAvailabilitySelect"
-                                    forceSelection="false"
-                                >
-                                    <core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
-                                </Select>
-
-                                <Label text="{i18n>CurrencyText}" labelFor="idCurrencyInput" />
-                                <Input 
-                                    required="true"
-                                    liveChange="onLiveChange"
-                                    value="{
-                                        path: 'FormModel>/Currency',
-                                        type: 'sap.ui.model.type.String'
-                                    }" 
-                                    id="idCurrencyInput" 
-                                />
                                 
                             </form:content>
                         </form:SimpleForm>
@@ -263,6 +214,7 @@
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
+                showTitle="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -275,117 +227,146 @@
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
-                        <Table id="idSuppliersTable"
-                            visible="{= !!${Name}}"
-                            sticky="HeaderToolbar,ColumnHeaders"
-                            items="{Suppliers}"
-                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
-                            selectionChange="onSelectSuppliers"
-                            class="sapUiSmallNegativeMarginBeginEnd"
-                            width="auto">
-                            <headerToolbar>
-                                <Toolbar>
-                                    <Label text="{i18n>SupplierText}"></Label>  
-                                    <ToolbarSpacer/>
-                                    <Button
-                                        text="{i18n>Addtext}"
-                                        type="Emphasized"
-                                        press="handleValueHelpRequest"
-                                        visible="{= !!${EditModel>/EditMode}}"
-                                    />
-                                    <Button
-                                        text="{i18n>Removetext}"
-                                        enabled="{view>/isButtonEnable}"
-                                        press="onRemoveSuppliers"
-                                        visible="{= !!${EditModel>/EditMode}}"
-                                    />
-                                </Toolbar>
-                            </headerToolbar>
-                            <columns>
-                                <Column width="12em">
-                                    <Text text="{i18n>ProductNameText}" />
-                                </Column>
-                                <Column minScreenWidth="Tablet" demandPopin="true">
-                                    <Text text="{i18n>AddressText}" />
-                                </Column>                           
-                            </columns>
-                            <items>
-                                <ColumnListItem>
-                                    <cells> 
-                                        <Text 
-                                            text="{= ${
-                                                path: 'SupplierId',
-                                                formatter: '.formatter.getCurrentSupplier'
-                                                }.SuppliersName
-                                            }" 
-                                            
-                                        />     
-                                        <Text text="{= ${
-                                                    path: 'SupplierId',
-                                                    formatter: '.formatter.getCurrentSupplier'
-                                                }.Address
-                                            }" 
-                                        />
-                                    </cells>
-                                </ColumnListItem>
-                            </items>
-                        </Table>
-                        <Table 
-                            id="idCreateSuppliersTable"
-                            sticky="HeaderToolbar,ColumnHeaders"
-                            items="{FormModel>/Suppliers}"
-                            visible="{= !${Name}}"
-                            mode="{= ${EditModel>/EditMode} ? 'MultiSelect' : 'None'}"
-                            selectionChange="onSelectSuppliers"
-                            class="sapUiSmallNegativeMarginBeginEnd"
-                            width="auto">
-                            <headerToolbar>
-                                <Toolbar>
-                                    <Label text="{i18n>SupplierText}"></Label>  
-                                    <ToolbarSpacer/>
-                                    <Button
-                                        text="{i18n>Addtext}"
-                                        type="Emphasized"
-                                        press="handleValueHelpRequest"
-                                        visible="{= !!${EditModel>/EditMode}}"
-                                    />
-                                    <Button
-                                        text="{i18n>Removetext}"
-                                        enabled="{view>/isButtonEnable}"
-                                        press="onRemoveSuppliersInCreateMode"
-                                        visible="{= !!${EditModel>/EditMode}}"
-                                    />
-                                </Toolbar>
-                            </headerToolbar>
-                            <columns>
-                                <Column width="12em">
-                                    <Text text="{i18n>ProductNameText}" />
-                                </Column>
-                                <Column minScreenWidth="Tablet" demandPopin="true">
-                                    <Text text="{i18n>AddressText}" />
-                                </Column>                           
-                            </columns>
-                            <items>
-                                <ColumnListItem>
-                                    <cells> 
-                                        <Text 
-                                            text="{= ${
-                                                path: 'FormModel>',
-                                                formatter: '.formatter.getCurrentSupplier'
-                                                }.SuppliersName
-                                            }" 
-                                            
-                                        />     
-                                        <Text text="{= ${
-                                                path: 'FormModel>',
-                                                formatter: '.formatter.getCurrentSupplier'
-                                                }.Address
-                                            }" 
-                                        />
-                                    </cells>
-                                </ColumnListItem>
-                            </items>
-                        </Table>
+                        <form:SimpleForm 
+                            visible="{EditModel>/DisplayMode}"
+                            editable="false"
+                            layout="ResponsiveGridLayout"
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>SupplierText}}"                
+                            singleContainerFullSize="false">
+                            <form:content>
+                                <core:Title text="{i18n>SupplierInformationText}" />
+                                <VBox >
+                                    <ObjectStatus 
+                                        title="{i18n>NameText}" 
+                                        text="{Supplier/Name}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />   
+                                    <ObjectStatus 
+                                        title="{i18n>ConcurrencyText}" 
+                                        text="{Supplier/Concurrency}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />                       
+                                </VBox>
+                                <core:Title text="{i18n>SupplierAddressText}" />
+                                <VBox >
+                                    <ObjectStatus 
+                                        title="{i18n>StreetText}" 
+                                        text="{Supplier/Address/Street}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />   
+                                    <ObjectStatus 
+                                        title="{i18n>CityText}" 
+                                        text="{Supplier/Address/City}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />   
+                                    <ObjectStatus 
+                                        title="{i18n>StateText}" 
+                                        text="{Supplier/Address/State}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />   
+                                    <ObjectStatus 
+                                        title="{i18n>ZipCodeText}" 
+                                        text="{Supplier/Address/ZipCode}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />  
+                                    <ObjectStatus 
+                                        title="{i18n>CountryText}" 
+                                        text="{Supplier/Address/Country}" 
+                                        class="sapUiTinyMarginBottom"
+                                    />                   
+                                </VBox>
+                                
+                            </form:content>
+                        </form:SimpleForm>
+                        <form:SimpleForm 
+                            visible="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>SupplierText}}"                
+                            singleContainerFullSize="false"
+                            labelSpanXL="2"
+                            emptySpanXL="3">
+                            <form:content>
+                                <core:Title text="{i18n>SupplierInformationText}" />
+                               
+                                <Label text="{i18n>NameText}" labelFor="idSupplierNameInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Name',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierNameInput" 
+                                />
+                                <Label text="{i18n>ConcurrencyText}" labelFor="idSupplierConcurrency" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Concurrency',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierConcurrency" 
+                                />
+                                                    
+                            
+                            <core:Title text="{i18n>SupplierAddressText}" />
+                            
+                                <Label text="{i18n>StreetText}"  labelFor="IdSupplierStreetInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Address/Street',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="IdSupplierStreetInput" 
+                                />
+                                <Label text="{i18n>CityText}"  labelFor="idSupplierCityInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Address/City',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierCityInput" 
+                                />
+                                <Label text="{i18n>StateText}"  labelFor="idSupplierStateInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Address/State',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierStateInput" 
+                                />
+                                <Label text="{i18n>ZipCodeText}"  labelFor="idSupplierZipCodeInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Address/ZipCode',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierZipCodeInput" 
+                                />
+                                <Label text="{i18n>CountryText}"  labelFor="idSupplierCountryInput" />
+                                <Input 
+                                    required="true"
+                                    liveChange="onLiveChange"
+                                    value="{
+                                        path: 'Supplier/Address/Country',
+                                        type: 'sap.ui.model.type.String'
+                                    }" 
+                                    id="idSupplierCountryInput" 
+                                />               
+                           
+                                
+                            </form:content>
+                        </form:SimpleForm>
                     </u:ObjectPageSubSection>
                   </u:subSections>
             </u:ObjectPageSection>
@@ -397,13 +378,14 @@
                 <ToolbarSpacer />
                 <Button 
                     text="Save" 
-                    visible="{= !!${Name}}" 
+                    visible="{= !!${EditModel>/EditMode}}" 
                     press="onSaveProductPress" 
                     type="Emphasized"
                 />
+            
                 <Button 
                     text="Create" 
-                    visible="{= !${Name}}" 
+                    visible="{= !!${EditModel>/CreateMode}}"
                     press="onCreateProductPress" 
                     type="Emphasized"
                 />
@@ -413,7 +395,4 @@
         </u:footer>
 
     </u:ObjectPageLayout>
-
-
-
 </mvc:View>
