@@ -56,21 +56,37 @@ sap.ui.define([
 				Name: "",
 				Description: "",
 				Price: null,
-				Category: null,
-				Supplier: null,
+				Category: {
+					ID: null,
+					Name: ""
+				},
+				Supplier: {
+					Name: "",
+					Concurrency: "",
+					Address: {
+						Street: "",
+						City: "",
+						State: "",
+						ZipCode: "",
+						Country: ""
+					}
+				},
 				Rating: null,
 				ReleaseDate: new Date(),
 				DiscontinuedDate: null
 			})
-		
 			this.getView().setModel(oFormModel, "FormModel");
+			
 
 			oODataModel.metadataLoaded().then(() => {
+				
 				if(sProductMode === "create") {
-					const oNewSupplierCtx = oODataModel.createEntry("/Products", {
+					const oNewProductCtx = oODataModel.createEntry("/Products", {
 						properties: oFormModel.getData()
 					});
-					this.bindObjectView(oNewSupplierCtx.getPath());
+					
+					this.bindObjectView(oNewProductCtx.getPath());
+					
 				} else {
 					const sKey = oODataModel.createKey("/Products", {ID: sProductId});
 					this.bindObjectView(sKey);
@@ -156,22 +172,51 @@ sap.ui.define([
 		onCreateProductPress: function() {
 			const oODataModel = this.getModel();
 			const aFormFields = this.getFormFields();
-			
 			aFormFields.forEach(oControl => this.validateField(oControl));
 			const aMessages = Messaging.getMessageModel().getData();
-
-			if(!aMessages.length) {
-				oODataModel.submitChanges();		
 			
+			if(!aMessages.length) {	
+				
+				oODataModel.submitChanges();
+				
 				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
 					closeOnBrowserNavigation: false
 				});
+				
 				this.getOwnerComponent().getRouter().navTo("ListReport");
 				
-				oODataModel.resetChanges()
 			} else {
+			
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}
+	
+			
+		},
+
+		onSuppliersSelectChange: function(oControl) {
+			const oSupplierForm = this.byId("idSupplierForm");
+			const oODataModel = this.getModel();
+			const sCurrentSupplierId = oControl.getSource().getBinding("selectedKey").getValue();
+			const sKey = oODataModel.createKey("/Suppliers", {ID: sCurrentSupplierId});
+			const sCurrentProductId = this.getView().getBindingContext().getObject("ID");
+			oSupplierForm.bindObject({
+				path: sKey
+			});
+			const oSupplierCtx = oSupplierForm.getBindingContext()
+			//uri should be like entity set, that's why it doesn't work
+		/* 	oODataModel.createEntry(`/Products(${sCurrentProductId})/$links/Supplier`, {
+				properties: {
+					Name: oSupplierCtx.getObject("Name"),
+					Concurrency: oSupplierCtx.getObject("Concurrency"),
+					Address: {
+						Street: oSupplierCtx.getObject("Address/Street"),
+						City: oSupplierCtx.getObject("Address/City"),
+						State: oSupplierCtx.getObject("Address/State"),
+						ZipCode: oSupplierCtx.getObject("Address/ZipCode"),
+						Country: oSupplierCtx.getObject("Address/Country")
+					}
+				}
+			}) */
 		},
 
 		displayNotValidMessage: function(aFormFields, aMessages) {

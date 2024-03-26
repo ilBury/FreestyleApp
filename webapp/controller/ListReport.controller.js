@@ -75,7 +75,6 @@ sap.ui.define([
 		onRouteMatched: function() {
 			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
-			console.log(oItemsBinding)
 			const oSorter = new Sorter("ReleaseDate", "ASC");
 			
 			oItemsBinding.sort(oSorter);	

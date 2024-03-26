@@ -175,7 +175,12 @@
                                     liveChange="onLiveChange"
                                     value="{
                                         path: 'Price',
-                                        type: 'sap.ui.model.odata.type.Decimal'
+                                        type: 'sap.ui.model.odata.type.Decimal',
+                                        constraints: {
+                                            minimum: '1',
+                                            maximum: '1000000',
+                                            scale: '2'
+                                        }
                                     }" 
                                     id="idPriceInput" 
                                 />
@@ -281,6 +286,7 @@
                         <form:SimpleForm 
                             visible="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
                             editable="true"
+                            id="idSupplierForm"
                             layout="ResponsiveGridLayout"
                             title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>SupplierText}}"                
                             singleContainerFullSize="false"
@@ -290,35 +296,37 @@
                                 <core:Title text="{i18n>SupplierInformationText}" />
                                
                                 <Label text="{i18n>NameText}" labelFor="idSupplierNameInput" />
-                                <Input 
+                                <Select 
                                     required="true"
-                                    liveChange="onLiveChange"
-                                    value="{
-                                        path: 'Supplier/Name',
-                                        type: 'sap.ui.model.type.String'
-                                    }" 
-                                    id="idSupplierNameInput" 
-                                />
+                                    forceSelection="false"
+                                    change="onSuppliersSelectChange"
+                                    items="{/Suppliers}" 
+                                    id="idSupplierNameInput"
+                                    selectedKey="{FormModel>/Supplier/Name}"
+                                >
+                                    <core:Item key="{ID}" text="{Name}" />
+                                </Select>
+                          
                                 <Label text="{i18n>ConcurrencyText}" labelFor="idSupplierConcurrency" />
                                 <Input 
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Concurrency',
+                                        path: 'Concurrency',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierConcurrency" 
                                 />
                                                     
                             
-                            <core:Title text="{i18n>SupplierAddressText}" />
+                                <core:Title text="{i18n>SupplierAddressText}" />
                             
                                 <Label text="{i18n>StreetText}"  labelFor="IdSupplierStreetInput" />
                                 <Input 
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Address/Street',
+                                        path: 'Address/Street',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="IdSupplierStreetInput" 
@@ -328,7 +336,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Address/City',
+                                        path: 'Address/City',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierCityInput" 
@@ -338,7 +346,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Address/State',
+                                        path: 'Address/State',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierStateInput" 
@@ -348,7 +356,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Address/ZipCode',
+                                        path: 'Address/ZipCode',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierZipCodeInput" 
@@ -358,13 +366,12 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Supplier/Address/Country',
+                                        path: 'Address/Country',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierCountryInput" 
                                 />               
-                           
-                                
+                            
                             </form:content>
                         </form:SimpleForm>
                     </u:ObjectPageSubSection>
