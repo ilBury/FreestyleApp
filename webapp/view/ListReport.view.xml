@@ -195,7 +195,7 @@
 									text="{Supplier/Name}" 
 								/>
 								
-								<Text text="{Category/ID}" />
+								<Text text="{Category/Name}" />
 								
 							</cells>
 						</ColumnListItem>
