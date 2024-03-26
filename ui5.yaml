@@ -2,14 +2,17 @@ specVersion: "3.2"
 metadata:
   name: products
 type: application
+framework:
+  name: SAPUI5
+  version: "1.120.0"
+  libraries:
+    - name: sap.m
+    - name: sap.ui.core
+    - name: themelib_sap_horizon
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
-      afterMiddleware: compression
-      configuration:
-        ignoreCertError: false
-        ui5:
-          path:
-            - /resources
-            - /test-resources
-          url: https://sapui5.hana.ondemand.com
+  - name: ui5-middleware-simpleproxy
+    afterMiddleware: compression
+    mountPath: /proxy
+    configuration:
+      baseUri: "https://services.odata.org"

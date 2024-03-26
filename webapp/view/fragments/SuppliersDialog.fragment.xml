@@ -12,8 +12,8 @@
 		<StandardListItem
 			iconDensityAware="false"
 			iconInset="false"
-			selected="{= ${view>/selectedInDialogSuppliers}.includes(${SuppliersName})}"
-			title="{SuppliersName}"
-			description="{Address}" />
+			selected="{= ${view>/selectedInDialogSuppliers}.includes(${Name})}"
+			title="{Name}"
+			description="{Address/Street}" />
 	</SelectDialog>
 </core:FragmentDefinition>
