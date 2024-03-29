@@ -203,11 +203,11 @@
                                 <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
                                 <Select 
                                     required="true"
-                                    change="onLiveChange"
+                                    change="onCategoryChange"
                                     forceSelection="false"
                                     items="{/Categories}" 
                                     id="idCategoriesSelect"
-                                    selectedKey="{Category/ID}"
+                                    selectedKey="{FormModel>/Category/ID}"
                                 >
                                     <core:Item key="{ID}" text="{Name}" />
                                 </Select>
@@ -302,17 +302,17 @@
                                     change="onSuppliersSelectChange"
                                     items="{/Suppliers}" 
                                     id="idSupplierNameInput"
-                                    selectedKey="{FormModel>/Supplier/Name}"
+                                    selectedKey="{FormModel>/Supplier/ID}"
                                 >
                                     <core:Item key="{ID}" text="{Name}" />
                                 </Select>
-                          
+
                                 <Label text="{i18n>ConcurrencyText}" labelFor="idSupplierConcurrency" />
                                 <Input 
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Concurrency',
+                                        path: 'Supplier/Concurrency',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierConcurrency" 
@@ -326,7 +326,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Address/Street',
+                                        path: 'Supplier/Address/Street',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="IdSupplierStreetInput" 
@@ -336,7 +336,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Address/City',
+                                        path: 'Supplier/Address/City',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierCityInput" 
@@ -346,7 +346,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Address/State',
+                                        path: 'Supplier/Address/State',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierStateInput" 
@@ -356,7 +356,7 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Address/ZipCode',
+                                        path: 'Supplier/Address/ZipCode',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierZipCodeInput" 
@@ -366,12 +366,11 @@
                                     required="true"
                                     liveChange="onLiveChange"
                                     value="{
-                                        path: 'Address/Country',
+                                        path: 'Supplier/Address/Country',
                                         type: 'sap.ui.model.type.String'
                                     }" 
                                     id="idSupplierCountryInput" 
-                                />               
-                            
+                                />          
                             </form:content>
                         </form:SimpleForm>
                     </u:ObjectPageSubSection>

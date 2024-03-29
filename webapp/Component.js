@@ -13,12 +13,7 @@ sap.ui.define([
 		init : function () {
 			// call the init function of the parent
 			UIComponent.prototype.init.apply(this, arguments);
-			/* const oModel = new JSONModel();
-			oModel.loadData("./model/products.json", "", false, "", true);
-			oModel.loadData("./model/categories.json", "", false, "", true);
-			oModel.loadData("./model/suppliers.json", "", false, "", true);
-
-            this.setModel(oModel); */
+		
 			this.getRouter().initialize();
 		}
 	});

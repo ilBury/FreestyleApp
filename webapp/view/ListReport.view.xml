@@ -196,7 +196,6 @@
 								/>
 								
 								<Text text="{Category/Name}" />
-								
 							</cells>
 						</ColumnListItem>
 					</items>

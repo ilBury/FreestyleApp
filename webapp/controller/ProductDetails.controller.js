@@ -30,13 +30,14 @@ sap.ui.define([
 				Selected: []
 			})
 			const oViewModel = new JSONModel({
-				isBusyIndicator: false
+				isBusyIndicator: true
 			})
 			
 			this.getView().setModel(oViewModel, "view")
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
 
             oRouter.getRoute("ProductDetails").attachPatternMatched(this.onPatternMatched, this);
+
         },
 
         onPatternMatched: function(oEvent) {
@@ -61,6 +62,7 @@ sap.ui.define([
 					Name: ""
 				},
 				Supplier: {
+					ID: null,
 					Name: "",
 					Concurrency: "",
 					Address: {
@@ -77,35 +79,37 @@ sap.ui.define([
 			})
 			this.getView().setModel(oFormModel, "FormModel");
 			
-
-			oODataModel.metadataLoaded().then(() => {
-				
+			
+			oODataModel.metadataLoaded().then(() => {			
 				if(sProductMode === "create") {
 					const oNewProductCtx = oODataModel.createEntry("/Products", {
 						properties: oFormModel.getData()
 					});
 					
-					this.bindObjectView(oNewProductCtx.getPath());
-					
+					this.bindObjectView(oNewProductCtx.getPath());		
 				} else {
-					const sKey = oODataModel.createKey("/Products", {ID: sProductId});
-					this.bindObjectView(sKey);
+					const sKey = oODataModel.createKey("/Products", {ID: sProductId});	
+					this.bindObjectView(sKey);		
 				}
-			})	
+			})		
         },
 
-		bindObjectView: function(sPath) {
+		bindObjectView: function(sPath) {	
 			this.getView().bindObject({
 				path: sPath,
 				parameters: {
 					expand: 'Supplier, Category'
 				},
 				events: {
-					dataReceived: () => {	
-						this.getView().getModel("view").setProperty("/isBusyIndicator", false)
+					change: () => {
+						const sSupplierId = this.getView().getBindingContext().getObject("Supplier").ID
+						this.getModel("FormModel").setProperty("/Supplier/ID", sSupplierId);
+						const sCategoryId = this.getView().getBindingContext().getObject("Category").ID
+						this.getModel("FormModel").setProperty("/Category/ID", sCategoryId);
+						this.getView().getModel("view").setProperty("/isBusyIndicator", false);
 					}
 				}
-			})		
+			})	
 		},
 
 		createNewProductId: function() {
@@ -136,14 +140,14 @@ sap.ui.define([
 		},
 
 		getCurrentMessagePath: function(oControl, sBinding) {
-			return oControl.getBinding(sBinding).oContext.sPath + "/" + oControl.getBindingPath(sBinding)
+			const sInputValue = "value";
+			return sInputValue === sBinding ? oControl.getBindingContext() + "/" + oControl.getBindingPath(sBinding) : oControl.getBindingPath(sBinding);
 		},
 
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
 			const sSelectControl = "sap.m.Select";
 			const sCurrentControlName = oControl.getMetadata().getName();
-			
 			const sValue = sCurrentControlName === sSelectControl ? oControl.getSelectedItem()?.getText() : oControl.getValue();
 			const sCurrentBindingPath = sCurrentControlName === sSelectControl ? this.getCurrentMessagePath(oControl, "selectedKey") : this.getCurrentMessagePath(oControl, "value");
 			
@@ -152,14 +156,14 @@ sap.ui.define([
 					Messaging.removeMessages(el)
 				}	
 			})
-		
+			
 			if(!sValue) {
 				Messaging.addMessages(
 					new Message({
 						message: "Should be required",
 						type: library.MessageType.Error,
 						target: sCurrentBindingPath,
-						processor: this.getModel()
+						processor: sCurrentControlName === sSelectControl ? this.getModel("FormModel") : this.getModel()
 					})
 				)
 			}
@@ -177,47 +181,53 @@ sap.ui.define([
 			
 			if(!aMessages.length) {	
 				
-				oODataModel.submitChanges();
+				oODataModel.submitChanges({
+					success: () => {
+						const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
+						const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
+						this.getModel().update(path, {
+							uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcjt9coqzw))/V2/OData/OData.svc${newCategoryURI}`		
+						})
+					}
+				});
 				
 				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
 					closeOnBrowserNavigation: false
-				});
-				
-				this.getOwnerComponent().getRouter().navTo("ListReport");
-				
-			} else {
-			
-				this.displayNotValidMessage(aFormFields, aMessages);
-			}
+				});		
 	
-			
+				
+
+				this.getOwnerComponent().getRouter().navTo("ListReport");	
+			} else {	
+				this.displayNotValidMessage(aFormFields, aMessages);
+			}	
 		},
 
-		onSuppliersSelectChange: function(oControl) {
-			const oSupplierForm = this.byId("idSupplierForm");
-			const oODataModel = this.getModel();
-			const sCurrentSupplierId = oControl.getSource().getBinding("selectedKey").getValue();
-			const sKey = oODataModel.createKey("/Suppliers", {ID: sCurrentSupplierId});
-			const sCurrentProductId = this.getView().getBindingContext().getObject("ID");
-			oSupplierForm.bindObject({
-				path: sKey
-			});
-			const oSupplierCtx = oSupplierForm.getBindingContext()
-			//uri should be like entity set, that's why it doesn't work
-		/* 	oODataModel.createEntry(`/Products(${sCurrentProductId})/$links/Supplier`, {
-				properties: {
-					Name: oSupplierCtx.getObject("Name"),
-					Concurrency: oSupplierCtx.getObject("Concurrency"),
-					Address: {
-						Street: oSupplierCtx.getObject("Address/Street"),
-						City: oSupplierCtx.getObject("Address/City"),
-						State: oSupplierCtx.getObject("Address/State"),
-						ZipCode: oSupplierCtx.getObject("Address/ZipCode"),
-						Country: oSupplierCtx.getObject("Address/Country")
-					}
-				}
-			}) */
+		onSuppliersSelectChange: function(oControl) {	
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+			if(!bIsCreateMode) {
+				const path = `${this.getView().getBindingContext().getPath()}/$links/Supplier`
+				const newSupplierURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
+				
+				this.getModel().update(path, {
+					uri: `https://services.odata.org/(S(3g0wqswc4ao3yrwcjt9coqzw))/V2/OData/OData.svc${newSupplierURI}`		
+				})
+			}
 		},
+
+		onCategoryChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				const path = `${this.getView().getBindingContext().getPath()}/$links/Category`
+				const newCategoryURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
+				
+				this.getModel().update(path, {
+					uri: `https://services.odata.org/(S(3g0wqswc4ao3yrwcjt9coqzw))/V2/OData/OData.svc${newCategoryURI}`		
+				})
+			}
+		},
+
 
 		displayNotValidMessage: function(aFormFields, aMessages) {
 			const sSelectControl = "sap.m.Select";
@@ -233,7 +243,7 @@ sap.ui.define([
 		onSaveProductPress: function() {
 			const oODataModel = this.getModel();
 			const aFormFields = this.getFormFields();
-
+			
 			aFormFields.forEach(oControl => this.validateField(oControl));
 			const aMessages = Messaging.getMessageModel().getData();
 			
@@ -297,7 +307,7 @@ sap.ui.define([
 		},
 
 		onUpdateProductPress: function() {
-			this.changeRouteMode("edit")	
+			this.changeRouteMode("edit");	
 		},
 
 		onCancelButtonPress: function() {
