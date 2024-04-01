@@ -64,7 +64,7 @@ sap.ui.define([
 				Supplier: {
 					ID: null,
 					Name: "",
-					Concurrency: "",
+					Concurrency: 0,
 					Address: {
 						Street: "",
 						City: "",
@@ -83,6 +83,7 @@ sap.ui.define([
 			oODataModel.metadataLoaded().then(() => {			
 				if(sProductMode === "create") {
 					const oNewProductCtx = oODataModel.createEntry("/Products", {
+						"headers": {"Content-ID": 40},
 						properties: oFormModel.getData()
 					});
 					
@@ -182,11 +183,28 @@ sap.ui.define([
 			if(!aMessages.length) {	
 				
 				oODataModel.submitChanges({
-					success: () => {
+					success: (oData) => {
+						console.log(oData)
 						const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
 						const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
 						this.getModel().update(path, {
-							uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcjt9coqzw))/V2/OData/OData.svc${newCategoryURI}`		
+							uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
+						
+						},
+						{
+							"headers": {"Content-ID": 77},
+							success: () => {
+								this.getOwnerComponent().getRouter().navTo("ListReport");
+								/* oODataModel.read("/Products", {
+									urlParameters: {
+										"$expand": "Category"
+									}
+								}) */
+
+							}, 
+							error: (e) => {
+								MessageBox.error(e)
+							}
 						})
 					}
 				});
@@ -195,9 +213,7 @@ sap.ui.define([
 					closeOnBrowserNavigation: false
 				});		
 	
-				
-
-				this.getOwnerComponent().getRouter().navTo("ListReport");	
+			
 			} else {	
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}	
@@ -210,7 +226,7 @@ sap.ui.define([
 				const newSupplierURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
 				
 				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4ao3yrwcjt9coqzw))/V2/OData/OData.svc${newSupplierURI}`		
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newSupplierURI}`		
 				})
 			}
 		},
@@ -223,11 +239,10 @@ sap.ui.define([
 				const newCategoryURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
 				
 				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4ao3yrwcjt9coqzw))/V2/OData/OData.svc${newCategoryURI}`		
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
 				})
 			}
 		},
-
 
 		displayNotValidMessage: function(aFormFields, aMessages) {
 			const sSelectControl = "sap.m.Select";

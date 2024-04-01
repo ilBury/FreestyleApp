@@ -72,11 +72,13 @@ sap.ui.define([
 			oRouter.attachRouteMatched(this.onRouteMatched, this);
 		},
 
+
+		
 		onRouteMatched: function() {
 			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
 			const oSorter = new Sorter("ReleaseDate", "ASC");
-			
+			oItemsBinding.refresh()
 			oItemsBinding.sort(oSorter);	
 		},
 
