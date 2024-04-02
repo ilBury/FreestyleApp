@@ -3,20 +3,11 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/m/MessageBox",
-	"sap/ui/core/format/DateFormat",
-	"sap/base/util/deepEqual",
 	"sap/ui/core/Messaging",
 	'sap/ui/core/message/Message',
 	'sap/ui/core/library',
-	"sap/ui/core/Fragment",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	'sap/m/Label',
-	'sap/ui/table/Column',
-	'sap/m/Text',
-	"sap/m/Token",
 	"../model/formatter"
-], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, Text, Token, formatter) {
+], function (BaseController, JSONModel,	MessageToast, MessageBox, Messaging, Message, library,  formatter) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ProductDetails", {
@@ -26,255 +17,267 @@ sap.ui.define([
 			
             const oComponent = this.getOwnerComponent();
             const oRouter = oComponent.getRouter();
-            const oAvailabilityModel = new JSONModel({
-				Availability: [
-					{
-						key: "true",
-						value: this.getTextFromI18n("InStockText")
-					},
-					{
-						key: "false",
-						value: this.getTextFromI18n("OutOfStockText")
-					}
-				]
-			})
 			const oSelectedSupModel = new JSONModel({
 				Selected: []
 			})
 			const oViewModel = new JSONModel({
-				isButtonEnable: false
+				isBusyIndicator: true
 			})
 			
 			this.getView().setModel(oViewModel, "view")
-			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
 
             oRouter.getRoute("ProductDetails").attachPatternMatched(this.onPatternMatched, this);
+
         },
 
         onPatternMatched: function(oEvent) {
             const mRouteArguments = oEvent.getParameter("arguments");
             const sProductId = mRouteArguments.productId;
-			const sNewProduct = "newProduct";
+			const sProductMode = mRouteArguments.mode;
 			const oEditModel = new JSONModel({
-				EditMode: sProductId === sNewProduct
+				CreateMode: sProductMode === "create",
+				EditMode: sProductMode === "edit",
+				DisplayMode: sProductMode === "view"
 			});
-			
+			const oODataModel = this.getModel();
+			const nNewProductId = this.createNewProductId();
 			this.getView().setModel(oEditModel, "EditModel");
-			const bEditMode = this.getModel("EditModel").getProperty("/EditMode");
-			const sKey = bEditMode ? "/Products/newProduct" : "/Products/" + (sProductId - 1);	
 			const oFormModel = new JSONModel({
-				Id: "",
+				ID: nNewProductId,
 				Name: "",
 				Description: "",
 				Price: null,
-				Quantity: null,
-				Category: "",
-				Suppliers: [],
-				Availability: "",
-				Currency: "",
-				CreatedAt: null,
-				UpdatedAt: null
+				Category: {
+					ID: null,
+					Name: ""
+				},
+				Supplier: {
+					ID: null,
+					Name: "",
+					Concurrency: 0,
+					Address: {
+						Street: "",
+						City: "",
+						State: "",
+						ZipCode: "",
+						Country: ""
+					}
+				},
+				Rating: null,
+				ReleaseDate: new Date(),
+				DiscontinuedDate: null
 			})
-
-			this.checkForCorrectPath(sProductId, bEditMode);
-			this.getModel("CopyModel")?.setProperty("/", null)
 			this.getView().setModel(oFormModel, "FormModel");
-			this.getView().getModel("view").setProperty("/isButtonEnable", false)
-            this.getView().bindObject({
-                path: sKey
-            })
-	
+			
+			oODataModel.metadataLoaded().then(() => {			
+				if(sProductMode === "create") {
+					const oNewProductCtx = oODataModel.createEntry("/Products", {
+						"headers": {"Content-ID": 40},
+						properties: oFormModel.getData()
+					});
+					
+					this.bindObjectView(oNewProductCtx.getPath());		
+				} else {
+					const sKey = oODataModel.createKey("/Products", {ID: sProductId});	
+					this.bindObjectView(sKey);		
+				}
+			})		
         },
-		checkForCorrectPath: function(sProductId, bEditMode) {
-			const oModel = this.getModel();
-			const bCorrectId = oModel.getProperty("/Products").map((el) => el.Id).includes(sProductId);
 
-			if(!bCorrectId && !bEditMode) {
-				const oComponent = this.getOwnerComponent();
-				oComponent.getRouter().getTargets().display("notFound");
-			}
+		bindObjectView: function(sPath) {	
+			this.getView().bindObject({
+				path: sPath,
+				parameters: {
+					expand: 'Supplier, Category'
+				},
+				events: {
+					change: () => {
+						
+						const sSupplierId = this.getView().getBindingContext().getObject("Supplier")?.ID
+						this.getModel("FormModel").setProperty("/Supplier/ID", sSupplierId);
+						const sCategoryId = this.getView().getBindingContext().getObject("Category")?.ID
+						
+						this.getModel("FormModel").setProperty("/Category/ID", sCategoryId);
+						this.getView().getModel("view").setProperty("/isBusyIndicator", false);
+					}
+				}
+			})	
+		},
+
+		createNewProductId: function() {
+			return Math.floor(Math.random() * 1000) + 1
 		},
 
 		getFormFields: function() {
 			return [
 				this.byId("idNameInput"),
 				this.byId("idPriceInput"),
-				this.byId("idQuantityInput"),
+				this.byId("idRatingInput"),
 				this.byId("idCategoriesSelect"),
-				this.byId("idAvailabilitySelect"),
-				this.byId("idCurrencyInput")
+				this.byId("idSupplierNameSelect")
 			]
+		},
+
+		getCurrentMessagePath: function(oControl, sBinding) {
+			const sInputValue = "value";
+			return sInputValue === sBinding ? oControl.getBindingContext() + "/" + oControl.getBindingPath(sBinding) : oControl.getBindingPath(sBinding);
 		},
 
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
 			const sSelectControl = "sap.m.Select";
 			const sCurrentControlName = oControl.getMetadata().getName();
-			const sValue = sCurrentControlName === sSelectControl ? oControl.getSelectedKey() : oControl.getValue();
-			const sCurrentBindingPath = sCurrentControlName === sSelectControl ? oControl.getBindingPath("selectedKey") : oControl.getBindingPath("value")
+			const sValue = sCurrentControlName === sSelectControl ? oControl.getSelectedItem()?.getText() : oControl.getValue();
+			const sCurrentBindingPath = sCurrentControlName === sSelectControl ? this.getCurrentMessagePath(oControl, "selectedKey") : this.getCurrentMessagePath(oControl, "value");
+			
 			aMessages.forEach(el => {
 				if(el.target === sCurrentBindingPath) {
 					Messaging.removeMessages(el)
 				}	
 			})
-
+			
 			if(!sValue) {
 				Messaging.addMessages(
 					new Message({
 						message: "Should be required",
 						type: library.MessageType.Error,
 						target: sCurrentBindingPath,
-						processor: this.getModel("FormModel")
+						processor: sCurrentControlName === sSelectControl ? this.getModel("FormModel") : this.getModel()
 					})
 				)
 			}
 		},
 
-		onCreateProductPress: function() {
-			const oView = this.getView();
-			const oModel = oView.getModel();
-			const oFormModel = oView.getModel("FormModel");
-			const aProducts = oModel.getProperty("/Products");
-			const nProductId = aProducts.length + 1;
-			const aSuppliers = oFormModel.getProperty("/Suppliers").map(el => ({SupplierId: el}));
-			const sAvailability = oFormModel.getProperty("/Availability");
-			const oDateFormat = DateFormat.getDateTimeInstance({
-				pattern: "yyyy-MM-dd'T'HH:mm:ss"
-			});
-			const aFormFields = this.getFormFields();
-
-			aFormFields.forEach(oControl => this.validateField(oControl));
-			const aMessages = Messaging.getMessageModel().getData();
-
-			if(!aMessages.length) {
-				oFormModel.setProperty("/Availability", JSON.parse(sAvailability.toLowerCase()))
-				oFormModel.setProperty("/Id", String(nProductId));
-				oFormModel.setProperty("/Suppliers", aSuppliers);
-				oFormModel.setProperty("/CreatedAt", oDateFormat.format(new Date()));
-				oFormModel.setProperty("/UpdatedAt", oDateFormat.format(new Date()));
-
-				aProducts.push(oFormModel.getData())
-				oModel.setProperty("/Products", aProducts);
-		
-				oFormModel.setProperty("/", {
-					Id: "",
-					Name: "",
-					Description: "",
-					Price: null,
-					Quantity: null,
-					Category: "",
-					Suppliers: [],
-					Availability: "",
-					Currency: "",
-					CreatedAt: null,
-					UpdatedAt: null
-				})
-			
-				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
-					closeOnBrowserNavigation: false
-				});
-				this.getOwnerComponent().getRouter().navTo("ListReport");
-			} else {
-				const sSelectControl = "sap.m.Select";
-				aFormFields
-					.filter(oControl => oControl.getMetadata().getName() !== sSelectControl)
-					.find(oControl => oControl.getBinding("value").getPath() === aMessages[0].target)
-					?.focus();
-				MessageToast.show(this.getTextFromI18n("NotValidatedMessage"), {
-					closeOnBrowserNavigation: false
-				});
-			}
-		},
-
 		onLiveChange: function(oEvent) {	
-			
 			this.validateField(oEvent.getSource())
 		},
 
-		onConfirmationMessageBoxPress: function(oComponent) {
-			const oCopyModel = this.getModel("CopyModel");
-			const oCopyModelSuppliers = oCopyModel?.getProperty("/Suppliers")?.map(el => ({SupplierId: el}));
-			const oFormModel = this.getModel("FormModel");
-			const sCurrentId = this.getView().getBindingContext().getObject("Id")
-			const oModel = this.getModel();
+		updateCategory: function() {
+			const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
+			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
+			this.getModel().update(path, {
+				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`			
+			},
+			{
+				"headers": {"Content-ID": 77}
+			})
+		},
+
+		updateSupplier: function() {
+			const newSupplierURI = this.byId("idSupplierNameSelect").getSelectedItem().getBindingContext().getPath();		
+			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Supplier`
+			this.getModel().update(path, {
+				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`			
+			},
+			{
+				"headers": {"Content-ID": 78}
+			})
 			
+		},
+
+		onCreateProductPress: function() {
+			const oODataModel = this.getModel();
+			const aFormFields = this.getFormFields();
+			aFormFields.forEach(oControl => this.validateField(oControl));
+			const aMessages = Messaging.getMessageModel().getData();
 			
-			MessageBox
-			.warning(this.getTextFromI18n(oCopyModel ? "LostChangesWarningMessage" : "LostDataWarningMessage"), {
-				actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
-				emphasizedAction: MessageBox.Action.OK,
-				onClose: (sAction) => {
-					if(sAction === MessageBox.Action.OK) {
-						if(oCopyModelSuppliers) {
-							oFormModel.setProperty("/", Object.assign({}, oCopyModel.getData()))
-							oCopyModel.setProperty("/Suppliers", oCopyModelSuppliers)
-							oModel.setProperty("/Products/" + (sCurrentId - 1), Object.assign({}, oCopyModel.getData()));
-							this.getModel("EditModel").setProperty("/EditMode", false);
-							
-							oFormModel.updateBindings(true);
-							Messaging.getMessageModel().getData().forEach(el => Messaging.removeMessages(el))
-						} else {
-							oComponent.getRouter().navTo("ListReport");
-						}	
+			if(!aMessages.length) {	
+				
+				oODataModel.submitChanges({
+					"headers": {"Content-ID": this.createNewProductId()},
+					success: () => {
+						this.updateCategory();
+						this.updateSupplier();
+						this.getModel().resetChanges(undefined, true)
+						this.getOwnerComponent().getRouter().navTo("ListReport");
+					},
+					error: (e) => {
+						MessageBox.error(e)
 					}
-				}
+				});				
+				
+				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
+					closeOnBrowserNavigation: false
+				});		
+			} else {	
+				this.displayNotValidMessage(aFormFields, aMessages);
+			}	
+		},
+
+		onSuppliersSelectChange: function(oControl) {	
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+			if(!bIsCreateMode) {
+				const path = `${this.getView().getBindingContext().getPath()}/$links/Supplier`
+				const newSupplierURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
+				
+				this.getModel().update(path, {
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`		
+				}, {
+					"headers": {"Content-ID": 99}
+				})
+			}
+			this.onLiveChange(oControl);
+		},
+
+		onCategoryChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				const path = `${this.getView().getBindingContext().getPath()}/$links/Category`
+				const newCategoryURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
+				
+				this.getModel().update(path, {
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
+				}, {
+					"headers": {"Content-ID": 71}
+				})
+			}
+			this.onLiveChange(oControl);
+		},
+
+		getControlPath: function(oControl) {
+			const sSelectControl = "sap.m.Select";
+
+			return oControl.getMetadata().getName() === sSelectControl ? oControl.getBinding("selectedKey").getPath() : oControl.getBinding("value").getPath();
+		},
+
+		displayNotValidMessage: function(aFormFields, aMessages) {
+			aFormFields
+				.find(oControl => aMessages[0].target.includes(this.getControlPath(oControl)))
+				?.focus();
+
+			MessageToast.show(this.getTextFromI18n("NotValidatedMessage"), {
+				closeOnBrowserNavigation: false
 			});
 		},
 
-		isFieldsChanged: function(oFormData, oCopyData) {
-			if(!oCopyData) return false; 
-
-			const aSelectedSuppliers = oFormData.Suppliers;			
-			const bIsEqualModels = deepEqual(oFormData, oCopyData);
-			const aCopySuppliers = oCopyData.Suppliers;
-			const aChangedSuppliers = aSelectedSuppliers.filter(el => !aCopySuppliers.includes(el));
-
+		onSaveProductPress: function() {
+			const oODataModel = this.getModel();
+			const aFormFields = this.getFormFields();
 			
-			return !aChangedSuppliers.length && bIsEqualModels ? false : true;
-		},
-
-		onCancelButtonPress: function() {
-			const oCopyModel = this.getModel("CopyModel");
-			const oComponent = this.getOwnerComponent();
-			const oFormModelData = this.getModel("FormModel").getData();
-			const bAllEmptyFields = Object.keys(oFormModelData)
-										.slice(0, -2)
-										.every(el => !oFormModelData[el] || !oFormModelData[el]?.length);
-			const bIsChangedFields = this.isFieldsChanged(oFormModelData, oCopyModel?.getData());
-			const bIsInvalidChanges = !!Messaging.getMessageModel().getData().length;
-		
-			if(bAllEmptyFields) {
-				oComponent.getRouter().navTo("ListReport");
-			} else if(!bIsChangedFields && oCopyModel?.getData() && !bIsInvalidChanges) {
-				this.getModel("EditModel").setProperty("/EditMode", false);
+			aFormFields.forEach(oControl => this.validateField(oControl));
+			const aMessages = Messaging.getMessageModel().getData();
+			
+			if(!aMessages.length) {
 				
+				oODataModel.submitChanges({
+					success: () => {
+						this.getModel("EditModel").setProperty("/EditMode", false);
+						this.getModel("EditModel").setProperty("/DisplayMode", true);
+						MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
+							closeOnBrowserNavigation: false
+						});
+					
+						this.changeRouteMode("view");
+					},
+					error: (e) => {
+						MessageBox.error(e)
+					}
+				});		
 			} else {
-				this.onConfirmationMessageBoxPress(oComponent);		
-			}	
-			this.getView().getModel("view").setProperty("/isButtonEnable", false)
-		},
-
-		rewriteProductsIds: function() {
-			const aProducts = this.getModel().getProperty("/Products");
-			aProducts.map((el, id) => {
-				el.Id = String(id + 1);
-				return el;
-			})
-		},
-
-		removeProduct: function() {
-			const oComponent = this.getOwnerComponent()
-			const sCurrentId = this.getView().getBindingContext().getObject("Id");
-			const oModel = this.getModel();
-			const aCurrentProducts = oModel.getProperty("/Products").filter(el => el.Id !== sCurrentId);
-
-			oModel.setProperty("/Products", aCurrentProducts);
-			this.rewriteProductsIds();
-			oComponent.getRouter().navTo("ListReport");	
-			MessageToast.show(this.getTextFromI18n("ProductWasNotRemovedMessage"), {
-				closeOnBrowserNavigation:false
-			})
+				this.displayNotValidMessage(aFormFields, aMessages);
+			}
 		},
 
 		onDeleteProductPress: function() {
@@ -289,195 +292,75 @@ sap.ui.define([
 			});
 		},
 
-		onUpdateProductPress: function() {
-			const oCtx = this.getView().getBindingContext();
-			const sCurrentId = oCtx.getObject("Id")
-			const oCurrentProduct = oCtx.getProperty("/Products").find(el => el.Id == sCurrentId);
-			const oFormModel = this.getModel("FormModel");
-			const oCopyProductModel = new JSONModel(Object.assign({}, oCurrentProduct));
+		removeProduct: function() {
+			const oComponent = this.getOwnerComponent()
+			const sCurrentId = this.getView().getBindingContext().getObject("ID");
+			const oODataModel = this.getModel();
+			const sKey = oODataModel.createKey("/Products", {ID: sCurrentId});
 
-			oFormModel.setData({
-				...oCurrentProduct,
-				Suppliers: oCurrentProduct.Suppliers.map(({SupplierId}) => SupplierId)
-			})
-			
-			oCopyProductModel.setProperty("/Suppliers", oCurrentProduct.Suppliers.map(el => el.SupplierId))
-			
-			this.getModel("EditModel").setProperty("/EditMode", true)
-			this.getView().setModel(oCopyProductModel, "CopyModel")
-		},
-
-		onSaveProductPress: function() {
-			const oFormModel = this.getModel("FormModel");
-			const oModel = this.getModel();
-			const aSelectedSuppliers = oFormModel.getData().Suppliers.map(el => ({SupplierId: el}));
-			const oDateFormat = DateFormat.getDateTimeInstance({
-				pattern: "yyyy-MM-dd'T'HH:mm:ss"
-			});
-			const nProductPositionInArray = oFormModel.getData().Id - 1;
-			const aFormFields = this.getFormFields();
-
-			aFormFields.forEach(oControl => this.validateField(oControl));
-			const aMessages = Messaging.getMessageModel().getData();
-			
-			if(!aMessages.length) {
-				oFormModel.setProperty("/UpdatedAt", oDateFormat.format(new Date()))
-				oFormModel.setProperty("/Suppliers", aSelectedSuppliers)
-				oModel.setProperty("/Products/" + nProductPositionInArray, oFormModel.getData());
-				
-				this.getModel("EditModel").setProperty("/EditMode", false)
-		
-				MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
-					closeOnBrowserNavigation: false
-				});
-			} else {
-				const sSelectControl = "sap.m.Select";
-				aFormFields
-					.filter(oControl => oControl.getMetadata().getName() !== sSelectControl)
-					.find(oControl => oControl.getBinding("value").getPath() === aMessages[0].target)
-					?.focus();
-				MessageToast.show(this.getTextFromI18n("NotValidatedMessage"), {
-					closeOnBrowserNavigation: false
-				});
-			}
-		},
-
-		getSuppliersSelectedFilters: function(aCurrentSuppliersName) {
-			const aFilters = aCurrentSuppliersName.map(el => {
-
-				return new Filter("SuppliersName", FilterOperator.NE, el)
-			})
-			return aFilters.length ? aFilters : [new Filter("SuppliersName", FilterOperator.Contains, "")];
-		},
-
-		handleValueHelpRequest: function() {
-			const oView = this.getView();
-			const aCurrentSuppliers = this.getModel("FormModel").getProperty("/Suppliers");
-			const aSuppliers = this.getModel().getProperty("/Suppliers");
-			const aCurrentSuppliersName = aSuppliers
-											.filter((el) => aCurrentSuppliers?.includes(el.SupplierId))
-											.map(el => el.SuppliersName)
-			const aCurrentTokens = [];
-			Fragment.load({
-				id: oView.getId(),
-				name: "products.app.view.fragments.ValueHelpDialogSuppliers",
-				controller: this
-			}).then((oDialog) => {
-				this.oDialog = oDialog;
-				oView.addDependent(this.oDialog);
-				this.oDialog.getTableAsync().then((oTable) => {
-					
-					if (oTable.bindRows) {
-						console.log(aCurrentSuppliersName)
-						const oFilter = new Filter({
-							filters: this.getSuppliersSelectedFilters(aCurrentSuppliersName),
-							and: true
-						})
-						oTable.bindAggregation("rows", {
-							path: "/Suppliers",
-							filters: oFilter,
-							events: {
-								dataReceived: function() {
-									this.oDialog.update();
-								}
-							}
-						});
-						console.log(oTable.getBinding())
-						const oColumnSupplierName = new UIColumn({
-							label: new Label({text: "Name"}),
-							template: new Text({wrapping: false, text: "{SuppliersName}"})
-						});
-						const oColumnSupplierAddress = new UIColumn({
-							label: new Label({text: "Address"}), 
-							template: new Text({wrapping: false, text: "{Address}"})
-						});
-
-						oTable.addColumn(oColumnSupplierName);
-						oTable.addColumn(oColumnSupplierAddress);
-					}
-					this.oDialog.update();
-				});
-				
-				this.setValueHelpTokens(aCurrentSuppliersName, aCurrentTokens)
-				
-				this.oDialog.open();
-			})		
-		},
-
-		onValueHelpOkPress: function(oEvent) {
-			const aTokens = oEvent.getParameter("tokens");
-			const aSelectedSuppliersName = aTokens.map(el => el.getText());
-			const aSuppliers = this.getModel().getProperty("/Suppliers");
-			const oFormModel = this.getModel("FormModel");
-			const aSelectedSuppliers = aSuppliers.filter(el => aSelectedSuppliersName.includes(el.SuppliersName));
-			const aSelectedSuppliersId = aSelectedSuppliers.map(el => el.SupplierId);
-			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
-
-			oFormModel.setProperty("/Suppliers", aSelectedSuppliersId);
-			this.getModel().setProperty(sCurrentBindingPath + "/Suppliers", aSelectedSuppliers);	
-			
-			this.onValueHelpCancelPress();
-		},
-
-		setValueHelpTokens: function(aCurrentSuppliersName, aCurrentTokens) {
-			aCurrentSuppliersName.forEach(sName => {
-				aCurrentTokens.push(
-					new Token({
-						key: sName,
-						text: sName
+			oODataModel.remove(sKey, {
+				"headers": {"Content-ID": 31},
+				success: () => {
+					oComponent.getRouter().navTo("ListReport");	
+					MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"), {
+						closeOnBrowserNavigation:false
 					})
-				)
-			})
-	
-			this.oDialog.setTokens(aCurrentTokens);
+				},
+				error: (e) => {
+					MessageBox.error(e)
+				}
+			})	
 		},
 
-		onValueHelpCancelPress: function () {
-			this.oDialog.close();
-		},
-
-		onValueHelpAfterClose: function () {
-			this.oDialog.setTokens([])
-		},
-
-		onSelectSuppliers: function(oEvent) {
-			const aSelectedItems = oEvent.getSource().getSelectedItems();
-			this.getView().getModel("view").setProperty("/isButtonEnable", !!aSelectedItems.length);	
-		},
-
-		cleanSelectedTableItems: function() {
-			const oTable = this.byId("idSuppliersTable");
-			oTable.getSelectedItems()?.forEach(el => {
-				oTable.setSelectedItem(el, false)
-			})
-			this.getView().getModel("view").setProperty("/isButtonEnable", false)
-		},
-
-		onRemoveSuppliers: function() {
+		changeRouteMode: function(sMode) {
+			const oCtx = this.getView().getBindingContext();
+			const sCurrentId = oCtx.getObject("ID")
+			const oComponent = this.getOwnerComponent();
 			
-			const oTable = this.byId("idSuppliersTable");
-			const aSelectedSuppliersId = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("SupplierId"));
-			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers")
-			const aNonSelectedSuppliersId = aCurrentSuppliersId.filter(el => !aSelectedSuppliersId.includes(el));
-			const sCurrentBindingPath = this.getView().getBindingContext().getPath();
-			
-			this.getModel("FormModel").setProperty("/Suppliers", aNonSelectedSuppliersId);
-			this.getModel()
-				.setProperty(sCurrentBindingPath + "/Suppliers", aNonSelectedSuppliersId.map(el => ({SupplierId: el})));	
-			this.cleanSelectedTableItems();
+			oComponent.getRouter().navTo(
+				"ProductDetails",
+				{
+					productId: sCurrentId,
+					mode: sMode
+				},
+			 	true
+			)	
 		},
 
-		onRemoveSuppliersInCreateMode: function() {
-			const oTable = this.byId("idCreateSuppliersTable");
-			const aSuppliers = this.getModel().getProperty("/Suppliers");
-			const aCurrentSuppliersId = this.getModel("FormModel").getProperty("/Suppliers");
-			const aSelectedSuppliersName = oTable.getSelectedItems().map(el => el.getCells()[0].getText());
-			const aNonSelectedSuppliersId = aSuppliers
-											.filter(el => !aSelectedSuppliersName.includes(el.SuppliersName))
-											.filter(el => aCurrentSuppliersId.includes(el.SupplierId))
-											.map(el => el.SupplierId);
+		onUpdateProductPress: function() {
+			this.changeRouteMode("edit");	
+		},
+
+		onCancelButtonPress: function() {
+			const oODataModel = this.getModel();
+			const bIsChangedFields = oODataModel.hasPendingChanges();
+			const bIsEditMode = this.getModel("EditModel").getProperty("/EditMode");
 			
-			this.getModel("FormModel").setProperty("/Suppliers", aNonSelectedSuppliersId)	
-		}
+			if(!bIsChangedFields) {
+				this.changeRouteMode("view");
+			} else {
+				this.onConfirmationMessageBoxPress(bIsEditMode);	
+			} 
+		},
+
+		onConfirmationMessageBoxPress: function(bIsEditMode) {
+			const oODataModel = this.getModel();
+			MessageBox
+			.warning(this.getTextFromI18n(bIsEditMode ? "LostChangesWarningMessage" : "LostDataWarningMessage"), {
+				actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+				emphasizedAction: MessageBox.Action.OK,
+				onClose: (sAction) => {
+					if(sAction === MessageBox.Action.OK) {
+						if(bIsEditMode) {
+							oODataModel.resetChanges();
+							this.changeRouteMode("view");
+							Messaging.getMessageModel().getData().forEach(el => Messaging.removeMessages(el))
+						} else {
+							this.getOwnerComponent().getRouter().navTo("ListReport");
+						}	
+					}
+				}
+			});
+		},
 	});
 });

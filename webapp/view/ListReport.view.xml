@@ -37,7 +37,7 @@
 									label="{
 										parts: [
 											'i18n>SearcherLabelText',
-											'i18n>ProductNameText',
+											'i18n>NameText',
 											'i18n>AndText',
 											'i18n>DescriptionText'
 										],
@@ -51,25 +51,8 @@
 											id="searcher" 
 											width="100%" 
 											value="{view>/searchField}"
-											liveChange="onFilter(null)" 	
+											liveChange="onFilter" 	
 										/>
-									</fb:control>
-								</fb:FilterGroupItem>
-
-								<fb:FilterGroupItem 
-									name="Availability" 
-									label="{i18n>AvailabilityText}" 
-									groupName="ProductFiltersGroup" 
-									visibleInFilterBar="true">
-									<fb:control>
-										<MultiComboBox
-											id="availabilitySelect"
-											
-											items="{AvailabilityModel>/Availability}"
-											selectionChange="onFilter(null)"
-										>
-											<core:Item key="{AvailabilityModel>key}" text="{AvailabilityModel>value}" />
-										</MultiComboBox>
 									</fb:control>
 								</fb:FilterGroupItem>
 
@@ -91,7 +74,7 @@
 											forceSelection="false"
 											selectedKey="{PriceModel>/SelectedKey}"
 											items="{PriceModel>/Range}"
-											change="onFilter(null)"
+											change="onFilter"
 										>
 											<core:Item key="{PriceModel>id}" text="{PriceModel>value}" />
 										</Select>
@@ -108,7 +91,7 @@
 											id="categorySelect"
 											
 											items="{/Categories}"
-											selectionChange="onFilter(null)"
+											selectionChange="onFilter"
 										>
 											<core:Item key="{Id}" text="{Name}" />
 										</MultiComboBox>
@@ -121,7 +104,7 @@
 										parts: [
 											'i18n>SupplierNameText',
 											'i18n>SupplierText', 
-											'i18n>ProductNameText'
+											'i18n>NameText'
 										],
 										formatter: 'formatMessage'
 									}" 
@@ -148,7 +131,16 @@
 				<Table
 					id="idProductsTable"
 					mode="MultiSelect"
-					items="{/Products}"
+					items="{
+						path: '/Products',
+						parameters: {
+							expand: 'Supplier, Category'
+						},
+						sorter: {
+							path: 'ReleaseDate',
+							descending: true
+						}
+					}"
 					
 					selectionChange="onTableSelectionChange"
 				>
@@ -170,7 +162,7 @@
 					</headerToolbar>
 					<columns>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>ProductNameText}"/>
+							<Text text="{i18n>NameText}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="{i18n>DescriptionText}"/>
@@ -179,23 +171,17 @@
 							<Text text="{i18n>PriceText}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>QuantityText}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="{
 									parts: [
 										'i18n>SupplierNameText',
 										'i18n>SupplierText', 
-										'i18n>ProductNameText'
+										'i18n>NameText'
 									],
 									formatter: 'formatMessage'
 								}"/>
 						</Column>
 						<Column minScreenWidth="Tablet" demandPopin="true">
 							<Text text="{i18n>CategoryText}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>AvailabilityText}"/>
 						</Column>
 					</columns>
 
@@ -207,25 +193,13 @@
 							<cells>
 								<ObjectIdentifier title="{Name}"/>
 								<Text text="{Description}" />
-								<ObjectIdentifier title="{Price}" text="{Currency}" />
-								<Text text="{Quantity}" />
+								<ObjectIdentifier title="{Price}"/>
 								
 								<Text 
-									text="{
-										path: 'Suppliers',
-										formatter: '.formatter.getSuppliersName'
-									}" 
+									text="{Supplier/Name}" 
 								/>
 								
-								<Text text="{
-									path: 'Category',
-									formatter: '.formatter.getCategoriesName'
-								}" />
-								<ObjectStatus 
-									inverted="true"
-									state="{= ${Availability} === true ? ${i18n>SuccessText} : ${i18n>WarningText}}"
-									text="{= ${Availability} === true ? ${i18n>InStockText} : ${i18n>OutOfStockText}}"
-								/>
+								<Text text="{Category/Name}" />
 							</cells>
 						</ColumnListItem>
 					</items>
