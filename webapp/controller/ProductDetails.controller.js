@@ -3,20 +3,11 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/m/MessageBox",
-	"sap/ui/core/format/DateFormat",
-	"sap/base/util/deepEqual",
 	"sap/ui/core/Messaging",
 	'sap/ui/core/message/Message',
 	'sap/ui/core/library',
-	"sap/ui/core/Fragment",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	'sap/m/Label',
-	'sap/ui/table/Column',
-	'sap/m/Text',
-	"sap/m/Token",
 	"../model/formatter"
-], function (BaseController, JSONModel,	MessageToast, MessageBox, DateFormat, deepEqual, Messaging,	Message, library, Fragment,	Filter,	FilterOperator,	Label, UIColumn, Text, Token, formatter) {
+], function (BaseController, JSONModel,	MessageToast, MessageBox, Messaging, Message, library,  formatter) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ProductDetails", {
@@ -79,7 +70,6 @@ sap.ui.define([
 			})
 			this.getView().setModel(oFormModel, "FormModel");
 			
-			
 			oODataModel.metadataLoaded().then(() => {			
 				if(sProductMode === "create") {
 					const oNewProductCtx = oODataModel.createEntry("/Products", {
@@ -103,9 +93,11 @@ sap.ui.define([
 				},
 				events: {
 					change: () => {
-						const sSupplierId = this.getView().getBindingContext().getObject("Supplier").ID
+						
+						const sSupplierId = this.getView().getBindingContext().getObject("Supplier")?.ID
 						this.getModel("FormModel").setProperty("/Supplier/ID", sSupplierId);
-						const sCategoryId = this.getView().getBindingContext().getObject("Category").ID
+						const sCategoryId = this.getView().getBindingContext().getObject("Category")?.ID
+						
 						this.getModel("FormModel").setProperty("/Category/ID", sCategoryId);
 						this.getView().getModel("view").setProperty("/isBusyIndicator", false);
 					}
@@ -116,27 +108,14 @@ sap.ui.define([
 		createNewProductId: function() {
 			return Math.floor(Math.random() * 1000) + 1
 		},
- 
-		checkForCorrectPath: function(sProductId, sProductMode) {
-			const oModes = ["view", "create", "edit"];
-
-			this.getModel().read("/Products" + "/$count", {
-				success: (nCount) => {
-					const bCorrectId = nCount > sProductId || sProductId === "newProduct";
-					if(!bCorrectId || !oModes.includes(sProductMode)) {
-						const oComponent = this.getOwnerComponent();
-						oComponent.getRouter().getTargets().display("notFound");
-					}
-				}
-			})
-		},
 
 		getFormFields: function() {
 			return [
 				this.byId("idNameInput"),
 				this.byId("idPriceInput"),
 				this.byId("idRatingInput"),
-				this.byId("idCategoriesSelect")
+				this.byId("idCategoriesSelect"),
+				this.byId("idSupplierNameSelect")
 			]
 		},
 
@@ -174,6 +153,29 @@ sap.ui.define([
 			this.validateField(oEvent.getSource())
 		},
 
+		updateCategory: function() {
+			const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
+			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
+			this.getModel().update(path, {
+				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`			
+			},
+			{
+				"headers": {"Content-ID": 77}
+			})
+		},
+
+		updateSupplier: function() {
+			const newSupplierURI = this.byId("idSupplierNameSelect").getSelectedItem().getBindingContext().getPath();		
+			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Supplier`
+			this.getModel().update(path, {
+				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`			
+			},
+			{
+				"headers": {"Content-ID": 78}
+			})
+			
+		},
+
 		onCreateProductPress: function() {
 			const oODataModel = this.getModel();
 			const aFormFields = this.getFormFields();
@@ -183,37 +185,21 @@ sap.ui.define([
 			if(!aMessages.length) {	
 				
 				oODataModel.submitChanges({
-					success: (oData) => {
-						console.log(oData)
-						const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
-						const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
-						this.getModel().update(path, {
-							uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
-						
-						},
-						{
-							"headers": {"Content-ID": 77},
-							success: () => {
-								this.getOwnerComponent().getRouter().navTo("ListReport");
-								/* oODataModel.read("/Products", {
-									urlParameters: {
-										"$expand": "Category"
-									}
-								}) */
-
-							}, 
-							error: (e) => {
-								MessageBox.error(e)
-							}
-						})
+					"headers": {"Content-ID": this.createNewProductId()},
+					success: () => {
+						this.updateCategory();
+						this.updateSupplier();
+						this.getModel().resetChanges(undefined, true)
+						this.getOwnerComponent().getRouter().navTo("ListReport");
+					},
+					error: (e) => {
+						MessageBox.error(e)
 					}
-				});
+				});				
 				
 				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
 					closeOnBrowserNavigation: false
 				});		
-	
-			
 			} else {	
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}	
@@ -226,9 +212,12 @@ sap.ui.define([
 				const newSupplierURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
 				
 				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newSupplierURI}`		
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`		
+				}, {
+					"headers": {"Content-ID": 99}
 				})
 			}
+			this.onLiveChange(oControl);
 		},
 
 		onCategoryChange: function(oControl) {
@@ -239,17 +228,25 @@ sap.ui.define([
 				const newCategoryURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
 				
 				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcpt9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
+					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
+				}, {
+					"headers": {"Content-ID": 71}
 				})
 			}
+			this.onLiveChange(oControl);
+		},
+
+		getControlPath: function(oControl) {
+			const sSelectControl = "sap.m.Select";
+
+			return oControl.getMetadata().getName() === sSelectControl ? oControl.getBinding("selectedKey").getPath() : oControl.getBinding("value").getPath();
 		},
 
 		displayNotValidMessage: function(aFormFields, aMessages) {
-			const sSelectControl = "sap.m.Select";
 			aFormFields
-				.filter(oControl => oControl.getMetadata().getName() !== sSelectControl)
-				.find(oControl => oControl.getBinding("value").getPath() === aMessages[0].target)
+				.find(oControl => aMessages[0].target.includes(this.getControlPath(oControl)))
 				?.focus();
+
 			MessageToast.show(this.getTextFromI18n("NotValidatedMessage"), {
 				closeOnBrowserNavigation: false
 			});
@@ -263,15 +260,21 @@ sap.ui.define([
 			const aMessages = Messaging.getMessageModel().getData();
 			
 			if(!aMessages.length) {
-				oODataModel.submitChanges();
-				this.getModel("EditModel").setProperty("/EditMode", false);
-				this.getModel("EditModel").setProperty("/DisplayMode", true);
-		
-				MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
-					closeOnBrowserNavigation: false
-				});
-
-				this.changeRouteMode("view");
+				
+				oODataModel.submitChanges({
+					success: () => {
+						this.getModel("EditModel").setProperty("/EditMode", false);
+						this.getModel("EditModel").setProperty("/DisplayMode", true);
+						MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
+							closeOnBrowserNavigation: false
+						});
+					
+						this.changeRouteMode("view");
+					},
+					error: (e) => {
+						MessageBox.error(e)
+					}
+				});		
 			} else {
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}
@@ -296,12 +299,15 @@ sap.ui.define([
 			const sKey = oODataModel.createKey("/Products", {ID: sCurrentId});
 
 			oODataModel.remove(sKey, {
+				"headers": {"Content-ID": 31},
 				success: () => {
 					oComponent.getRouter().navTo("ListReport");	
 					MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"), {
 						closeOnBrowserNavigation:false
 					})
-					
+				},
+				error: (e) => {
+					MessageBox.error(e)
 				}
 			})	
 		},

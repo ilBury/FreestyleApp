@@ -72,14 +72,14 @@ sap.ui.define([
 			oRouter.attachRouteMatched(this.onRouteMatched, this);
 		},
 
-
+		createNewContentId: function() {
+			return Math.floor(Math.random() * 1000) + 1
+		},
 		
 		onRouteMatched: function() {
 			const oTable = this.byId("idProductsTable");
 			const oItemsBinding = oTable.getBinding("items");
-			const oSorter = new Sorter("ReleaseDate", "ASC");
 			oItemsBinding.refresh()
-			oItemsBinding.sort(oSorter);	
 		},
 
 		getCombinedFilter: function() {
@@ -264,9 +264,13 @@ sap.ui.define([
 			aSelectedItemsIds.forEach(el => {
 				const sKey = oODataModel.createKey("/Products", {ID: el});
 				oODataModel.remove(sKey, {
+					"headers": {"Content-ID": this.createNewContentId()},
 					success: () => {
 						this.cleanSelectedTableItems();
 						MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
+					},
+					error: (e) => {
+						MessageBox.error(e)
 					}
 				})
 			})

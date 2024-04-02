@@ -135,6 +135,10 @@
 						path: '/Products',
 						parameters: {
 							expand: 'Supplier, Category'
+						},
+						sorter: {
+							path: 'ReleaseDate',
+							descending: true
 						}
 					}"
 					
