@@ -1,0 +1,86 @@
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Communication.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/V2/(S(3g0csrzc4ao3krwejcbcoqzz))/OData/OData.svc/$metadata">
+        <edmx:Include Namespace="ODataDemo"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="local">
+
+
+            <Annotations Target="ODataDemo.Product">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Name"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Description"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="Price"/>
+                        </Record>
+                        <Record Type="UI.DataField" >
+                            <PropertyValue Property="Label" String="{@i18n>CategoryText}" />
+                            <PropertyValue Property="Value" Path="Category/Name" />
+                        </Record>
+                        <Record Type="UI.DataField" >
+                            <PropertyValue Property="Label" String="{@i18n>SupplierText}" />
+                            <PropertyValue Property="Value" Path="Supplier/Name" />
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.SelectionFields" >
+                    <Collection >
+                        <PropertyPath  >Price</PropertyPath>
+                        <PropertyPath  >Category/Name</PropertyPath>
+                        <PropertyPath  >Supplier/Name</PropertyPath>
+                    </Collection>
+                </Annotation>
+                
+            </Annotations>
+
+            <Annotations Target="ODataDemo.Category/Name">
+                <Annotation Term="Common.Label" String="{@i18n>CategoryText}" />
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="Categories" />
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Name" />
+                                    <PropertyValue Property="ValueListProperty" String="Name" />
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.ValueListWithFixedValues" />
+            </Annotations>
+            <Annotations Target="ODataDemo.Supplier/Name">
+                <Annotation Term="Common.Label" String="{@i18n>SupplierText}" />
+                <Annotation Term="Common.ValueList">
+                    <Record Type="Common.ValueListType">
+                        <PropertyValue Property="CollectionPath" String="Suppliers" />
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Name" />
+                                    <PropertyValue Property="ValueListProperty" String="Name" />
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.ValueListWithFixedValues" />
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

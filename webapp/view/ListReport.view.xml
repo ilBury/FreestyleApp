@@ -3,6 +3,8 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:f="sap.f"
 	xmlns:core="sap.ui.core"
+	xmlns:smartTable="sap.ui.comp.smarttable"
+	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
 	xmlns:fb="sap.ui.comp.filterbar"
     core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
 	controllerName="products.app.controller.ListReport">
@@ -29,7 +31,7 @@
 					
 					<f:content>
 						
-						<fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false" >
+						<!-- <fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false" >
 							<fb:filterGroupItems >
 
 								<fb:FilterGroupItem 
@@ -121,14 +123,40 @@
 								</fb:FilterGroupItem>
 
 							</fb:filterGroupItems>
-						</fb:FilterBar>
-					
+						</fb:FilterBar> -->
+						<smartFilterBar:SmartFilterBar id="idSmartFilterBar"
+							entitySet="Products" 
+						/>
 						
 					</f:content>
 				</f:DynamicPageHeader>
 			</f:header>
 				<f:content>
-				<Table
+					<smartTable:SmartTable 
+						entitySet="Products" enableAutoColumnWidth="true" enableExport="false"
+						enableAutoBinding="true" header="Products" useTablePersonalisation="false"
+						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
+						showTablePersonalisation="false" 
+					>
+						<smartTable:customToolbar>
+							<OverflowToolbar>
+								<ToolbarSpacer />
+								<Button
+									type="Emphasized"
+									text="{@i18n>CreateText}"
+								/>
+								<Button
+									enabled="{view>/isButtonEnable}"
+									text="{@i18n>DeleteText}"
+									press="onDeleteButtonPress"
+								/>
+									
+							</OverflowToolbar>
+						</smartTable:customToolbar>
+					</smartTable:SmartTable>
+
+
+				<!-- <Table
 					id="idProductsTable"
 					mode="MultiSelect"
 					items="{
@@ -203,7 +231,7 @@
 							</cells>
 						</ColumnListItem>
 					</items>
-				</Table>
+				</Table> -->
 			</f:content>
 		</f:DynamicPage>
 

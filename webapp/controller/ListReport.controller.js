@@ -1,15 +1,12 @@
 sap.ui.define([
 	"products/app/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
 	"sap/m/Token",
 	"sap/ui/core/Fragment",
-	"sap/ui/model/Sorter",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
 	"../model/formatter"
-], function (BaseController, JSONModel, Filter, FilterOperator, Token, Fragment, Sorter, MessageBox, MessageToast, formatter) {
+], function (BaseController, JSONModel, Token, Fragment,  MessageBox, MessageToast, formatter) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ListReport", {
@@ -63,94 +60,16 @@ sap.ui.define([
 				searchField: "",
 				selectedInDialogSuppliers: []
 			})
-			
-			
-
+			const oTable = this.byId("idSmartTable").getTable();
+			oTable.setMode("MultiSelect");
+			oTable.attachSelectionChange(this.onTableSelectionChange, this);
 			this.getView().setModel(oViewModel, "view");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
-			oRouter.attachRouteMatched(this.onRouteMatched, this);
 		},
 
 		createNewContentId: function() {
 			return Math.floor(Math.random() * 1000) + 1
-		},
-		
-		onRouteMatched: function() {
-			const oTable = this.byId("idProductsTable");
-			const oItemsBinding = oTable.getBinding("items");
-			oItemsBinding.refresh()
-		},
-
-		getCombinedFilter: function() {
-			const sQuerySearch = this.getView().getModel("view").getProperty("/searchField").trim();
-			const aSearchFilters = [
-				new Filter("Name", FilterOperator.Contains, sQuerySearch),
-				new Filter("Description", FilterOperator.Contains, sQuerySearch)
-			]
-			const oSearchFilter = new Filter({
-				filters: aSearchFilters,
-				and: false
-			});
-
-			const oCategoryFilters = new Filter({
-				filters: this.getCategoriesFilters(),
-				and: false
-			})
-			const oPriceFilter = new Filter({
-				filters: this.getPriceFilter(),
-				and: false
-			})
-
-			const oSuppliersFilters = new Filter({
-				filters: this.getSuppliersFilters(),
-				and: false
-			})
-			
-			return new Filter({
-				filters: [oSearchFilter, oCategoryFilters, oPriceFilter, oSuppliersFilters],
-				and: true
-			});
-		},
-
-		getPriceFilter: function() {
-			const oPriceModel = this.getModel("PriceModel");
-			const sSelectedKey = oPriceModel.getProperty("/SelectedKey");
-			const aPricesRange = oPriceModel.getProperty("/Range");
-			const [oCurrentPriceRange] = aPricesRange.filter(el => el.id === sSelectedKey);
-			const sRegNumbers = /[\wa-zA-Z]+|\d+/g;
-			const aCurrentPriceRange = oCurrentPriceRange.value.match(sRegNumbers);
-			const oWords = {
-				any: this.getTextFromI18n("AnyText"),
-				under: this.getTextFromI18n("UnderText"),
-				over: this.getTextFromI18n("OverText")
-			}
-			const [sFirstRange, sSecondRange] = aCurrentPriceRange;
-			switch(sFirstRange) {
-				case oWords.any: return [new Filter("Price", FilterOperator.NE, null)]; 
-				case oWords.under: return [new Filter("Price", FilterOperator.BT, 0, Number(sSecondRange))];
-				case oWords.over: return [new Filter("Price", FilterOperator.GT, Number(sSecondRange))];
-				default: return [new Filter("Price", FilterOperator.BT, Number(sFirstRange), Number(sSecondRange))];
-			}
-		},
-
-		onFilter: function() {
-			const oTable = this.byId("idProductsTable");
-			const oItemsBinding = oTable.getBinding("items");
-			const oFilter = this.getCombinedFilter();
-			
-			oItemsBinding.filter(oFilter);
-			
-		},
-
-		getCategoriesFilters: function() {
-			const oCategorySelect = this.byId("categorySelect");			
-			const aCategoryNames = oCategorySelect.getSelectedItems().map(el => el.getText());
-			const aFilters = aCategoryNames.map((el) => {
-				return new Filter("Category/Name", FilterOperator.Contains, el)
-			})
-			
-			return aFilters.length ? aFilters : [new Filter("Category/Name", FilterOperator.Contains, "")];
 		},
 
 		handlerTokenUpdate: function(oEvent) {
@@ -164,16 +83,6 @@ sap.ui.define([
 				oMultiInput.setTokens(aRemainingTokens)
 				this.onFilter()
 			}
-		},
-
-		getSuppliersFilters: function() {
-			const oMultiInput = this.byId("multiInput");
-			const aSuppliersNames = oMultiInput.getTokens().map(el => el.getText());
-			const aFilters = aSuppliersNames.map((el) => {
-				return new Filter("Supplier/Name", FilterOperator.Contains, el)
-			})
-		
-			return aFilters.length ? aFilters : [new Filter("Supplier/Name", FilterOperator.Contains, "")];
 		},
 
 		handleValueHelpRequest: function() {
@@ -227,7 +136,6 @@ sap.ui.define([
 			}
 		
 			this.onFilter()
-
 		},
 
 		onNavToObjectPage: function(oEvent) {
@@ -250,23 +158,24 @@ sap.ui.define([
 			})	
 		},
 
-		onTableSelectionChange: function(oEvent) {
+		onTableSelectionChange: function() {
 			const oViewModel = this.getModel("view");
-			const aSelectedItems = oEvent.getSource().getSelectedItems();
+			const aSelectedItems = this.byId("idSmartTable").getTable().getSelectedItems();
 
 			oViewModel.setProperty("/isButtonEnable", !!aSelectedItems.length)
 		},
 
 		deleteProducts: function() {		
-			const oTable = this.byId("idProductsTable");
+			const oTable = this.byId("idSmartTable").getTable();
 			const oODataModel = this.getModel();
-			const aSelectedItemsIds = oTable.getSelectedItems().map(el => el.getBindingContext().getObject("ID"));
-			aSelectedItemsIds.forEach(el => {
-				const sKey = oODataModel.createKey("/Products", {ID: el});
+			const aSelectedItemsPath = oTable.getSelectedItems()?.map(el => el.getBindingContext().getPath());
+			
+			aSelectedItemsPath.forEach(sKey => {
+				
 				oODataModel.remove(sKey, {
 					"headers": {"Content-ID": this.createNewContentId()},
 					success: () => {
-						this.cleanSelectedTableItems();
+						this.getModel("view").setProperty("/isButtonEnable", false)
 						MessageToast.show(this.getTextFromI18n("ProductWasRemovedMessage"));
 					},
 					error: (e) => {
@@ -276,14 +185,7 @@ sap.ui.define([
 			})
 		},
 
-		cleanSelectedTableItems: function() {
-			const oTable = this.byId("idProductsTable");
-			oTable.getSelectedItems()?.forEach(el => {
-				oTable.setSelectedItem(el, false)
-			})
-		},
-
-		onDeleteButtonPress: function(oEvent) {
+		onDeleteButtonPress: function() {
 			MessageBox.warning(this.getTextFromI18n("DeleteProductsWarningMessage"), {
 				actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
 				emphasizedAction: MessageBox.Action.OK,
