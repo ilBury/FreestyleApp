@@ -10,7 +10,7 @@
 		},
 		"dataSources": {
 			"default": {
-				"uri": "proxy/V2/(S(3g0csrzc4ab3krwejcbcoqzz))/OData/OData.svc/",
+				"uri": "proxy/V2/(S(3g0csrzc4YH3lrwejcbcoqzz))/OData/OData.svc/",
 				"type": "OData",
 				"settings": {
 					"annotations": [

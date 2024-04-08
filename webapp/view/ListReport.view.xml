@@ -2,11 +2,8 @@
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:f="sap.f"
-	xmlns:core="sap.ui.core"
 	xmlns:smartTable="sap.ui.comp.smarttable"
 	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
-	xmlns:fb="sap.ui.comp.filterbar"
-    core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
 	controllerName="products.app.controller.ListReport">
 
 		<f:DynamicPage 
@@ -30,100 +27,7 @@
 				<f:DynamicPageHeader>
 					
 					<f:content>
-						
-						<!-- <fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false" >
-							<fb:filterGroupItems >
-
-								<fb:FilterGroupItem 
-									name="search" 
-									label="{
-										parts: [
-											'i18n>SearcherLabelText',
-											'i18n>NameText',
-											'i18n>AndText',
-											'i18n>DescriptionText'
-										],
-										formatter: 'formatMessage'
-										
-									}" 
-									groupName="ProductFiltersGroup" 
-									visibleInFilterBar="true">
-									<fb:control>
-										<SearchField 
-											id="searcher" 
-											width="100%" 
-											value="{view>/searchField}"
-											liveChange="onFilter" 	
-										/>
-									</fb:control>
-								</fb:FilterGroupItem>
-
-								<fb:FilterGroupItem 
-									name="price range" 
-									label="{
-										parts: [
-											'i18n>PriceRangeText',
-											'i18n>PriceText',
-											'i18n>RangeText'
-										],
-										formatter: 'formatMessage'
-									}" 
-									groupName="ProductFiltersGroup" 
-									visibleInFilterBar="true">
-									<fb:control>
-										<Select
-											id="priceSelect"
-											forceSelection="false"
-											selectedKey="{PriceModel>/SelectedKey}"
-											items="{PriceModel>/Range}"
-											change="onFilter"
-										>
-											<core:Item key="{PriceModel>id}" text="{PriceModel>value}" />
-										</Select>
-									</fb:control>
-								</fb:FilterGroupItem>
-
-								<fb:FilterGroupItem 
-									name="Category" 
-									label="{i18n>CategoryText}" 
-									groupName="ProductFiltersGroup" 
-									visibleInFilterBar="true">
-									<fb:control>
-										<MultiComboBox
-											id="categorySelect"
-											
-											items="{/Categories}"
-											selectionChange="onFilter"
-										>
-											<core:Item key="{Id}" text="{Name}" />
-										</MultiComboBox>
-									</fb:control>
-								</fb:FilterGroupItem>
-
-								<fb:FilterGroupItem 
-									name="Supplier name" 
-									label="{
-										parts: [
-											'i18n>SupplierNameText',
-											'i18n>SupplierText', 
-											'i18n>NameText'
-										],
-										formatter: 'formatMessage'
-									}" 
-									groupName="ProductFiltersGroup" 
-									visibleInFilterBar="true">
-									<fb:control>
-										<MultiInput width="40%"
-											id="multiInput"	
-											tokenUpdate="handlerTokenUpdate"
-											valueHelpRequest="handleValueHelpRequest">
-											<core:Item key="1" text="{Name}" />
-										</MultiInput>
-									</fb:control>
-								</fb:FilterGroupItem>
-
-							</fb:filterGroupItems>
-						</fb:FilterBar> -->
+				
 						<smartFilterBar:SmartFilterBar id="idSmartFilterBar"
 							entitySet="Products" 
 						/>
@@ -133,10 +37,10 @@
 			</f:header>
 				<f:content>
 					<smartTable:SmartTable 
-						entitySet="Products" enableAutoColumnWidth="true" enableExport="false"
-						enableAutoBinding="true" header="Products" useTablePersonalisation="false"
+						entitySet="Products" enableAutoColumnWidth="true"
+						enableAutoBinding="true" header="Products" 
 						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
-						showTablePersonalisation="false" 
+						
 					>
 						<smartTable:customToolbar>
 							<OverflowToolbar>
@@ -144,94 +48,30 @@
 								<Button
 									type="Emphasized"
 									text="{@i18n>CreateText}"
+									press="onCreateButtonPress"
 								/>
 								<Button
 									enabled="{view>/isButtonEnable}"
-									text="{@i18n>DeleteText}"
+									text="{i18n>DeleteText}"
 									press="onDeleteButtonPress"
 								/>
 									
 							</OverflowToolbar>
 						</smartTable:customToolbar>
+
+						<Table>
+							<items>
+								<ColumnListItem
+									type="Navigation"
+									press="onNavToObjectPage"
+								>
+							
+								</ColumnListItem>
+							</items>
+						</Table>
+
 					</smartTable:SmartTable>
-
-
-				<!-- <Table
-					id="idProductsTable"
-					mode="MultiSelect"
-					items="{
-						path: '/Products',
-						parameters: {
-							expand: 'Supplier, Category'
-						},
-						sorter: {
-							path: 'ReleaseDate',
-							descending: true
-						}
-					}"
-					
-					selectionChange="onTableSelectionChange"
-				>
-					<headerToolbar>
-						<OverflowToolbar>
-							<Title text="{i18n>ListReportTitle}" />	
-							<ToolbarSpacer/>
-							<Button
-								text="{i18n>CreateText}"
-								type="Emphasized"
-								press="onCreateButtonPress"
-							/>
-							<Button
-								enabled="{view>/isButtonEnable}"
-								text="{i18n>DeleteText}"
-								press="onDeleteButtonPress"
-							/>
-						</OverflowToolbar>
-					</headerToolbar>
-					<columns>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>NameText}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>DescriptionText}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>PriceText}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{
-									parts: [
-										'i18n>SupplierNameText',
-										'i18n>SupplierText', 
-										'i18n>NameText'
-									],
-									formatter: 'formatMessage'
-								}"/>
-						</Column>
-						<Column minScreenWidth="Tablet" demandPopin="true">
-							<Text text="{i18n>CategoryText}"/>
-						</Column>
-					</columns>
-
-					<items>
-						<ColumnListItem 
-							type="Navigation" 
-							vAlign="Middle"
-							press="onNavToObjectPage">
-							<cells>
-								<ObjectIdentifier title="{Name}"/>
-								<Text text="{Description}" />
-								<ObjectIdentifier title="{Price}"/>
-								
-								<Text 
-									text="{Supplier/Name}" 
-								/>
-								
-								<Text text="{Category/Name}" />
-							</cells>
-						</ColumnListItem>
-					</items>
-				</Table> -->
+				
 			</f:content>
 		</f:DynamicPage>
 

@@ -13,11 +13,12 @@
     </edmx:Reference>
     <edmx:DataServices>
         <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="local">
-
-
             <Annotations Target="ODataDemo.Product">
                 <Annotation Term="UI.LineItem">
                     <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Value" Path="ID"/>
+                        </Record>
                         <Record Type="UI.DataField">
                             <PropertyValue Property="Value" Path="Name"/>
                         </Record>
@@ -44,14 +45,18 @@
                         <PropertyPath  >Supplier/Name</PropertyPath>
                     </Collection>
                 </Annotation>
-                
             </Annotations>
+            <Annotations Target="ODataDemo.Product/ID">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            
 
             <Annotations Target="ODataDemo.Category/Name">
                 <Annotation Term="Common.Label" String="{@i18n>CategoryText}" />
                 <Annotation Term="Common.ValueList">
-                    <Record Type="Common.ValueListType">
+                    <Record >
                         <PropertyValue Property="CollectionPath" String="Categories" />
+                        <PropertyValue Property="SearchSupported" Bool="true" />
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="Common.ValueListParameterInOut">
@@ -64,22 +69,29 @@
                 </Annotation>
                 <Annotation Term="Common.ValueListWithFixedValues" />
             </Annotations>
+            
             <Annotations Target="ODataDemo.Supplier/Name">
                 <Annotation Term="Common.Label" String="{@i18n>SupplierText}" />
                 <Annotation Term="Common.ValueList">
-                    <Record Type="Common.ValueListType">
+                    <Record >
                         <PropertyValue Property="CollectionPath" String="Suppliers" />
+                        <PropertyValue Property="SearchSupported" Bool="true" />
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="Common.ValueListParameterInOut">
                                     <PropertyValue Property="LocalDataProperty" PropertyPath="Name" />
                                     <PropertyValue Property="ValueListProperty" String="Name" />
                                 </Record>
+                                <Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
+									<PropertyValue   Property="ValueListProperty" String="ID" />
+								</Record>
+                                <Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
+									<PropertyValue Property="ValueListProperty" String="Address/City" />
+								</Record>   
                             </Collection>
                         </PropertyValue>
                     </Record>
                 </Annotation>
-                <Annotation Term="Common.ValueListWithFixedValues" />
             </Annotations>
         </Schema>
     </edmx:DataServices>

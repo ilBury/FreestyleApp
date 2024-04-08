@@ -1,16 +1,13 @@
 sap.ui.define([
 	"products/app/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
-	"sap/m/Token",
-	"sap/ui/core/Fragment",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
 	"../model/formatter"
-], function (BaseController, JSONModel, Token, Fragment,  MessageBox, MessageToast, formatter) {
+], function (BaseController, JSONModel,  MessageBox, MessageToast) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ListReport", {
-		formatter: formatter,
 
 		onInit: function() {
 			const oRouter = this.getOwnerComponent().getRouter();
@@ -62,7 +59,10 @@ sap.ui.define([
 			})
 			const oTable = this.byId("idSmartTable").getTable();
 			oTable.setMode("MultiSelect");
+		
+			
 			oTable.attachSelectionChange(this.onTableSelectionChange, this);
+		
 			this.getView().setModel(oViewModel, "view");
 			this.getView().setModel(oPriceRangeModel, "PriceModel");
 			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
@@ -71,82 +71,17 @@ sap.ui.define([
 		createNewContentId: function() {
 			return Math.floor(Math.random() * 1000) + 1
 		},
-
-		handlerTokenUpdate: function(oEvent) {
-			const oMultiInput = this.byId("multiInput");
-			
-			if (oEvent?.getParameter("type") === "removed") {
-				const aRemovedTokens = oEvent.getParameter("removedTokens");
-				const aRemainingTokens = oMultiInput.getTokens().filter(function (token) {
-					return !aRemovedTokens.includes(token);
-				});	
-				oMultiInput.setTokens(aRemainingTokens)
-				this.onFilter()
-			}
-		},
-
-		handleValueHelpRequest: function() {
-
-			const oView = this.getView();
-			
-			if(!this.oDialog) {
-				Fragment.load({
-					id: oView.getId(),
-					name: "products.app.view.fragments.SuppliersDialog",
-					controller: this
-				}).then((oDialog) => {
-					this.oDialog = oDialog
-					oView.addDependent(this.oDialog);
-					
-					this.oDialog.open();
-				})
-			} else {
-				const oMultiInput = this.byId("multiInput");
-				const aSelectedTokens = oMultiInput.getTokens().map(el => el.getText());
-				
-				this.getModel("view").setProperty("/selectedInDialogSuppliers", aSelectedTokens);
-		
-				this.oDialog.open()	
-			}
-		},
-		
-		addNewSupplierTokens: function(oMultiInput, aSelectedItems) {
-			const aInputTokensText = oMultiInput.getTokens().map(el => el.getText());
-			aSelectedItems.forEach(function (oItem) {
-				if(!aInputTokensText.includes(oItem.getTitle())) {
-					
-					oMultiInput.addToken(new Token({
-						text: oItem.getTitle()
-					}));
-					
-				}
-			});
-		},
-
-		_handleValueHelpClose: function (oEvent) {
-			const aSelectedItems = oEvent.getParameter("selectedItems"),
-				oMultiInput = this.byId("multiInput");
-			
-			if (aSelectedItems && aSelectedItems.length > 0) {
-				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
-			}	
-			if(aSelectedItems?.length < oMultiInput.getTokens().length) {
-				oMultiInput.removeAllTokens();
-				this.addNewSupplierTokens(oMultiInput, aSelectedItems);
-			}
-		
-			this.onFilter()
-		},
-
+	
 		onNavToObjectPage: function(oEvent) {
-			const oSource = oEvent.getSource();
-			const oCtx = oSource.getBindingContext();
+			const sNumberRegex = /[0-9]{1,}/gm;
+			const sPath = oEvent.getSource().getBindingContext().getPath();
+			const sProductId = sPath.match(sNumberRegex)[0];
 			const oComponent = this.getOwnerComponent();
 			
 			oComponent.getRouter().navTo("ProductDetails", {
-				productId: oCtx.getObject("ID"),
+				productId: sProductId,
 				mode: "view"
-			})
+			})	
 		},
 
 		onCreateButtonPress: function() {
@@ -190,7 +125,6 @@ sap.ui.define([
 				actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
 				emphasizedAction: MessageBox.Action.OK,
 				onClose: (sAction) => {
-					
 					if(sAction === MessageBox.Action.OK) {
 						this.deleteProducts();
 					} 
