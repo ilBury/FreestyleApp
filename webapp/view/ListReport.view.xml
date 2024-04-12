@@ -1,0 +1,78 @@
+<mvc:View
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:f="sap.f"
+	xmlns:smartTable="sap.ui.comp.smarttable"
+	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+	controllerName="products.products.controller.ListReport">
+
+		<f:DynamicPage 
+			id="dynamicPageId" 
+			preserveHeaderStateOnScroll="true" 
+			showFooter="true" 
+			fitContent="true">
+			<!-- DynamicPage Title -->
+			<f:title>
+				<f:DynamicPageTitle>
+					<f:heading>
+						<Title text="{i18n>ListReportTitle}"/>
+						
+					</f:heading>
+					
+				</f:DynamicPageTitle>
+			</f:title>
+
+			<!-- DynamicPage Header -->
+			<f:header>
+				<f:DynamicPageHeader>
+					
+					<f:content>
+				
+						<smartFilterBar:SmartFilterBar id="idSmartFilterBar"
+							entitySet="Products" 
+						/>
+						
+					</f:content>
+				</f:DynamicPageHeader>
+			</f:header>
+				<f:content>
+					<smartTable:SmartTable 
+						entitySet="Products" enableAutoColumnWidth="true"
+						enableAutoBinding="true" header="Products" 
+						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
+						
+					>
+						<smartTable:customToolbar>
+							<OverflowToolbar>
+								<ToolbarSpacer />
+								<Button
+									type="Emphasized"
+									text="{@i18n>CreateText}"
+									press="onCreateButtonPress"
+								/>
+								<Button
+									enabled="{view>/isButtonEnable}"
+									text="{i18n>DeleteText}"
+									press="onDeleteButtonPress"
+								/>
+									
+							</OverflowToolbar>
+						</smartTable:customToolbar>
+
+						<Table>
+							<items>
+								<ColumnListItem
+									type="Navigation"
+									press="onNavToObjectPage"
+								>
+							
+								</ColumnListItem>
+							</items>
+						</Table>
+
+					</smartTable:SmartTable>
+				
+			</f:content>
+		</f:DynamicPage>
+
+</mvc:View>

@@ -1,0 +1,133 @@
+{
+	"sap.app": {
+		"id": "products.products",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"title": "Products",
+		"description": "control of products at the enterprise",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.13.1",
+            "toolsId": "95a5d2cb-4d3d-4f4b-b5d3-83948a54ba1c"
+        },
+		"dataSources": {
+			"default": {
+				"uri": "V2/(S(3g0csrzc4YH3lrwejcbcoqzz))/OData/OData.svc/",
+				"type": "OData",
+				"settings": {
+					"annotations": [
+						"annotation"
+					],
+					"localUri": "localService/metadata.xml",
+					"odataVersion": "2.0"
+				}
+			},
+			"annotation": {
+				"type": "ODataAnnotation",
+				"uri": "annotations/annotation.xml",
+				"settings": {
+					"localUri": "annotations/annotation.xml"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_horizon"
+		]
+	},
+	"sap.ui5": {
+        "flexEnabled": true,
+		"rootView": "products.products.view.App",
+		"handleValidation": true,
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "products.products.view",
+				"controlId": "RootApp",
+				"controlAggregation": "pages",
+				"bypassed": {
+					"target": [
+						"notFound"
+					]
+				},
+				"async": true
+			},
+			"routes": [
+				{
+					"pattern": "",
+					"name": "ListReport",
+					"target": [
+						"listReport"
+					]
+				},
+				{
+					"pattern": "product/{productId}/:mode:",
+					"name": "ProductDetails",
+					"target": [
+						"productDetails"
+					]
+				}
+			],
+
+			"targets": {
+				"listReport": {
+					"viewName": "ListReport",
+					"viewId": "listReport",
+					"viewLevel": 1
+				},
+
+				"productDetails": {
+					"viewName": "ProductDetails",
+					"viewId": "productDetails",
+					"viewLevel": 2
+				},
+
+				"notFound": {
+					"viewName": "NotFound",
+					"viewId": "notFound"
+				}
+			}
+		},
+		"dependencies": {
+			"minUI5Version": "1.120.0",
+			"libs": {
+				"sap.m": {}
+			}
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "products.products.i18n.i18n"
+				}
+			},
+			"": {
+				"dataSource": "default",
+				"settings": {
+					"useBatch": true,
+					"defaultBindingMode": "TwoWay",
+					"defaultCountMode": "Inline",
+					"disableHeadRequestForToken": true
+				}
+			},
+			"@i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "uri": "i18n/i18n.properties"
+            }
+		}
+	},
+    "sap.cloud": {
+        "public": true,
+        "service": "products.products"
+    }
+}
