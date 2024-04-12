@@ -27,11 +27,7 @@
 				<f:DynamicPageHeader>
 					
 					<f:content>
-				
-						<smartFilterBar:SmartFilterBar id="idSmartFilterBar"
-							entitySet="Products" 
-						/>
-						
+						<smartFilterBar:SmartFilterBar id="idSmartFilterBar" entitySet="Products" />						
 					</f:content>
 				</f:DynamicPageHeader>
 			</f:header>

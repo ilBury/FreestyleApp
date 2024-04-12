@@ -10,48 +10,7 @@ sap.ui.define([
 	return BaseController.extend("products.app.controller.ListReport", {
 
 		onInit: function() {
-			const oRouter = this.getOwnerComponent().getRouter();
-			const oPriceRangeModel = new JSONModel({
-				Range: [
-					{
-						id: "1",
-						value: this.getTextFromI18n("AnyText")
-					},
-					{
-						id: "2",
-						value: this.getTextFromI18n("UnderText") + "\t" + "50"
-					},
-					{
-						id: "3",
-						value: "50-100"
-					},
-					{
-						id: "4",
-						value: "100-250"
-					},
-					{
-						id: "5",
-						value: "250-500"
-					}, 
-					{
-						id: "6",
-						value: this.getTextFromI18n("OverText") + "\t" + "500"
-					}
-				],
-				SelectedKey: "1"
-			})
-			const oAvailabilityModel = new JSONModel({
-				Availability: [
-					{
-						key: false,
-						value: this.getTextFromI18n("InStockText")
-					},
-					{
-						key: true,
-						value: this.getTextFromI18n("OutOfStockText")
-					}
-				]
-			})
+		
 			const oViewModel = new JSONModel({
 				isButtonEnable: false,
 				searchField: "",
@@ -64,8 +23,6 @@ sap.ui.define([
 			oTable.attachSelectionChange(this.onTableSelectionChange, this);
 		
 			this.getView().setModel(oViewModel, "view");
-			this.getView().setModel(oPriceRangeModel, "PriceModel");
-			this.getView().setModel(oAvailabilityModel, "AvailabilityModel");
 		},
 
 		createNewContentId: function() {
