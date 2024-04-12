@@ -104,10 +104,10 @@
                                 <smartForm:GroupElement label="{i18n>DescriptionText}" >
                                     <sf:SmartField value="{Description}" />
                                 </smartForm:GroupElement>
-                                <smartForm:GroupElement label="{i18n>CreatedAtText}">
+                                <smartForm:GroupElement label="{i18n>CreatedAtText}" visible="{= !${view>/formsEditable}}">
                                     <sf:SmartField value="{ReleaseDate}" />
                                 </smartForm:GroupElement>
-                                <smartForm:GroupElement label="{i18n>UpdatedAtText}">
+                                <smartForm:GroupElement label="{i18n>UpdatedAtText}" visible="{= !${view>/formsEditable}}">
                                     <sf:SmartField value="{DiscontinuedDate}" />
                                 </smartForm:GroupElement>
                             </smartForm:Group>

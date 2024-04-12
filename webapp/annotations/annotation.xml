@@ -49,6 +49,21 @@
             <Annotations Target="ODataDemo.Product/ID">
                 <Annotation Term="UI.Hidden" Bool="true" />
             </Annotations>
+            <Annotations Target="ODataDemo.Product/DiscontinuedDate">
+                <Annotation Term="Common.Label"  String="{@i18n>UpdatedAtText}" />
+            </Annotations>
+            <Annotations Target="ODataDemo.Product/ReleaseDate">
+                <Annotation Term="Common.Label"  String="{@i18n>CreatedAtText}" />
+            </Annotations>
+            <Annotations Target="ODataDemo.Category/ID">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="ODataDemo.Supplier/ID">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="ODataDemo.Supplier/Concurrency">
+                <Annotation Term="Common.Label"  String="{@i18n>SupplierConcurrencyText}" />
+            </Annotations>
             
 
             <Annotations Target="ODataDemo.Category/Name">
@@ -81,13 +96,7 @@
                                 <Record Type="Common.ValueListParameterInOut">
                                     <PropertyValue Property="LocalDataProperty" PropertyPath="Name" />
                                     <PropertyValue Property="ValueListProperty" String="Name" />
-                                </Record>
-                                <Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
-									<PropertyValue   Property="ValueListProperty" String="ID" />
-								</Record>
-                                <Record Type="com.sap.vocabularies.Common.v1.ValueListParameterDisplayOnly">
-									<PropertyValue Property="ValueListProperty" String="Address/City" />
-								</Record>   
+                                </Record> 
                             </Collection>
                         </PropertyValue>
                     </Record>
