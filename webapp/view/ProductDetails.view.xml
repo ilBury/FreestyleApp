@@ -2,7 +2,6 @@
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
     xmlns:u="sap.uxap"
-    xmlns:form="sap.ui.layout.form"
     xmlns:sf="sap.ui.comp.smartfield"
     xmlns:smartForm="sap.ui.comp.smartform"
 	xmlns:core="sap.ui.core"
@@ -99,7 +98,7 @@
                             <smartForm:Group >
                                 
                                 <smartForm:GroupElement label="{i18n>NameText}">
-                                    <sf:SmartField id="idSmartNameField"  textLabel="{Name}" value="{Name}" />
+                                    <sf:SmartField id="idSmartNameField" change="onLiveChange" textLabel="{Name}" value="{Name}" />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>DescriptionText}" >
                                     <sf:SmartField value="{Description}" />
@@ -113,10 +112,24 @@
                             </smartForm:Group>
                             <smartForm:Group >
                                 <smartForm:GroupElement label="{i18n>PriceText}">
-                                    <sf:SmartField id="idSmartPriceField"  value="{Price}" />
+                                    <sf:SmartField 
+                                        id="idSmartPriceField"  
+                                        change="onLiveChange"
+                                        value="{Price}" 
+                                    />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>RatingText}">
-                                    <sf:SmartField id="idSmartRatingField"  value="{Rating}" />
+                                    <sf:SmartField 
+                                        id="idSmartRatingField"  
+                                        value="{
+                                            path: 'Rating',
+                                            type: 'sap.ui.model.type.Integer',
+                                            constraints: {
+                                                minimum: 0,
+                                                maximum: 5
+                                            }
+                                        }" 
+                                    />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>CategoryText}">
                                     <sf:SmartField    

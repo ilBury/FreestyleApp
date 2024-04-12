@@ -22,7 +22,7 @@ sap.ui.define([
 			})
 			
 			this.getView().setModel(oViewModel, "view")
-
+			Messaging.registerObject(this.getView(), true);
             oRouter.getRoute("ProductDetails").attachPatternMatched(this.onPatternMatched, this);
         },
 
@@ -111,15 +111,24 @@ sap.ui.define([
 			return  oControl.getBindingContext() + "/" + oControl.getBindingPath("value");
 		},
 
+		onLiveChange: function(oEvent) {
+			this.validateField(oEvent.getSource())
+		},
+
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
 			const sValue = oControl.getValue();
 			const sCurrentBindingPath =  this.getCurrentMessagePath(oControl);
-			aMessages.forEach(el => {		
-				Messaging.removeMessages(el)	
+			
+			aMessages.forEach(el => {	
+				if(el.getTarget() === sCurrentBindingPath) {
+					console.log(el.getTarget())
+					Messaging.removeMessages(el)
+				}	
 			})
 			
 			if(!sValue) {
+				
 				Messaging.addMessages(
 					new Message({
 						message: "Should be required",
@@ -138,8 +147,8 @@ sap.ui.define([
 			const aMessages = Messaging.getMessageModel().getData();
 
 			if(!aMessages.length) {	
+				
 				oODataModel.submitChanges({
-					"headers": {"Content-ID": this.createNewId()},
 					success: () => {
 						this.getModel().resetChanges(undefined, true)
 						this.getOwnerComponent().getRouter().navTo("ListReport");
@@ -180,10 +189,6 @@ sap.ui.define([
 			const aMessages = Messaging.getMessageModel().getData();
 			
 			if(!aMessages.length) {
-				oODataModel.setHeaders({
-					"Content-ID": this.createNewId()
-				})
-
 				oODataModel.submitChanges({
 					
 					success: () => {

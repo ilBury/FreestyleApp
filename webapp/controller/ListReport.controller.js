@@ -10,7 +10,6 @@ sap.ui.define([
 	return BaseController.extend("products.app.controller.ListReport", {
 
 		onInit: function() {
-		
 			const oViewModel = new JSONModel({
 				isButtonEnable: false,
 				searchField: "",
@@ -30,12 +29,10 @@ sap.ui.define([
 		},
 	
 		onNavToObjectPage: function(oEvent) {
-			const sNumberRegex = /[0-9]{1,}/gm;
-			const sPath = oEvent.getSource().getBindingContext().getPath();
-			const sProductId = sPath.match(sNumberRegex)[0];
-			const oComponent = this.getOwnerComponent();
-			
-			oComponent.getRouter().navTo("ProductDetails", {
+			const oCtx = oEvent.getSource().getBindingContext();
+			const sProductId = oCtx.getObject("ID");
+
+			this.getOwnerComponent().getRouter().navTo("ProductDetails", {
 				productId: sProductId,
 				mode: "view"
 			})	

@@ -43,7 +43,7 @@
 								<ToolbarSpacer />
 								<Button
 									type="Emphasized"
-									text="{@i18n>CreateText}"
+									text="{i18n>CreateText}"
 									press="onCreateButtonPress"
 								/>
 								<Button
