@@ -115,11 +115,8 @@ sap.ui.define([
 			const aMessages = Messaging.getMessageModel().getData();
 			const sValue = oControl.getValue();
 			const sCurrentBindingPath =  this.getCurrentMessagePath(oControl);
-			aMessages.forEach(el => {
-				
-				if(el.target === sCurrentBindingPath) {
-					Messaging.removeMessages(el)
-				}	
+			aMessages.forEach(el => {		
+				Messaging.removeMessages(el)	
 			})
 			
 			if(!sValue) {
@@ -189,7 +186,7 @@ sap.ui.define([
 
 				oODataModel.submitChanges({
 					
-					success: (oData) => {
+					success: () => {
 						this.getModel("EditModel").setProperty("/EditMode", false);
 						this.getModel("EditModel").setProperty("/DisplayMode", true);
 						MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
