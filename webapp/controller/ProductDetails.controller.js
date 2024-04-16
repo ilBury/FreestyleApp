@@ -160,6 +160,9 @@ sap.ui.define([
 					if(bIsCreateMode) {
 						this.updateSupplier();
 					}
+				},
+				error: (e) => {
+					MessageBox.error(e)
 				}
 			})
 		},
@@ -177,6 +180,9 @@ sap.ui.define([
 					if(bIsCreateMode) {
 						this.getOwnerComponent().getRouter().navTo("ListReport");
 					}
+				},
+				error: (e) => {
+					MessageBox.error(e)
 				}
 			})
 		},

@@ -36,7 +36,7 @@
 						entitySet="Products" enableAutoColumnWidth="true"
 						enableAutoBinding="true" header="{i18n>ListReportTitle}" 
 						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
-						
+						beforeRebindTable="onBeforeRebindTable"
 					>
 						<smartTable:customToolbar>
 							<OverflowToolbar>

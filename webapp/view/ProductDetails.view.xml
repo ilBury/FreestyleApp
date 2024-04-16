@@ -94,9 +94,8 @@
                             editable="{view>/formsEditable}"
                         >
                             <smartForm:Group >
-                                
                                 <smartForm:GroupElement label="{i18n>NameText}">
-                                    <sf:SmartField id="idSmartNameField"  change="onLiveChange" textLabel="{Name}" value="{Name}" />
+                                    <sf:SmartField id="idSmartNameField" change="onLiveChange" textLabel="{Name}" value="{Name}" />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>DescriptionText}" >
                                     <sf:SmartField value="{Description}" />
@@ -147,8 +146,6 @@
                                 <smartForm:GroupElement label="{i18n>CategoryText}">
                                     <sf:SmartField visible="{= !${view>/formsEditable}}" value="{Category/Name}"  />      
                                 </smartForm:GroupElement>
-
-                                
                             </smartForm:Group>
                         </smartForm:SmartForm>    
                     </u:ObjectPageSubSection>

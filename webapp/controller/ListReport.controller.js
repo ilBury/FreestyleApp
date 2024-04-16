@@ -3,9 +3,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
-	"../model/formatter",
-	"sap/ui/model/Sorter"
-], function (BaseController, JSONModel,  MessageBox, MessageToast, Sorter) {
+	"../model/formatter"
+], function (BaseController, JSONModel,  MessageBox, MessageToast) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ListReport", {
@@ -30,6 +29,13 @@ sap.ui.define([
 			const oTable = this.byId("idSmartTable").getTable();
 			const oItemsBinding = oTable.getBinding("items");
 			oItemsBinding?.refresh()
+		},
+
+		onBeforeRebindTable: function(oEvent) {
+			const oBindingParams = oEvent.getParameter("bindingParams");
+			oBindingParams.sorter = [
+				new sap.ui.model.Sorter("ReleaseDate", true) 
+			];
 		},
 
 		createNewContentId: function() {

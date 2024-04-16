@@ -74,12 +74,8 @@
             <Annotations Target="ODataDemo.Supplier/Concurrency">
                 <Annotation Term="Common.Label"  String="{@i18n>SupplierConcurrencyText}" />
             </Annotations>
-           
-          
-
             <Annotations Target="ODataDemo.Category/Name">
                 <Annotation Term="Common.Label" String="{@i18n>CategoryText}" />
-                
                 <Annotation Term="Common.ValueList">
                     <Record >
                         <PropertyValue Property="CollectionPath" String="Categories" />
@@ -95,9 +91,7 @@
                     </Record>
                 </Annotation>
                 <Annotation Term="Common.ValueListWithFixedValues" />
-            </Annotations>
-          
-            
+            </Annotations>  
             <Annotations Target="ODataDemo.Supplier/Name">
                 <Annotation Term="Common.Label" String="{@i18n>SupplierText}" />
                 <Annotation Term="Common.ValueList">
@@ -115,6 +109,9 @@
                     </Record>
                 </Annotation>
             </Annotations>
+
+
+           
         </Schema>
     </edmx:DataServices>
 </edmx:Edmx>
