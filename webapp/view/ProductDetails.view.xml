@@ -78,9 +78,7 @@
                 number="{Price}"
                 unit="USD"
                 class="sapUiTinyMarginBottom"
-            />    
-         
-             
+            />       
         </u:headerContent>
         <u:sections>
             <u:ObjectPageSection 
@@ -98,7 +96,7 @@
                             <smartForm:Group >
                                 
                                 <smartForm:GroupElement label="{i18n>NameText}">
-                                    <sf:SmartField id="idSmartNameField" change="onLiveChange" textLabel="{Name}" value="{Name}" />
+                                    <sf:SmartField id="idSmartNameField"  change="onLiveChange" textLabel="{Name}" value="{Name}" />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>DescriptionText}" >
                                     <sf:SmartField value="{Description}" />
@@ -121,6 +119,7 @@
                                 <smartForm:GroupElement label="{i18n>RatingText}">
                                     <sf:SmartField 
                                         id="idSmartRatingField"  
+                                        
                                         value="{
                                             path: 'Rating',
                                             type: 'sap.ui.model.type.Integer',
@@ -132,14 +131,25 @@
                                     />
                                 </smartForm:GroupElement>
                                 <smartForm:GroupElement label="{i18n>CategoryText}">
-                                    <sf:SmartField    
-                                        id="idSmartCategoryField"                                     
-                                        value="{Category/Name}"
-                                    />
-                    
+                                    <Select
+                                        visible="{= !!${view>/formsEditable}}"
+                                        id="idCategoriesSelect"
+                                        required="true"
+                                        forceSelection="false"
+                                        items="{/Categories}"
+                                        change="onCategoryChange"
+                                        selectedKey="{FormModel>/Category/ID}"
+                                    >
+                                        <core:Item key="{ID}" text="{Name}" />
+                                    </Select>
+                                    
                                 </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CategoryText}">
+                                    <sf:SmartField visible="{= !${view>/formsEditable}}" value="{Category/Name}"  />      
+                                </smartForm:GroupElement>
+
+                                
                             </smartForm:Group>
-                            
                         </smartForm:SmartForm>    
                     </u:ObjectPageSubSection>
                   </u:subSections>
@@ -164,12 +174,28 @@
                         >
                             <smartForm:Group >    
                                 <smartForm:GroupElement label="{i18n>NameText}">
+                                    <Select 
+                                        required="true"
+                                        forceSelection="false"
+                                        visible="{= !!${view>/formsEditable}}"
+                                        items="{/Suppliers}" 
+                                        change="onSupplierChange"
+                                        id="idSupplierNameSelect"
+                                        selectedKey="{FormModel>/Supplier/ID}"
+                                    >
+                                        <core:Item key="{ID}" text="{Name}" />
+                                    </Select>   
+                                    
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement>
                                     <sf:SmartField 
                                         id="idSmartSupplierNameField" 
-                                        textLabel="{Name}" 
+                                        textLabel="{i18n>NameText}" 
+                                        visible="{= !${view>/formsEditable}}"
                                         value="{Supplier/Name}" 
                                     />
                                 </smartForm:GroupElement>
+
                                 <smartForm:GroupElement label="{i18n>ConcurrencyText}" visible="{= !${view>/formsEditable}}">
                                     <sf:SmartField value="{Supplier/Concurrency}" />
                                 </smartForm:GroupElement>

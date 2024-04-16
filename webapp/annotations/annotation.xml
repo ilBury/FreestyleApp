@@ -67,9 +67,7 @@
             <Annotations Target="ODataDemo.Product/ReleaseDate">
                 <Annotation Term="Common.Label"  String="{@i18n>CreatedAtText}" />
             </Annotations>
-            <Annotations Target="ODataDemo.Category/ID">
-                <Annotation Term="UI.Hidden" Bool="true" />
-            </Annotations>
+           
             <Annotations Target="ODataDemo.Supplier/ID">
                 <Annotation Term="UI.Hidden" Bool="true" />
             </Annotations>
@@ -81,15 +79,16 @@
 
             <Annotations Target="ODataDemo.Category/Name">
                 <Annotation Term="Common.Label" String="{@i18n>CategoryText}" />
+                
                 <Annotation Term="Common.ValueList">
                     <Record >
                         <PropertyValue Property="CollectionPath" String="Categories" />
-                        <PropertyValue Property="SearchSupported" Bool="true" />
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="Common.ValueListParameterInOut">
                                     <PropertyValue Property="LocalDataProperty" PropertyPath="Name" />
                                     <PropertyValue Property="ValueListProperty" String="Name" />
+                                   
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -97,6 +96,7 @@
                 </Annotation>
                 <Annotation Term="Common.ValueListWithFixedValues" />
             </Annotations>
+          
             
             <Annotations Target="ODataDemo.Supplier/Name">
                 <Annotation Term="Common.Label" String="{@i18n>SupplierText}" />

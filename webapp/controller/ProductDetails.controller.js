@@ -89,6 +89,10 @@ sap.ui.define([
 				},
 				events: {
 					change: () => {
+						const sCategoryId = this.getView().getBindingContext().getObject("Category")?.ID
+						const sSupplierId = this.getView().getBindingContext().getObject("Supplier")?.ID
+						this.getModel("FormModel").setProperty("/Supplier/ID", sSupplierId);
+						this.getModel("FormModel").setProperty("/Category/ID", sCategoryId);
 						this.getView().getModel("view").setProperty("/isBusyIndicator", false);
 					}
 				}
@@ -103,12 +107,15 @@ sap.ui.define([
 			return [
 				this.byId("idSmartNameField"),
 				this.byId("idSmartPriceField"),
-				this.byId("idSmartRatingField")
+				this.byId("idSmartRatingField"),
+				this.byId("idCategoriesSelect"),
+				this.byId("idSupplierNameSelect")
 			]
 		},
 
-		getCurrentMessagePath: function(oControl) {
-			return  oControl.getBindingContext() + "/" + oControl.getBindingPath("value");
+		getCurrentMessagePath: function(oControl, sBinding) {
+			const sInputValue = "value";
+			return sInputValue === sBinding ? oControl.getBindingContext() + "/" + oControl.getBindingPath(sBinding) : oControl.getBindingPath(sBinding);
 		},
 
 		onLiveChange: function(oEvent) {
@@ -117,27 +124,61 @@ sap.ui.define([
 
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
-			const sValue = oControl.getValue();
-			const sCurrentBindingPath =  this.getCurrentMessagePath(oControl);
+			const sSelectControl = "sap.m.Select";
+			const sCurrentControlName = oControl.getMetadata().getName();
+			const sValue = sCurrentControlName === sSelectControl ? oControl.getSelectedItem()?.getText() : oControl.getValue();
+			const sCurrentBindingPath = sCurrentControlName === sSelectControl ? this.getCurrentMessagePath(oControl, "selectedKey") : this.getCurrentMessagePath(oControl, "value");
 			
 			aMessages.forEach(el => {	
 				if(el.getTarget() === sCurrentBindingPath) {
-					console.log(el.getTarget())
 					Messaging.removeMessages(el)
 				}	
 			})
 			
 			if(!sValue) {
-				
 				Messaging.addMessages(
 					new Message({
-						message: "Should be required",
+						message: this.getTextFromI18n("RequiredMessage"),
 						type: library.MessageType.Error,
 						target: sCurrentBindingPath,
-						processor: this.getModel()
+						processor: sCurrentControlName === sSelectControl ? this.getModel("FormModel") : this.getModel()
 					})
 				)
 			}
+		},
+
+		updateCategory: function() {
+			const sPath = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
+			const sNewCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			this.getModel().update(sPath, {
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewCategoryURI}`		
+			}, {
+				"headers": {"Content-ID": this.createNewId()},
+				success: () => {
+					if(bIsCreateMode) {
+						this.updateSupplier();
+					}
+				}
+			})
+		},
+
+		updateSupplier: function() {
+			const sPath = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Supplier`
+			const sNewSupplierURI = this.byId("idSupplierNameSelect").getSelectedItem().getBindingContext().getPath();
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+			
+			this.getModel().update(sPath, {
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewSupplierURI}`		
+			}, {
+				"headers": {"Content-ID": this.createNewId()},
+				success: () => {
+					if(bIsCreateMode) {
+						this.getOwnerComponent().getRouter().navTo("ListReport");
+					}
+				}
+			})
 		},
 
 		onCreateProductPress: function() {
@@ -146,18 +187,18 @@ sap.ui.define([
 			aFormFields.forEach(oControl => this.validateField(oControl));
 			const aMessages = Messaging.getMessageModel().getData();
 
-			if(!aMessages.length) {	
-				
+			if(!aMessages.length) {		
 				oODataModel.submitChanges({
+					"headers": {"Content-ID": this.createNewId()},
 					success: () => {
-						this.getModel().resetChanges(undefined, true)
-						this.getOwnerComponent().getRouter().navTo("ListReport");
+						this.updateCategory();
+						oODataModel.resetChanges(undefined, true);	
 					},
 					error: (e) => {
 						MessageBox.error(e)
 					}
 				});
-								
+						
 				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
 					closeOnBrowserNavigation: false
 				});		
@@ -182,6 +223,24 @@ sap.ui.define([
 			});
 		},
 
+		onCategoryChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				this.updateCategory();
+			}
+			this.onLiveChange(oControl);
+		},
+
+		onSupplierChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				this.updateSupplier();
+			}
+			this.onLiveChange(oControl);
+		},
+
 		onSaveProductPress: function() {
 			const oODataModel = this.getModel();
 			const aFormFields = this.getFormFields();
@@ -190,7 +249,7 @@ sap.ui.define([
 			
 			if(!aMessages.length) {
 				oODataModel.submitChanges({
-					
+					"headers": {"Content-ID": 61},
 					success: () => {
 						this.getModel("EditModel").setProperty("/EditMode", false);
 						this.getModel("EditModel").setProperty("/DisplayMode", true);

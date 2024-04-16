@@ -34,7 +34,7 @@
 				<f:content>
 					<smartTable:SmartTable 
 						entitySet="Products" enableAutoColumnWidth="true"
-						enableAutoBinding="true" header="Products" 
+						enableAutoBinding="true" header="{i18n>ListReportTitle}" 
 						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
 						
 					>
@@ -55,8 +55,8 @@
 							</OverflowToolbar>
 						</smartTable:customToolbar>
 
-						<Table>
-							<items>
+						<Table >
+							<items >
 								<ColumnListItem
 									type="Navigation"
 									press="onNavToObjectPage"

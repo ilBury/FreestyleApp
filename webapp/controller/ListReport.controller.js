@@ -3,25 +3,33 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
-	"../model/formatter"
-], function (BaseController, JSONModel,  MessageBox, MessageToast) {
+	"../model/formatter",
+	"sap/ui/model/Sorter"
+], function (BaseController, JSONModel,  MessageBox, MessageToast, Sorter) {
 	"use strict";
 
 	return BaseController.extend("products.app.controller.ListReport", {
 
 		onInit: function() {
+			const oRouter = this.getOwnerComponent().getRouter();
 			const oViewModel = new JSONModel({
 				isButtonEnable: false,
 				searchField: "",
 				selectedInDialogSuppliers: []
 			})
 			const oTable = this.byId("idSmartTable").getTable();
-			oTable.setMode("MultiSelect");
-		
+			oTable.setMode("MultiSelect");	
 			
 			oTable.attachSelectionChange(this.onTableSelectionChange, this);
 		
 			this.getView().setModel(oViewModel, "view");
+			oRouter.attachRouteMatched(this.onRouteMatched, this);
+		},
+
+		onRouteMatched: function() {
+			const oTable = this.byId("idSmartTable").getTable();
+			const oItemsBinding = oTable.getBinding("items");
+			oItemsBinding?.refresh()
 		},
 
 		createNewContentId: function() {
