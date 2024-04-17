@@ -1,5 +1,5 @@
 sap.ui.define([
-	"products/app/controller/BaseController.controller",
+	"app/products/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel,  MessageBox, MessageToast) {
 	"use strict";
 
-	return BaseController.extend("products.app.controller.ListReport", {
+	return BaseController.extend("app.products.controller.ListReport", {
 
 		onInit: function() {
 			const oRouter = this.getOwnerComponent().getRouter();

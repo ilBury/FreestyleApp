@@ -4,7 +4,7 @@
 	xmlns:f="sap.f"
 	xmlns:smartTable="sap.ui.comp.smarttable"
 	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
-	controllerName="products.app.controller.ListReport">
+	controllerName="app.products.controller.ListReport">
 
 		<f:DynamicPage 
 			id="dynamicPageId" 

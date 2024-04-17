@@ -1,6 +1,6 @@
 {
 	"sap.app": {
-		"id": "products.app",
+		"id": "app.products",
 		"type": "application",
 		"i18n": "i18n/i18n.properties",
 		"title": "{{appTitle}}",
@@ -10,7 +10,7 @@
 		},
 		"dataSources": {
 			"default": {
-				"uri": "proxy/V2/(S(3g0csrzc4YH1lrwejcqcoqpz))/OData/OData.svc/",
+				"uri": "/V2/(S(3g0csrzc4YH1lrwejcqcoqpz))/OData/OData.svc/",
 				"type": "OData",
 				"settings": {
 					"annotations": [
@@ -40,13 +40,13 @@
 		]
 	},
 	"sap.ui5": {
-		"rootView": "products.app.view.App",
+		"rootView": "app.products.view.App",
 		"handleValidation": true,
 		"routing": {
 			"config": {
 				"routerClass": "sap.m.routing.Router",
 				"viewType": "XML",
-				"viewPath": "products.app.view",
+				"viewPath": "app.products.view",
 				"controlId": "RootApp",
 				"controlAggregation": "pages",
 				"bypassed": {
@@ -102,7 +102,7 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "products.app.i18n.i18n"
+					"bundleName": "app.products.i18n.i18n"
 				}
 			},
 			"": {

@@ -5,7 +5,7 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	return Controller.extend("products.app.controller.BaseController", {
+	return Controller.extend("app.products.controller.BaseController", {
 
 		getTextFromI18n: function(sKey) {
 			const i18nModel = this.getOwnerComponent().getModel("i18n");
