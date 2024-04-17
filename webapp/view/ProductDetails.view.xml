@@ -2,7 +2,8 @@
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
     xmlns:u="sap.uxap"
-    xmlns:form="sap.ui.layout.form"
+    xmlns:sf="sap.ui.comp.smartfield"
+    xmlns:smartForm="sap.ui.comp.smartform"
 	xmlns:core="sap.ui.core"
     core:require="{formatMessage: 'sap/base/strings/formatMessage'}"
 	controllerName="products.app.controller.ProductDetails"
@@ -77,9 +78,7 @@
                 number="{Price}"
                 unit="USD"
                 class="sapUiTinyMarginBottom"
-            />    
-         
-             
+            />       
         </u:headerContent>
         <u:sections>
             <u:ObjectPageSection 
@@ -89,159 +88,71 @@
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
-                        <form:SimpleForm 
-                            visible="{EditModel>/DisplayMode}"
-                            editable="false"
-                            layout="ResponsiveGridLayout"
-                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
-                            singleContainerFullSize="false">
-                            <form:content>
-                                <core:Title text="{i18n>ProductInformationText}" />
-                                <VBox >
-                                    <ObjectStatus title="{i18n>NameText}" text="{Name}" class="sapUiTinyMarginBottom"/>   
-                                    <ObjectStatus title="{i18n>DescriptionText}" text="{Description}" class="sapUiTinyMarginBottom"/>  
-                                    <ObjectStatus 
-                                        title="{i18n>CreatedAtText}" 
-                                        text="{
-                                            path: 'ReleaseDate',
-                                            type: 'sap.ui.model.type.Date'
-                                        }"
-                                        class="sapUiTinyMarginBottom"
-                                    />  
-                                    <ObjectStatus 
-                                        title="{i18n>DiscontinuedAtText}" 
-                                        text="{
-                                            path: 'DiscontinuedDate',
-                                            type: 'sap.ui.model.type.Date',
-                                            formatter: '.formatter.getCorrectDiscontinuedDate'  
+                        <smartForm:SmartForm id="idSmartProductForm"
+                            title="{i18n>GeneralInformationText}"
+                            validationMode="Async"
+                            editable="{view>/formsEditable}"
+                        >
+                            <smartForm:Group >
+                                <smartForm:GroupElement label="{i18n>NameText}">
+                                    <sf:SmartField id="idSmartNameField" change="onLiveChange" textLabel="{Name}" value="{Name}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>DescriptionText}" >
+                                    <sf:SmartField value="{Description}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CreatedAtText}" visible="{= !${view>/formsEditable}}">
+                                    <sf:SmartField value="{ReleaseDate}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>UpdatedAtText}" visible="{= !${view>/formsEditable}}">
+                                    <sf:SmartField value="{DiscontinuedDate}" />
+                                </smartForm:GroupElement>
+                            </smartForm:Group>
+                            <smartForm:Group >
+                                <smartForm:GroupElement label="{i18n>PriceText}">
+                                    <sf:SmartField 
+                                        id="idSmartPriceField"  
+                                        change="onLiveChange"
+                                        value="{Price}" 
+                                    />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>RatingText}">
+                                    <sf:SmartField 
+                                        id="idSmartRatingField"  
+                                        
+                                        value="{
+                                            path: 'Rating',
+                                            type: 'sap.ui.model.type.Integer',
+                                            constraints: {
+                                                minimum: 0,
+                                                maximum: 5
+                                            }
                                         }" 
-                                        class="sapUiTinyMarginBottom"
-                                    />  
-                                </VBox>
-                                
-                                <core:Title text="{i18n>ProductDetailsText}" />
-                                <VBox >
-                                    <HBox>
-                                       <Label
-                                            showColon="true"
-                                            text="{i18n>PriceText}"
-                                            class="sapUiTinyMarginEnd"
-                                        />
-                                        <ObjectNumber 
-                                            
-                                            number="{Price}"
-                                            unit="USD"
-                                            class="sapUiTinyMarginBottom"
-                                        />    
-                                    </HBox>
-                                    <HBox >
-                                        <Label 
-                                            text="{i18n>RatingText}" 
-                                            class="sapUiTinyMarginEnd"
-                                            showColon="true"
-                                        />
-                                        <RatingIndicator 
-                                            class="sapUiSmallMarginBottom" 
-                                            value="{Rating}" 
-                                            tooltip="Rating Tooltip"
-                                            displayOnly="true" 
-                                        />
-                                    </HBox>
+                                    />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CategoryText}">
+                                    <Select
+                                        visible="{= !!${view>/formsEditable}}"
+                                        id="idCategoriesSelect"
+                                        required="true"
+                                        forceSelection="false"
+                                        items="{/Categories}"
+                                        change="onCategoryChange"
+                                        selectedKey="{FormModel>/Category/ID}"
+                                    >
+                                        <core:Item key="{ID}" text="{Name}" />
+                                    </Select>
                                     
-                                                        
-                                </VBox>
-                                
-                            </form:content>
-                        </form:SimpleForm>
-                        <form:SimpleForm 
-                            visible="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
-                            editable="true"
-                            id="idSimpleForm"
-                            layout="ResponsiveGridLayout"
-                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>GeneralInformationText}}"                
-                            singleContainerFullSize="false"
-                            validateFieldGroup="onFormValidateFieldGroup"
-                            labelSpanXL="2"
-                            emptySpanXL="3">
-                            <form:content>
-                                <core:Title text="{i18n>ProductInformationText}" />
-                                
-                                <Label text="{i18n>NameText}" labelFor="idNameInput" />
-                                <Input
-                                    required="true"
-                                    liveChange="onLiveChange"
-                                    id="idNameInput"    
-                                    value="{
-                                        path: 'Name',
-                                        type: 'sap.ui.model.type.String',
-                                        constraints: {
-                                            minLength: 1
-                                        }
-                                    }" 
-                                    
-                                />   
-
-                                <Label text="{i18n>DescriptionText}" labelFor="idDescriptionInput" />
-                                <Input 
-                                    value="{
-                                        path: 'Description',
-                                        type: 'sap.ui.model.type.String'
-                                    }" 
-                                    id="idDescriptionInput" 
-                                />
-
-                                <Label text="{i18n>PriceText}" labelFor="idPriceInput" />
-                                <Input 
-                                    required="true"
-                                    liveChange="onLiveChange"
-                                    value="{
-                                        path: 'Price',
-                                        type: 'sap.ui.model.odata.type.Decimal',
-                                        constraints: {
-                                            minimum: '1',
-                                            maximum: '1000000',
-                                            scale: '2'
-                                        }
-                                    }" 
-                                    id="idPriceInput" 
-                                />
-
-                                <Label text="{i18n>RatingText}" labelFor="idRatingInput" />
-                                <Input 
-                                    required="true"
-                                    liveChange="onLiveChange"
-                                    value="{
-                                        path: 'Rating',
-                                        type: 'sap.ui.model.type.Integer',
-                                        constraints: {
-                                            minimum: 0,
-                                            maximum: 5
-                                        }
-                                    }" 
-                    
-                                    id="idRatingInput" 
-                                />
-                                <core:Title text="{i18n>ProductDetailsText}" />
-                                <Label text="{i18n>CategoryText}" labelFor="idCategoriesSelect" />
-                                <Select 
-                                    required="true"
-                                    change="onCategoryChange"
-                                    forceSelection="false"
-                                    items="{/Categories}" 
-                                    id="idCategoriesSelect"
-                                    selectedKey="{FormModel>/Category/ID}"
-                                >
-                                    <core:Item key="{ID}" text="{Name}" />
-                                </Select>
-                                
-                            </form:content>
-                        </form:SimpleForm>
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CategoryText}">
+                                    <sf:SmartField visible="{= !${view>/formsEditable}}" value="{Category/Name}"  />      
+                                </smartForm:GroupElement>
+                            </smartForm:Group>
+                        </smartForm:SmartForm>    
                     </u:ObjectPageSubSection>
                   </u:subSections>
             </u:ObjectPageSection>
 
             <u:ObjectPageSection 
-                showTitle="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                 title="{
                     parts: [
                         'i18n>SuppliersInfotext',
@@ -254,82 +165,56 @@
                 class="sapUiResponsiveContentPadding">
                 <u:subSections>
                     <u:ObjectPageSubSection>
-                        <form:SimpleForm 
-                            visible="{EditModel>/DisplayMode}"
-                            editable="false"
-                            layout="ResponsiveGridLayout"
-                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>SupplierText}}"                
-                            singleContainerFullSize="false">
-                            <form:content>
-                                <core:Title text="{i18n>SupplierInformationText}" />
-                                <VBox >
-                                    <ObjectStatus 
-                                        title="{i18n>NameText}" 
-                                        text="{Supplier/Name}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />   
-                                    <ObjectStatus 
-                                        title="{i18n>ConcurrencyText}" 
-                                        text="{Supplier/Concurrency}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />                       
-                                </VBox>
-                                <core:Title text="{i18n>SupplierAddressText}" />
-                                <VBox >
-                                    <ObjectStatus 
-                                        title="{i18n>StreetText}" 
-                                        text="{Supplier/Address/Street}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />   
-                                    <ObjectStatus 
-                                        title="{i18n>CityText}" 
-                                        text="{Supplier/Address/City}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />   
-                                    <ObjectStatus 
-                                        title="{i18n>StateText}" 
-                                        text="{Supplier/Address/State}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />   
-                                    <ObjectStatus 
-                                        title="{i18n>ZipCodeText}" 
-                                        text="{Supplier/Address/ZipCode}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />  
-                                    <ObjectStatus 
-                                        title="{i18n>CountryText}" 
-                                        text="{Supplier/Address/Country}" 
-                                        class="sapUiTinyMarginBottom"
-                                    />                   
-                                </VBox>
-                                
-                            </form:content>
-                        </form:SimpleForm>
-                        <form:SimpleForm 
-                            visible="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
-                            editable="true"
-                            id="idSupplierForm"
-                            layout="ResponsiveGridLayout"
-                            title="{= ${EditModel>/EditMode} ? ${i18n>EnterDataText} : ${i18n>SupplierText}}"                
-                            singleContainerFullSize="false"
-                            labelSpanXL="2"
-                            emptySpanXL="3">
-                            <form:content>
-                                <core:Title text="{i18n>SupplierInformationText}" />
-                               
-                                <Label text="{i18n>NameText}" labelFor="idSupplierNameSelect" />
-                                <Select 
-                                    required="true"
-                                    forceSelection="false"
-                                    change="onSuppliersSelectChange"
-                                    items="{/Suppliers}" 
-                                    id="idSupplierNameSelect"
-                                    selectedKey="{FormModel>/Supplier/ID}"
-                                >
-                                    <core:Item key="{ID}" text="{Name}" />
-                                </Select>       
-                            </form:content>
-                        </form:SimpleForm>
+                        <smartForm:SmartForm id="idSmartSupplierForm"
+                            validationMode="Async"
+                            editable="{view>/formsEditable}"
+                        >
+                            <smartForm:Group >    
+                                <smartForm:GroupElement label="{i18n>NameText}">
+                                    <Select 
+                                        required="true"
+                                        forceSelection="false"
+                                        visible="{= !!${view>/formsEditable}}"
+                                        items="{/Suppliers}" 
+                                        change="onSupplierChange"
+                                        id="idSupplierNameSelect"
+                                        selectedKey="{FormModel>/Supplier/ID}"
+                                    >
+                                        <core:Item key="{ID}" text="{Name}" />
+                                    </Select>   
+                                    
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement>
+                                    <sf:SmartField 
+                                        id="idSmartSupplierNameField" 
+                                        textLabel="{i18n>NameText}" 
+                                        visible="{= !${view>/formsEditable}}"
+                                        value="{Supplier/Name}" 
+                                    />
+                                </smartForm:GroupElement>
+
+                                <smartForm:GroupElement label="{i18n>ConcurrencyText}" visible="{= !${view>/formsEditable}}">
+                                    <sf:SmartField value="{Supplier/Concurrency}" />
+                                </smartForm:GroupElement>
+                            </smartForm:Group>
+                            <smartForm:Group visible="{= !${view>/formsEditable}}">
+                                <smartForm:GroupElement label="{i18n>StreetText}">
+                                    <sf:SmartField value="{Supplier/Address/Street}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CityText}">
+                                    <sf:SmartField value="{Supplier/Address/City}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>StateText}">
+                                    <sf:SmartField value="{Supplier/Address/State}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>ZipCodeText}">
+                                    <sf:SmartField value="{Supplier/Address/ZipCode}" />
+                                </smartForm:GroupElement>
+                                <smartForm:GroupElement label="{i18n>CountryText}">
+                                    <sf:SmartField value="{Supplier/Address/Country}" />
+                                </smartForm:GroupElement>
+                            </smartForm:Group>
+                        </smartForm:SmartForm>            
                     </u:ObjectPageSubSection>
                   </u:subSections>
             </u:ObjectPageSection>

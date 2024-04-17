@@ -13,22 +13,17 @@ sap.ui.define([
 	return BaseController.extend("products.app.controller.ProductDetails", {
 		formatter: formatter,
 
-        onInit: function() {
-			
+        onInit: function() {	
             const oComponent = this.getOwnerComponent();
             const oRouter = oComponent.getRouter();
-			const oSelectedSupModel = new JSONModel({
-				Selected: []
-			})
 			const oViewModel = new JSONModel({
-				isBusyIndicator: true
+				isBusyIndicator: true,
+				formsEditable: false
 			})
 			
 			this.getView().setModel(oViewModel, "view")
-			this.getView().setModel(oSelectedSupModel, "SelectedSupModel");
-
+			Messaging.registerObject(this.getView(), true);
             oRouter.getRoute("ProductDetails").attachPatternMatched(this.onPatternMatched, this);
-
         },
 
         onPatternMatched: function(oEvent) {
@@ -41,7 +36,7 @@ sap.ui.define([
 				DisplayMode: sProductMode === "view"
 			});
 			const oODataModel = this.getModel();
-			const nNewProductId = this.createNewProductId();
+			const nNewProductId = this.createNewId();
 			this.getView().setModel(oEditModel, "EditModel");
 			const oFormModel = new JSONModel({
 				ID: nNewProductId,
@@ -82,6 +77,7 @@ sap.ui.define([
 					const sKey = oODataModel.createKey("/Products", {ID: sProductId});	
 					this.bindObjectView(sKey);		
 				}
+				this.getModel("view").setProperty("/formsEditable", !(sProductMode === "view"))
 			})		
         },
 
@@ -93,11 +89,9 @@ sap.ui.define([
 				},
 				events: {
 					change: () => {
-						
+						const sCategoryId = this.getView().getBindingContext().getObject("Category")?.ID
 						const sSupplierId = this.getView().getBindingContext().getObject("Supplier")?.ID
 						this.getModel("FormModel").setProperty("/Supplier/ID", sSupplierId);
-						const sCategoryId = this.getView().getBindingContext().getObject("Category")?.ID
-						
 						this.getModel("FormModel").setProperty("/Category/ID", sCategoryId);
 						this.getView().getModel("view").setProperty("/isBusyIndicator", false);
 					}
@@ -105,15 +99,15 @@ sap.ui.define([
 			})	
 		},
 
-		createNewProductId: function() {
+		createNewId: function() {
 			return Math.floor(Math.random() * 1000) + 1
 		},
 
 		getFormFields: function() {
 			return [
-				this.byId("idNameInput"),
-				this.byId("idPriceInput"),
-				this.byId("idRatingInput"),
+				this.byId("idSmartNameField"),
+				this.byId("idSmartPriceField"),
+				this.byId("idSmartRatingField"),
 				this.byId("idCategoriesSelect"),
 				this.byId("idSupplierNameSelect")
 			]
@@ -124,6 +118,10 @@ sap.ui.define([
 			return sInputValue === sBinding ? oControl.getBindingContext() + "/" + oControl.getBindingPath(sBinding) : oControl.getBindingPath(sBinding);
 		},
 
+		onLiveChange: function(oEvent) {
+			this.validateField(oEvent.getSource())
+		},
+
 		validateField: function(oControl) {
 			const aMessages = Messaging.getMessageModel().getData();
 			const sSelectControl = "sap.m.Select";
@@ -131,8 +129,8 @@ sap.ui.define([
 			const sValue = sCurrentControlName === sSelectControl ? oControl.getSelectedItem()?.getText() : oControl.getValue();
 			const sCurrentBindingPath = sCurrentControlName === sSelectControl ? this.getCurrentMessagePath(oControl, "selectedKey") : this.getCurrentMessagePath(oControl, "value");
 			
-			aMessages.forEach(el => {
-				if(el.target === sCurrentBindingPath) {
+			aMessages.forEach(el => {	
+				if(el.getTarget() === sCurrentBindingPath) {
 					Messaging.removeMessages(el)
 				}	
 			})
@@ -140,7 +138,7 @@ sap.ui.define([
 			if(!sValue) {
 				Messaging.addMessages(
 					new Message({
-						message: "Should be required",
+						message: this.getTextFromI18n("RequiredMessage"),
 						type: library.MessageType.Error,
 						target: sCurrentBindingPath,
 						processor: sCurrentControlName === sSelectControl ? this.getModel("FormModel") : this.getModel()
@@ -149,31 +147,44 @@ sap.ui.define([
 			}
 		},
 
-		onLiveChange: function(oEvent) {	
-			this.validateField(oEvent.getSource())
-		},
-
 		updateCategory: function() {
-			const newCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();		
-			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
-			this.getModel().update(path, {
-				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`			
-			},
-			{
-				"headers": {"Content-ID": 77}
+			const sPath = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Category`
+			const sNewCategoryURI = this.byId("idCategoriesSelect").getSelectedItem().getBindingContext().getPath();
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			this.getModel().update(sPath, {
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewCategoryURI}`		
+			}, {
+				"headers": {"Content-ID": this.createNewId()},
+				success: () => {
+					if(bIsCreateMode) {
+						this.updateSupplier();
+					}
+				},
+				error: (e) => {
+					MessageBox.error(e)
+				}
 			})
 		},
 
 		updateSupplier: function() {
-			const newSupplierURI = this.byId("idSupplierNameSelect").getSelectedItem().getBindingContext().getPath();		
-			const path = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Supplier`
-			this.getModel().update(path, {
-				uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`			
-			},
-			{
-				"headers": {"Content-ID": 78}
-			})
+			const sPath = `/Products(${this.getView().getBindingContext().getObject("ID")})/$links/Supplier`
+			const sNewSupplierURI = this.byId("idSupplierNameSelect").getSelectedItem().getBindingContext().getPath();
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
 			
+			this.getModel().update(sPath, {
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewSupplierURI}`		
+			}, {
+				"headers": {"Content-ID": this.createNewId()},
+				success: () => {
+					if(bIsCreateMode) {
+						this.getOwnerComponent().getRouter().navTo("ListReport");
+					}
+				},
+				error: (e) => {
+					MessageBox.error(e)
+				}
+			})
 		},
 
 		onCreateProductPress: function() {
@@ -181,59 +192,25 @@ sap.ui.define([
 			const aFormFields = this.getFormFields();
 			aFormFields.forEach(oControl => this.validateField(oControl));
 			const aMessages = Messaging.getMessageModel().getData();
-			
-			if(!aMessages.length) {	
-				
+
+			if(!aMessages.length) {		
 				oODataModel.submitChanges({
-					"headers": {"Content-ID": this.createNewProductId()},
+					"headers": {"Content-ID": this.createNewId()},
 					success: () => {
 						this.updateCategory();
-						this.updateSupplier();
-						this.getModel().resetChanges(undefined, true)
-						this.getOwnerComponent().getRouter().navTo("ListReport");
+						oODataModel.resetChanges(undefined, true);	
 					},
 					error: (e) => {
 						MessageBox.error(e)
 					}
-				});				
-				
+				});
+						
 				MessageToast.show(this.getTextFromI18n("CreatedProductText"), {
 					closeOnBrowserNavigation: false
 				});		
 			} else {	
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}	
-		},
-
-		onSuppliersSelectChange: function(oControl) {	
-			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
-			if(!bIsCreateMode) {
-				const path = `${this.getView().getBindingContext().getPath()}/$links/Supplier`
-				const newSupplierURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
-				
-				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newSupplierURI}`		
-				}, {
-					"headers": {"Content-ID": 99}
-				})
-			}
-			this.onLiveChange(oControl);
-		},
-
-		onCategoryChange: function(oControl) {
-			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
-
-			if(!bIsCreateMode) {
-				const path = `${this.getView().getBindingContext().getPath()}/$links/Category`
-				const newCategoryURI = oControl.getParameter("selectedItem").getBindingContext().getPath()
-				
-				this.getModel().update(path, {
-					uri: `https://services.odata.org/(S(3g0wqswc4au3yrwcut9coqpw))/V2/OData/OData.svc${newCategoryURI}`		
-				}, {
-					"headers": {"Content-ID": 71}
-				})
-			}
-			this.onLiveChange(oControl);
 		},
 
 		getControlPath: function(oControl) {
@@ -252,29 +229,47 @@ sap.ui.define([
 			});
 		},
 
+		onCategoryChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				this.updateCategory();
+			}
+			this.onLiveChange(oControl);
+		},
+
+		onSupplierChange: function(oControl) {
+			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
+
+			if(!bIsCreateMode) {
+				this.updateSupplier();
+			}
+			this.onLiveChange(oControl);
+		},
+
 		onSaveProductPress: function() {
 			const oODataModel = this.getModel();
 			const aFormFields = this.getFormFields();
-			
 			aFormFields.forEach(oControl => this.validateField(oControl));
 			const aMessages = Messaging.getMessageModel().getData();
 			
 			if(!aMessages.length) {
-				
 				oODataModel.submitChanges({
+					"headers": {"Content-ID": 61},
 					success: () => {
 						this.getModel("EditModel").setProperty("/EditMode", false);
 						this.getModel("EditModel").setProperty("/DisplayMode", true);
 						MessageToast.show(this.getTextFromI18n("ProductWasUpdatedMessage"), {
 							closeOnBrowserNavigation: false
 						});
-					
+						
 						this.changeRouteMode("view");
 					},
 					error: (e) => {
 						MessageBox.error(e)
 					}
-				});		
+				});
+						
 			} else {
 				this.displayNotValidMessage(aFormFields, aMessages);
 			}
