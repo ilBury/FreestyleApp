@@ -1,5 +1,5 @@
 sap.ui.define([
-	"products/app/controller/BaseController.controller",
+	"app/products/controller/BaseController.controller",
 	"sap/ui/model/json/JSONModel",
 	"sap/m/MessageToast",
 	"sap/m/MessageBox",
@@ -10,7 +10,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel,	MessageToast, MessageBox, Messaging, Message, library,  formatter) {
 	"use strict";
 
-	return BaseController.extend("products.app.controller.ProductDetails", {
+	return BaseController.extend("app.products.controller.ProductDetails", {
 		formatter: formatter,
 
         onInit: function() {	

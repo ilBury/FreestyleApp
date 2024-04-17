@@ -12,13 +12,13 @@
 			data-sap-ui-libs="sap.m"
 			data-sap-ui-theme="sap_horizon"
 			data-sap-ui-compatVersion="edge"
-			data-sap-ui-resourceroots='{"products.app": "./"}'>
+			data-sap-ui-resourceroots='{"app.products": "./"}'>
 	</script>
 
 	<script>
 		sap.ui.getCore().attachInit(function() {
 			new sap.ui.core.ComponentContainer({
-				name : "products.app"
+				name : "app.products"
 			}).placeAt("content");
 		});
 	</script>
