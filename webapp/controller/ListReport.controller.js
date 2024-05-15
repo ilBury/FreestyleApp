@@ -31,7 +31,7 @@ sap.ui.define([
 			oItemsBinding?.refresh()
 		},
 
-		foo: function() {
+		onCustomBtnPress: function() {
 			MessageToast.show(this.getTextFromI18n("InfoText"))
 		},
 
