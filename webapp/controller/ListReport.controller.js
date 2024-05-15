@@ -31,6 +31,10 @@ sap.ui.define([
 			oItemsBinding?.refresh()
 		},
 
+		foo: function() {
+			MessageToast.show(this.getTextFromI18n("InfoText"))
+		},
+
 		onBeforeRebindTable: function(oEvent) {
 			const oBindingParams = oEvent.getParameter("bindingParams");
 			oBindingParams.sorter = [

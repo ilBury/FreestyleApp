@@ -32,42 +32,43 @@
 				</f:DynamicPageHeader>
 			</f:header>
 				<f:content>
-					<smartTable:SmartTable 
-						entitySet="Products" enableAutoColumnWidth="true"
-						enableAutoBinding="true" header="{i18n>ListReportTitle}" 
-						id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
-						beforeRebindTable="onBeforeRebindTable"
-					>
-						<smartTable:customToolbar>
-							<OverflowToolbar>
-								<ToolbarSpacer />
-								<Button
-									type="Emphasized"
-									text="{i18n>CreateText}"
-									press="onCreateButtonPress"
-								/>
-								<Button
-									enabled="{view>/isButtonEnable}"
-									text="{i18n>DeleteText}"
-									press="onDeleteButtonPress"
-								/>
-									
-							</OverflowToolbar>
-						</smartTable:customToolbar>
+					<VBox>
+						<smartTable:SmartTable 
+							entitySet="Products" enableAutoColumnWidth="true"
+							enableAutoBinding="true" header="{i18n>ListReportTitle}" 
+							id="idSmartTable" smartFilterId="idSmartFilterBar" tableType="ResponsiveTable"
+							beforeRebindTable="onBeforeRebindTable"
+						>
+							<smartTable:customToolbar>
+								<OverflowToolbar>
+									<ToolbarSpacer />
+									<Button
+										type="Emphasized"
+										text="{i18n>CreateText}"
+										press="onCreateButtonPress"
+									/>
+									<Button
+										enabled="{view>/isButtonEnable}"
+										text="{i18n>DeleteText}"
+										press="onDeleteButtonPress"
+									/>
+										
+								</OverflowToolbar>
+							</smartTable:customToolbar>
 
-						<Table >
-							<items >
-								<ColumnListItem
-									type="Navigation"
-									press="onNavToObjectPage"
-								>
-							
-								</ColumnListItem>
-							</items>
-						</Table>
+							<Table >
+								<items >
+									<ColumnListItem
+										type="Navigation"
+										press="onNavToObjectPage"
+									>
+								
+									</ColumnListItem>
+								</items>
+							</Table>
 
-					</smartTable:SmartTable>
-				
+						</smartTable:SmartTable>
+					</VBox>
 			</f:content>
 		</f:DynamicPage>
 
