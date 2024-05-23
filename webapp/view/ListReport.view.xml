@@ -4,7 +4,7 @@
 	xmlns:f="sap.f"
 	xmlns:smartTable="sap.ui.comp.smarttable"
 	xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
-	xmlns:demo="lib.test"
+	xmlns:demo="app.mylibrary"
 	controllerName="app.products.controller.ListReport">
 
 		<f:DynamicPage 
@@ -53,7 +53,7 @@
 										text="{i18n>DeleteText}"
 										press="onDeleteButtonPress"
 									/>
-									<demo:Example text="{i18n>CustomBtnFromLibraryMessage}" press="onCustomBtnPress" />
+									<demo:Example text="click button from library"/>
 								</OverflowToolbar>
 							</smartTable:customToolbar>
 
