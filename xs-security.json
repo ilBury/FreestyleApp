@@ -1,7 +1,17 @@
 {
   "xsappname": "appproducts",
-  "tenant-mode": "dedicated",
+  "tenant-mode": "shared",
   "description": "Security profile of called application",
-  "scopes": [],
-  "role-templates": []
+  "scopes": [{
+		"name": "$XSAPPNAME.Display",
+		"description": "display"
+	}],
+	"role-templates": [{
+		"name": "FEViewer",
+		"description": "View all products",
+		"default-role-name": "Viewer: Authorized to view all products",
+		"scope-references": [
+			"$XSAPPNAME.Display"
+		]
+	}]
 }

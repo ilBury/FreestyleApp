@@ -43,6 +43,10 @@
 								<OverflowToolbar>
 									<ToolbarSpacer />
 									<Button
+										text="{i18n>NavToFeAppText}"
+										press="navToFeAppPress"
+									/>
+									<Button
 										type="Emphasized"
 										text="{i18n>CreateText}"
 										press="onCreateButtonPress"
@@ -52,7 +56,7 @@
 										text="{i18n>DeleteText}"
 										press="onDeleteButtonPress"
 									/>
-										
+									
 								</OverflowToolbar>
 							</smartTable:customToolbar>
 
@@ -68,6 +72,7 @@
 							</Table>
 
 						</smartTable:SmartTable>
+						
 					</VBox>
 			</f:content>
 		</f:DynamicPage>
