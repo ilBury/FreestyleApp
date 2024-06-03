@@ -102,9 +102,6 @@
         }
       }
     },
-    "resourceRoots": {
-      "app.mylibrary": "app/mylibrary"
-    },
     "dependencies": {
       "minUI5Version": "1.120.0",
       "libs": {
@@ -136,5 +133,8 @@
   "sap.cloud": {
     "public": true,
     "service": "appproducts"
+  },
+  "sap.platform.cf": {
+    "OAuth scopes": ["$XSAPPNAME.Display"]
   }
 }

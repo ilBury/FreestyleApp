@@ -103,5 +103,19 @@ sap.ui.define([
 				}
 			});
 		},
+
+		navToFeAppPress: function() {
+			sap.ushell?.Container.getServiceAsync("CrossApplicationNavigation").then((oService) => {
+                const sHref = (oService &&
+                    oService.hrefForExternal({
+                        target: {
+                            semanticObject: "feproduct",
+                            action: "display"
+                        }   
+                    })
+                ) || ""
+                oService.toExternal({target: {shellHash: sHref}})
+            })
+		}
 	});
 });
