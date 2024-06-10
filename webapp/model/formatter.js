@@ -5,7 +5,7 @@ sap.ui.define([
 	return  {
 	
 		getCorrectDiscontinuedDate: function(oDate) {
-			return oDate ? oDate : this.getTextFromI18n("InProductionText");
+			return oDate ? oDate : this.getTextFromI18n.getText("InProductionText");
 		},
     };
 });
