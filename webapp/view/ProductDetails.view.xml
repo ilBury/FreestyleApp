@@ -11,6 +11,7 @@
     busyIndicatorDelay="0">
 
     <u:ObjectPageLayout 
+        id="idProductDetailsThePageView"
         showFooter="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
         class="sapUiNoContentPadding"
         >
@@ -237,7 +238,7 @@
                     press="onCreateProductPress" 
                     type="Emphasized"
                 />
-                <Button text="{i18n>CancelText}" press="onCancelButtonPress"/>
+                <Button id="idCancelButton" text="{i18n>CancelText}" press="onCancelButtonPress"/>
                 
             </OverflowToolbar>
         </u:footer>

@@ -10,7 +10,7 @@
     },
     "dataSources": {
       "default": {
-        "uri": "/V2/(S(3g0csrzc4YH1lrwejcqcoqpz))/OData/OData.svc/",
+        "uri": "/V2/(S(3g0csrzc4YH1llwej5qcoqpz))/OData/OData.svc/",
         "type": "OData",
         "settings": {
           "annotations": [

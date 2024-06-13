@@ -47,11 +47,13 @@
 										press="navToFeAppPress"
 									/>
 									<Button
+										id="idProductCreateButton"
 										type="Emphasized"
 										text="{i18n>CreateText}"
 										press="onCreateButtonPress"
 									/>
 									<Button
+										id="idProductsDeleteButton"
 										enabled="{view>/isButtonEnable}"
 										text="{i18n>DeleteText}"
 										press="onDeleteButtonPress"
@@ -60,7 +62,7 @@
 								</OverflowToolbar>
 							</smartTable:customToolbar>
 
-							<Table >
+							<Table id="idListReportTable">
 								<items >
 									<ColumnListItem
 										type="Navigation"
