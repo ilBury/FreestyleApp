@@ -16,6 +16,7 @@ sap.ui.define([
 						id: "RootApp",
 						viewName: sViewName,
 						success: function () {
+							
 							Opa5.assert.ok(true, `The ${sViewName} view is displayed`);
 						},
 						errorMessage: `Did not find the ${sViewName} view`

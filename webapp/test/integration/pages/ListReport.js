@@ -75,7 +75,7 @@ sap.ui.define(
 						errorMessage: "Can't press create button",
 					});
 				},
-				iClickOnConfirmDeleteButton() {
+				iPressOnConfirmDeleteButton() {
 					return this.waitFor({
 						controlType: "sap.m.Button",
 						viewName: sViewName,
@@ -91,6 +91,20 @@ sap.ui.define(
 							);
 						},
 						errorMessage: "Can't press delete confirm button",
+					});
+				},
+				iPressOnGetDataByRatingButton() {
+					return this.waitFor({
+						id: "idGetDataByRatingButton",
+						viewName: sViewName,
+						actions: new Press(),
+						success() {
+							Opa5.assert.ok(
+								true,
+								"The function import button is pressed"
+							);
+						},
+						errorMessage: "Can't press create button",
 					});
 				}
 			},
@@ -149,7 +163,22 @@ sap.ui.define(
 							"The confirmation dialog is not visible",
 					});
 				},
-			
+				iShouldSeeDataByRating() {
+					return this.waitFor({
+						viewName: sViewName,
+						controlType: "sap.m.Dialog",
+						autoWait: true,
+						searchOpenDialogs: true,
+						success() {
+							Opa5.assert.ok(
+								true,
+								"The message toast dialog is visible"
+							);
+						},
+						errorMessage:
+							"The message toast dialog is not visible",
+					});
+				}
 			}
 		}
 	  });

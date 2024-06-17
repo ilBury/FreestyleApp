@@ -3,8 +3,8 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	'sap/m/MessageBox',
 	"sap/m/MessageToast",
-	"../model/formatter"
-], function (BaseController, JSONModel,  MessageBox, MessageToast) {
+	"sap/m/Text"
+], function (BaseController, JSONModel,  MessageBox, MessageToast, Text) {
 	"use strict";
 
 	return BaseController.extend("app.products.controller.ListReport", {
@@ -115,6 +115,21 @@ sap.ui.define([
                     })
                 ) || ""
                 oService.toExternal({target: {shellHash: sHref}})
+            })
+		},
+
+		getDataByRating: function() {
+			this.getView().getModel().callFunction("/GetProductsByRating", {
+                method: "GET",
+                urlParameters: {
+                    rating: 4
+                },
+                success: (oData) => {
+                    MessageBox.information(oData.results.map(el => el.Name).join(', '))
+                },
+                error: (oError) => {
+                    MessageBox.error(oError.message)
+                }
             })
 		}
 	});

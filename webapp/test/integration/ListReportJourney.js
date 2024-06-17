@@ -12,7 +12,7 @@ sap.ui.define([
       "Should see the table with 9 products and disabled delete button",
       function (Given, When, Then) {
         Given.iStartMyApp();
-    
+      
         Then.onTheListReport.theTableShouldHaveProducts(9);
         Then.onTheListReport.theDeleteButtonShouldHaveEnablement(false);
     });
@@ -21,29 +21,37 @@ sap.ui.define([
       "Should be possible to select a product, after which the delete button will be enabled.", 
       function (Given, When, Then) {
         When.onTheListReport.iSelectListItem();
-        Then.onTheListReport.theDeleteButtonShouldHaveEnablement(true);
-        
+        Then.onTheListReport.theDeleteButtonShouldHaveEnablement(true);   
     });
 
     opaTest(
       "Should press the 'Delete' button after which 'confirmation' dialog is open", 
       function (Given, When, Then) {
-        
         When.onTheListReport.iPressOnDeleteButton();
-        Then.onTheListReport.iShouldSeeConfirmationDialog();
-        Then.iTeardownMyApp();
+        Then.onTheListReport.iShouldSeeConfirmationDialog();  
     });
 
     opaTest(
-      "Should choose the product after which product details page is open  in 'view' mode",
-      function (Given, When, Then) {
-        Given.iStartMyApp();
-        When.onTheListReport.iPressOnProduct();
-        Then.onTheProductDetails.iShouldSeeThePageView();
+			"Should confirm product deletion and see table with 8 products",
+			function (Given, When, Then) {
+				When.onTheListReport.iPressOnConfirmDeleteButton();
+				Then.onTheListReport.theTableShouldHaveProducts(8);
 
-        Then.iTeardownMyApp();
-      }
-    );
+				Then.iTeardownMyApp();
+			}
+		);
+
+    opaTest(
+			"Should get data by rating using function import",
+			function (Given, When, Then) {
+        Given.iStartMyApp();
+
+				When.onTheListReport.iPressOnGetDataByRatingButton();
+				Then.onTheListReport.iShouldSeeDataByRating();
+
+				Then.iTeardownMyApp();
+			}
+		);
 
     opaTest(
 			"Should press the 'Create' button after which product details page is open in 'create' mode",

@@ -153,7 +153,7 @@ sap.ui.define([
 			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
 
 			this.getModel().update(sPath, {
-				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewCategoryURI}`		
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1llwej5qgoqpz))/V2/OData/OData.svc/${sNewCategoryURI}`		
 			}, {
 				"headers": {"Content-ID": this.createNewId()},
 				success: () => {
@@ -173,7 +173,7 @@ sap.ui.define([
 			const bIsCreateMode = this.getModel("EditModel").getProperty("/CreateMode");
 			
 			this.getModel().update(sPath, {
-				uri: `https://services.odata.org/(S(3g0csrzc4YH1lrwejcqcoqpz))/V2/OData/OData.svc/${sNewSupplierURI}`		
+				uri: `https://services.odata.org/(S(3g0csrzc4YH1llwej5qgoqpz))/V2/OData/OData.svc/${sNewSupplierURI}`		
 			}, {
 				"headers": {"Content-ID": this.createNewId()},
 				success: () => {

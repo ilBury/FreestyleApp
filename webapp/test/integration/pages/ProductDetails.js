@@ -42,6 +42,48 @@ sap.ui.define([
 							errorMessage: "Can't press delete confirm button",
 						});
 					},
+					iPressOnCreateButton() {
+						return this.waitFor({
+							id: "idCreateButton",
+							viewName: sViewName,
+							actions: new Press(),
+							success() {
+								Opa5.assert.ok(
+									true,
+									"The Delete button is pressed"
+								);
+							},
+							errorMessage: "Can't press delete button",
+						});
+					},
+					iPressOnUpdateButton() {
+						return this.waitFor({
+							id: "idUpdateButton",
+							viewName: sViewName,
+							actions: new Press(),
+							success() {
+								Opa5.assert.ok(
+									true,
+									"The Delete button is pressed"
+								);
+							},
+							errorMessage: "Can't press delete button",
+						});
+					},
+					iPressOnSaveButton() {
+						return this.waitFor({
+							id: "idSaveButton",
+							viewName: sViewName,
+							actions: new Press(),
+							success() {
+								Opa5.assert.ok(
+									true,
+									"The Delete button is pressed"
+								);
+							},
+							errorMessage: "Can't press delete button",
+						});
+					}
 				},
 
 				assertions: {
@@ -85,6 +127,19 @@ sap.ui.define([
 							},
 							errorMessage:
 								"The confirmation dialog is not visible",
+						});
+					},
+					iShouldSeeEditMode() {
+						return this.waitFor({
+							id: "idProductDetailsThePageView",
+							viewName: sViewName,
+							success() {
+								Opa5.assert.ok(
+									true,
+									"The create mode is visible"
+								);
+							},
+							errorMessage: "The create mode is not visible",
 						});
 					}
 				},

@@ -43,6 +43,11 @@
 								<OverflowToolbar>
 									<ToolbarSpacer />
 									<Button
+										id="idGetDataByRatingButton"
+										text="{i18n>GetDataByRatingText}"
+										press="getDataByRating"
+									/>
+									<Button
 										text="{i18n>NavToFeAppText}"
 										press="navToFeAppPress"
 									/>

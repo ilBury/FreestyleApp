@@ -21,6 +21,7 @@
             >
                 <u:actions>
                     <Button
+                        id="idUpdateButton"
                         visible="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                         text="{i18n>UpdateText}"
                         type="Emphasized"
@@ -226,6 +227,7 @@
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button 
+                    id="idSaveButton"
                     text="Save" 
                     visible="{= !!${EditModel>/EditMode}}" 
                     press="onSaveProductPress" 
@@ -233,6 +235,7 @@
                 />
             
                 <Button 
+                    id="idCreateButton"
                     text="Create" 
                     visible="{= !!${EditModel>/CreateMode}}"
                     press="onCreateProductPress" 
