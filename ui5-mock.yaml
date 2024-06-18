@@ -15,10 +15,7 @@ server:
             - /resources
             - /test-resources
           url: https://ui5.sap.com
-        backend:
-          - path: /V2
-            url: https://services.odata.org
-            destination: Odata
+
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -30,8 +27,8 @@ server:
       configuration:
         mountPath: /
         services:
-          - urlPath: /V2/(S(3g0csrzc4YH1lrwejcqcoqpz))/OData/OData.svc
+          - urlPath: /V2/OData/OData.svc
             metadataPath: ./webapp/localService/metadata.xml
-            mockdataPath: ./webapp/localService/data
+            mockdataPath: ./webapp/localService/mockdata
             generateMockData: true
         annotations: []

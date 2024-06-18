@@ -11,6 +11,7 @@
     busyIndicatorDelay="0">
 
     <u:ObjectPageLayout 
+        id="idProductDetailsThePageView"
         showFooter="{= ${EditModel>/EditMode} || ${EditModel>/CreateMode}}"
         class="sapUiNoContentPadding"
         >
@@ -20,6 +21,7 @@
             >
                 <u:actions>
                     <Button
+                        id="idUpdateButton"
                         visible="{= !(${EditModel>/EditMode} || ${EditModel>/CreateMode})}"
                         text="{i18n>UpdateText}"
                         type="Emphasized"
@@ -225,6 +227,7 @@
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button 
+                    id="idSaveButton"
                     text="Save" 
                     visible="{= !!${EditModel>/EditMode}}" 
                     press="onSaveProductPress" 
@@ -232,12 +235,13 @@
                 />
             
                 <Button 
+                    id="idCreateButton"
                     text="Create" 
                     visible="{= !!${EditModel>/CreateMode}}"
                     press="onCreateProductPress" 
                     type="Emphasized"
                 />
-                <Button text="{i18n>CancelText}" press="onCancelButtonPress"/>
+                <Button id="idCancelButton" text="{i18n>CancelText}" press="onCancelButtonPress"/>
                 
             </OverflowToolbar>
         </u:footer>
