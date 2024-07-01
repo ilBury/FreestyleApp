@@ -298,13 +298,5 @@ exports.config = {
     */
     // afterAssertion: function(params) {
     // }
-    before: function () {
-        // Добавление метода asControl к browser для работы с SAP UI5
-        const { browser } = require('webdriverio');
-
-        browser.addCommand('asControl', async function (selector) {
-            const element = await this.$('#' + selector.id); // Предположим, что selector.id это ID элемента
-            return element; // Возвращаем элемент для дальнейшего взаимодействия
-        });
-    },
+    
 }
